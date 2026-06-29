@@ -6,7 +6,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public class ZombieMinion extends AbstractMinion{
-    protected ZombieMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
+    public ZombieMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
         super(type, level);
     }
 }

@@ -1,6 +1,7 @@
 package net.necrocraft.core;
 
 import com.mojang.logging.LogUtils;
+import net.necrocraft.world.entity.ModEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -13,6 +14,8 @@ public class NecroCraft {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public NecroCraft(IEventBus modEventBus, ModContainer modContainer) {
+        ModEntity.ENTITY_TYPES.register(modEventBus);
+
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 }
