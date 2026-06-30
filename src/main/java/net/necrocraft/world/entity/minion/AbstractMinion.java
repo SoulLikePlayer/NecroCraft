@@ -21,8 +21,10 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.necrocraft.world.entity.ai.goal.FollowSummonerGoal;
 import net.necrocraft.world.entity.ai.goal.SummonerHurtByTargetGoal;
+import net.necrocraft.world.entity.ai.goal.SummonerHurtTargetGoal;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**
@@ -149,5 +151,13 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
 
     protected boolean canFlyToOwner() {
         return false;
+    }
+
+    public void setOwner(LivingEntity owner) {
+        if (owner != null) {
+            this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.of(EntityReference.of(owner)));
+        } else {
+            this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.empty());
+        }
     }
 }

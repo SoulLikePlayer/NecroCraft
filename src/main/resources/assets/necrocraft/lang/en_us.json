@@ -1,3 +1,5 @@
 {
-
+  "command.necrocraft.summon_minion.not_player": "This command must be executed by a player.",
+  "command.necrocraft.summon_minion.unknown_type": "Unknown minion type: %s",
+  "command.necrocraft.summon_minion.success": "Minion '%s' successfully summoned!"
 }
