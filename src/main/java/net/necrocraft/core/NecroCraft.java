@@ -3,6 +3,7 @@ package net.necrocraft.core;
 import com.mojang.logging.LogUtils;
 import net.necrocraft.command.NecroCraftCommands;
 import net.necrocraft.world.entity.ModEntity;
+import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.ModItemGroups;
 import net.necrocraft.world.item.ModItems;
 import net.neoforged.bus.api.Event;
@@ -23,6 +24,7 @@ public class NecroCraft {
         ModEntity.ENTITY_TYPES.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModItemGroups.CREATIVE_MODE_TABS.register(modEventBus);
+        ModDataComponents.DATA_COMPONENTS.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
