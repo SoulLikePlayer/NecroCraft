@@ -1,19 +1,16 @@
 package net.necrocraft.client.renderer.entity;
 
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.monster.zombie.ZombieModel;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
-import net.minecraft.client.renderer.entity.state.ZombieRenderState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.item.SwingAnimationType;
 import net.minecraft.world.item.component.SwingAnimation;
-import net.necrocraft.client.model.ZombieMinionModel;
+import net.necrocraft.client.model.minion.zombie.ZombieMinionModel;
 import net.necrocraft.client.renderer.entity.state.ZombieMinionRenderState;
 import net.necrocraft.world.entity.minion.ZombieMinion;
 

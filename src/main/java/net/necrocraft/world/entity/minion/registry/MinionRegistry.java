@@ -37,5 +37,6 @@ public class MinionRegistry {
 
     static {
         register(EntityTypes.ZOMBIE, ModEntity.ZOMBIE_MINION);
+        register(EntityTypes.SKELETON, ModEntity.SKELETON_MINION);
     }
 }

@@ -21,7 +21,7 @@ import net.necrocraft.world.entity.minion.AbstractMinion;
 public class NecroCraftCommands {
 
     private static final SuggestionProvider<CommandSourceStack> MINION_SUGGESTIONS =
-            (ctx, builder) -> SharedSuggestionProvider.suggest(new String[]{"zombie"}, builder);
+            (ctx, builder) -> SharedSuggestionProvider.suggest(new String[]{"zombie", "skeleton"}, builder);
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
@@ -47,6 +47,7 @@ public class NecroCraftCommands {
 
         AbstractMinion minion = switch (minionType.toLowerCase()) {
             case "zombie" -> ModEntity.ZOMBIE_MINION.get().create(level, EntitySpawnReason.COMMAND);
+            case "skeleton" -> ModEntity.SKELETON_MINION.get().create(level, EntitySpawnReason.COMMAND);
             default -> null;
         };
 
