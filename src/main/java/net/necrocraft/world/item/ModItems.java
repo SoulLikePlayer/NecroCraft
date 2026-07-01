@@ -2,6 +2,7 @@ package net.necrocraft.world.item;
 
 import net.minecraft.world.item.Item;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.world.item.equipment.SoulTotem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,12 @@ public class ModItems {
     public static final DeferredItem<@NotNull Item> NECROTIC_SHARD = ITEMS.registerItem(
             "necrotic_shard",
             Item::new,
+            properties -> properties
+    );
+
+    public static DeferredItem<@NotNull Item> SOUL_TOTEM = ITEMS.registerItem(
+            "soul_totem",
+            SoulTotem::new,
             properties -> properties
     );
 }

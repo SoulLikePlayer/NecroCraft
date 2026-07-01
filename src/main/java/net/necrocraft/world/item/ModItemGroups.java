@@ -24,4 +24,15 @@ public class ModItemGroups {
                     .build()
 
     );
+
+    public static final Supplier<CreativeModeTab> NECROCRAFT_EQUIPMENT = CREATIVE_MODE_TABS.register("necrocraft_equipment",
+            () -> CreativeModeTab.builder()
+                    .icon(() -> new ItemStack(ModItems.SOUL_TOTEM.get()))
+                    .title(Component.translatable("itemGroup.necrocraft.necrocraft_equipment"))
+                    .displayItems(((itemDisplayParameters, output) -> {
+                        output.accept(ModItems.SOUL_TOTEM);
+                    }))
+                    .build()
+
+    );
 }

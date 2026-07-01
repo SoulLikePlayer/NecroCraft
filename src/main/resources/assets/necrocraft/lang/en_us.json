@@ -4,6 +4,8 @@
   "command.necrocraft.summon_minion.success": "Minion '%s' successfully summoned!",
 
   "item.necrocraft.necrotic_shard": "Necrotic Shard",
+  "item.necrocraft.soul_totem": "Soul Totem",
 
-  "itemGroup.necrocraft.necrocraft_ingredient": "NecroCraft Ingredients"
+  "itemGroup.necrocraft.necrocraft_ingredient": "NecroCraft : Ingredients",
+  "itemGroup.necrocraft.necrocraft_equipment": "NecroCraft : Equipment"
 }
