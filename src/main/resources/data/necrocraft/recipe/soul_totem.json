@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "soul_totem",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    " N ",
+    "GGG"
+  ],
+  "key": {
+    "N": "necrocraft:necrotic_shard",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "count": 1,
+    "id": "necrocraft:soul_totem"
+  }
+}

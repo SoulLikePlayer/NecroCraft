@@ -3,9 +3,8 @@
   "group": "necrotic_shard",
   "category": "misc",
   "pattern": [
-    "   ",
-    " E ",
-    " S "
+    "E",
+    "S"
   ],
   "key": {
     "E": [

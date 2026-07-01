@@ -1,7 +1,9 @@
 package net.necrocraft.world.item.equipment;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -10,15 +12,17 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
-import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.entity.minion.AbstractMinion;
-import net.necrocraft.world.entity.minion.MinionRegistry;
+import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.component.SoulData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class SoulTotem extends Item {
     public SoulTotem(Properties properties) {
@@ -54,5 +58,37 @@ public class SoulTotem extends Item {
         ((ServerLevel) level).addFreshEntity(minion);
 
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack itemStack,
+                                @NotNull TooltipContext context,
+                                @NotNull TooltipDisplay display,
+                                @NotNull Consumer<Component> builder,
+                                @NotNull TooltipFlag tooltipFlag) {
+
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+        builder.accept(Component.empty());
+
+        SoulData soulData = itemStack.get(ModDataComponents.SOUL_DATA.get());
+        if (soulData == null) {
+            builder.accept(Component.translatable("item.necrocraft.soul_totem.empty")
+                    .withStyle(ChatFormatting.GRAY));
+            return;
+        }
+
+        Optional<Holder.Reference<@NotNull EntityType<?>>> capturedType =
+                BuiltInRegistries.ENTITY_TYPE.get(soulData.entityType());
+
+        if (capturedType.isEmpty()) {
+            builder.accept(Component.translatable("item.necrocraft.soul_totem.unknown")
+                    .withStyle(ChatFormatting.RED));
+            return;
+        }
+
+        EntityType<?> entityType = capturedType.get().value();
+        builder.accept(Component.translatable("item.necrocraft.soul_totem.summons",
+                        entityType.getDescription())
+                .withStyle(ChatFormatting.GOLD));
     }
 }

@@ -7,5 +7,9 @@
   "item.necrocraft.soul_totem": "Soul Totem",
 
   "itemGroup.necrocraft.necrocraft_ingredient": "NecroCraft : Ingredients",
-  "itemGroup.necrocraft.necrocraft_equipment": "NecroCraft : Equipment"
+  "itemGroup.necrocraft.necrocraft_equipment": "NecroCraft : Equipment",
+
+  "item.necrocraft.soul_totem.empty": "No soul captured",
+  "item.necrocraft.soul_totem.unknown": "Unknown captured creature",
+  "item.necrocraft.soul_totem.summons": "Summons: %s"
 }

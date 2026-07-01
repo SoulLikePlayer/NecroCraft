@@ -1,13 +1,17 @@
 package net.necrocraft.event;
 
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.necrocraft.core.NecroCraft;
-import net.necrocraft.world.entity.minion.MinionRegistry;
+import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.ModItems;
 import net.necrocraft.world.item.component.SoulData;
@@ -20,6 +24,8 @@ public class ModEvent {
 
     @SubscribeEvent
     public static void onMobDeath(LivingDeathEvent event) {
+        if (event.getEntity().level().isClientSide()) return;
+
         EntityType<?> killedType = event.getEntity().getType();
         if (!MinionRegistry.isCapturable(killedType)) return;
 
@@ -33,5 +39,53 @@ public class ModEvent {
 
         Identifier entityId = BuiltInRegistries.ENTITY_TYPE.getKey(killedType);
         offhandItem.set(ModDataComponents.SOUL_DATA.get(), new SoulData(entityId));
+
+        if (event.getEntity().level() instanceof ServerLevel serverLevel) {
+            spawnSoulCaptureEffect(serverLevel, player.getX(), player.getY() + 1.0, player.getZ());
+        }
+    }
+
+    private static void spawnSoulCaptureEffect(ServerLevel level, double x, double y, double z) {
+        level.sendParticles(
+                ParticleTypes.SOUL,
+                x, y, z,
+                80,
+                0.4, 0.6, 0.4,
+                0.2
+        );
+
+        level.sendParticles(
+                ParticleTypes.LARGE_SMOKE,
+                x, y, z,
+                30,
+                0.5, 0.7, 0.5,
+                0.05
+        );
+
+        level.sendParticles(
+                ParticleTypes.SOUL_FIRE_FLAME,
+                x, y, z,
+                25,
+                0.2, 0.4, 0.2,
+                0.05
+        );
+
+        level.playSound(
+                null,
+                x, y, z,
+                SoundEvents.TOTEM_USE,
+                SoundSource.PLAYERS,
+                1.0F,
+                1.0F
+        );
+
+        level.playSound(
+                null,
+                x, y, z,
+                SoundEvents.SOUL_ESCAPE,
+                SoundSource.PLAYERS,
+                1.0F,
+                0.7F + level.getRandom().nextFloat() * 0.3F
+        );
     }
 }

@@ -1,9 +1,10 @@
-package net.necrocraft.world.entity.minion;
+package net.necrocraft.world.entity.minion.registry;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.necrocraft.world.entity.ModEntity;
+import net.necrocraft.world.entity.minion.AbstractMinion;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
