@@ -15,16 +15,27 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.component.SoulData;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 public class SoulTotem extends Item {
+    private static final EquipmentSlot[] EQUIPMENT_ORDER = new EquipmentSlot[] {
+            EquipmentSlot.HEAD,
+            EquipmentSlot.CHEST,
+            EquipmentSlot.LEGS,
+            EquipmentSlot.FEET,
+            EquipmentSlot.MAINHAND,
+            EquipmentSlot.OFFHAND
+    };
+
     public SoulTotem(Properties properties) {
         super(properties);
     }
@@ -55,9 +66,20 @@ public class SoulTotem extends Item {
 
         minion.setOwner(player);
         minion.snapTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), 0.0F);
+        equipMinion(minion, soulData);
         ((ServerLevel) level).addFreshEntity(minion);
 
         return InteractionResult.SUCCESS;
+    }
+
+    private static void equipMinion(AbstractMinion minion, SoulData soulData) {
+        List<ItemStack> equipment = soulData.equipment();
+        for (int i = 0; i < EQUIPMENT_ORDER.length && i < equipment.size(); i++) {
+            ItemStack piece = equipment.get(i);
+            if (!piece.isEmpty()) {
+                minion.setItemSlot(EQUIPMENT_ORDER[i], piece.copy());
+            }
+        }
     }
 
     @Override
@@ -90,5 +112,20 @@ public class SoulTotem extends Item {
         builder.accept(Component.translatable("item.necrocraft.soul_totem.summons",
                         entityType.getDescription())
                 .withStyle(ChatFormatting.GOLD));
+
+        List<ItemStack> equipment = soulData.equipment();
+        boolean hasEquipment = equipment.stream().anyMatch(piece -> !piece.isEmpty());
+        if (hasEquipment) {
+            builder.accept(Component.empty());
+            builder.accept(Component.translatable("item.necrocraft.soul_totem.equipment")
+                    .withStyle(ChatFormatting.GRAY));
+            for (ItemStack piece : equipment) {
+                if (!piece.isEmpty()) {
+                    builder.accept(Component.literal(" - ")
+                            .append(piece.getHoverName())
+                            .withStyle(ChatFormatting.DARK_GRAY));
+                }
+            }
+        }
     }
 }

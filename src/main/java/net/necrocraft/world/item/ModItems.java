@@ -1,8 +1,10 @@
 package net.necrocraft.world.item;
 
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.item.equipment.SoulTotem;
+import net.necrocraft.world.level.block.ModBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
@@ -22,4 +24,6 @@ public class ModItems {
             SoulTotem::new,
             properties -> properties
     );
+
+    public static DeferredItem<@NotNull BlockItem> SOUL_CARVING_TABLE = ITEMS.registerSimpleBlockItem(ModBlock.SOUL_CARVING_TABLE_BLOCK);
 }

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "necrocraft:block/soul_carving_block_bottom",
+    "east": "necrocraft:block/soul_carving_block_side",
+    "north": "necrocraft:block/soul_carving_block_side",
+    "particle": "necrocraft:block/soul_carving_block_bottom",
+    "south": "necrocraft:block/soul_carving_block_side",
+    "up": "necrocraft:block/soul_carving_block_top",
+    "west": "necrocraft:block/soul_carving_block_side"
+  }
+}

@@ -14,23 +14,16 @@ public class ModItemGroups {
     public static DeferredRegister<@NotNull CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, NecroCraft.MODID);
 
-    public static final Supplier<CreativeModeTab> NECROCRAFT_INGREDIENT = CREATIVE_MODE_TABS.register("necrocraft_ingredient",
+    public static final Supplier<CreativeModeTab> NECROCRAFT= CREATIVE_MODE_TABS.register("necrocraft",
             () -> CreativeModeTab.builder()
                     .icon(() -> new ItemStack(ModItems.NECROTIC_SHARD.get()))
-                    .title(Component.translatable("itemGroup.necrocraft.necrocraft_ingredient"))
+                    .title(Component.translatable("itemGroup.necrocraft"))
                     .displayItems(((itemDisplayParameters, output) -> {
                         output.accept(ModItems.NECROTIC_SHARD);
-                    }))
-                    .build()
 
-    );
-
-    public static final Supplier<CreativeModeTab> NECROCRAFT_EQUIPMENT = CREATIVE_MODE_TABS.register("necrocraft_equipment",
-            () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModItems.SOUL_TOTEM.get()))
-                    .title(Component.translatable("itemGroup.necrocraft.necrocraft_equipment"))
-                    .displayItems(((itemDisplayParameters, output) -> {
                         output.accept(ModItems.SOUL_TOTEM);
+
+                        output.accept(ModItems.SOUL_CARVING_TABLE);
                     }))
                     .build()
 
