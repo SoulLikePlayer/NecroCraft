@@ -5,6 +5,7 @@
 
   "item.necrocraft.necrotic_shard": "Necrotic Shard",
   "item.necrocraft.soul_totem": "Soul Totem",
+  "item.necrocraft.solid_skin_bonus_item": "Solid Skin",
 
   "block.necrocraft.soul_carving_block": "Soul Carving Block",
 
@@ -27,5 +28,6 @@
   "carving.necrocraft.page.equipment": "Equipment",
   "carving.necrocraft.page.bonus": "Bonus",
   "carving.necrocraft.page.equipment.tooltip": "Switch to the equipment page",
-  "carving.necrocraft.page.bonus.tooltip": "Switch to the bonus slots page"
+  "carving.necrocraft.page.bonus.tooltip": "Switch to the bonus slots page",
+  "item.necrocraft.soul_totem.bonuses": "Bonus :"
 }

@@ -127,12 +127,17 @@ public class CarvingScreen extends AbstractContainerScreen<@NotNull CarvingMenu>
                     showEquipment ? pos[1] : HIDDEN);
         }
 
-        for (int i = 0; i < CarvingMenu.FREE_SLOT_COUNT; i++) {
-            Slot bonusSlot = this.menu.slots.get(CarvingMenu.FREE_SLOT_START + i);
-            int[] pos = CarvingMenu.FREE_SLOT_POSITIONS[i];
+        for (int i = 0; i < CarvingMenu.BONUS_SLOT_COUNT; i++) {
+            Slot bonusSlot = this.menu.slots.get(CarvingMenu.BONUS_SLOT_START + i);
+            int[] pos = CarvingMenu.BONUS_SLOT_POSITIONS[i];
             setSlotPos(bonusSlot,
                     showEquipment ? HIDDEN : pos[0],
                     showEquipment ? HIDDEN : pos[1]);
+        }
+
+        for (int i = 0; i < CarvingMenu.FREE_SLOT_COUNT; i++) {
+            Slot freeSlot = this.menu.slots.get(CarvingMenu.FREE_SLOT_START + i);
+            setSlotPos(freeSlot, HIDDEN, HIDDEN);
         }
 
         if (this.prevPageButton != null) {
@@ -187,8 +192,8 @@ public class CarvingScreen extends AbstractContainerScreen<@NotNull CarvingMenu>
         }
 
         if (this.currentPage == Page.BONUS) {
-            int freeIndex = slotIndex - CarvingMenu.FREE_SLOT_START;
-            if (freeIndex >= 0 && freeIndex < CarvingMenu.FREE_SLOT_COUNT) {
+            int bonusIndex = slotIndex - CarvingMenu.BONUS_SLOT_START;
+            if (bonusIndex >= 0 && bonusIndex < CarvingMenu.BONUS_SLOT_COUNT) {
                 return BONUS_TOOLTIP;
             }
         } else {

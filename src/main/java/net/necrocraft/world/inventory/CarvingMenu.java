@@ -36,14 +36,14 @@ public class CarvingMenu extends AbstractContainerMenu {
     private static final int FREE_SLOT_END = FREE_SLOT_START + FREE_SLOT_COUNT;
 
     public static final int[][] FREE_SLOT_POSITIONS = {
-            {80, 12},
-            {44, 28},
-            {116, 28},
-            {29, 62},
-            {130, 62},
-            {44, 99},
-            {116, 99},
-            {80, 113}
+            {152, 12},
+            {152, 30},
+            {152, 48},
+            {152, 66},
+            {152, 84},
+            {152, 102},
+            {152, 120},
+            {152, 138}
     };
 
     public static final int EQUIPMENT_SLOT_START = FREE_SLOT_END;
@@ -64,14 +64,14 @@ public class CarvingMenu extends AbstractContainerMenu {
     private static final int BONUS_SLOT_END = BONUS_SLOT_START + BONUS_SLOT_COUNT;
 
     public static final int[][] BONUS_SLOT_POSITIONS = {
-            {152, 12},
-            {152, 30},
-            {152, 48},
-            {152, 66},
-            {152, 84},
-            {152, 102},
-            {152, 120},
-            {152, 138},
+            {80, 12},
+            {44, 28},
+            {116, 28},
+            {29, 62},
+            {130, 62},
+            {44, 99},
+            {116, 99},
+            {80, 113}
     };
 
     private static final int CONTAINER_SIZE = BONUS_SLOT_END;
