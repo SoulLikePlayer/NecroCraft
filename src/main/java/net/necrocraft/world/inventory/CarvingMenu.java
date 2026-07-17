@@ -1,6 +1,8 @@
 package net.necrocraft.world.inventory;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -12,6 +14,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.Equippable;
 import net.necrocraft.world.item.ModDataComponents;
+import net.necrocraft.world.item.bonus.AbstractBonusItem;
+import net.necrocraft.world.item.bonus.BonusUtil;
 import net.necrocraft.world.item.component.SoulData;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.level.block.ModBlock;
@@ -55,7 +59,22 @@ public class CarvingMenu extends AbstractContainerMenu {
             {8, 108},
     };
 
-    private static final int CONTAINER_SIZE = EQUIPMENT_SLOT_END;
+    public static final int BONUS_SLOT_START = EQUIPMENT_SLOT_END;
+    public static final int BONUS_SLOT_COUNT = SoulData.MAX_BONUSES;
+    private static final int BONUS_SLOT_END = BONUS_SLOT_START + BONUS_SLOT_COUNT;
+
+    public static final int[][] BONUS_SLOT_POSITIONS = {
+            {152, 12},
+            {152, 30},
+            {152, 48},
+            {152, 66},
+            {152, 84},
+            {152, 102},
+            {152, 120},
+            {152, 138},
+    };
+
+    private static final int CONTAINER_SIZE = BONUS_SLOT_END;
 
     private static final int INV_SLOT_START = CONTAINER_SIZE;
     private static final int INV_SLOT_END = INV_SLOT_START + 27;
@@ -79,6 +98,10 @@ public class CarvingMenu extends AbstractContainerMenu {
         if (EQUIPMENT_SLOT_POSITIONS.length != EQUIPMENT_SLOT_COUNT) {
             throw new ExceptionInInitializerError("EQUIPMENT_SLOT_POSITIONS.length (" + EQUIPMENT_SLOT_POSITIONS.length
                     + ") ne correspond pas à EQUIPMENT_SLOT_COUNT (" + EQUIPMENT_SLOT_COUNT + ")");
+        }
+        if (BONUS_SLOT_POSITIONS.length != BONUS_SLOT_COUNT) {
+            throw new ExceptionInInitializerError("BONUS_SLOT_POSITIONS.length (" + BONUS_SLOT_POSITIONS.length
+                    + ") ne correspond pas à BONUS_SLOT_COUNT (" + BONUS_SLOT_COUNT + ")");
         }
     }
 
@@ -108,6 +131,11 @@ public class CarvingMenu extends AbstractContainerMenu {
         for (int i = 0; i < EQUIPMENT_SLOT_COUNT; i++) {
             int[] pos = EQUIPMENT_SLOT_POSITIONS[i];
             this.addSlot(new EquipmentColumnSlot(container, EQUIPMENT_SLOT_START + i, pos[0], pos[1], EQUIPMENT_ORDER[i]));
+        }
+
+        for (int i = 0; i < BONUS_SLOT_COUNT; i++) {
+            int[] pos = BONUS_SLOT_POSITIONS[i];
+            this.addSlot(new BonusSlot(container, BONUS_SLOT_START + i, pos[0], pos[1]));
         }
 
         for (int row = 0; row < 3; ++row) {
@@ -148,6 +176,17 @@ public class CarvingMenu extends AbstractContainerMenu {
                             CarvingMenu.this.container.setItem(EQUIPMENT_SLOT_START + i, piece.copy());
                         }
                     }
+
+                    List<Identifier> bonuses = soulData.bonuses();
+                    for (int i = 0; i < BONUS_SLOT_COUNT && i < bonuses.size(); i++) {
+                        Identifier bonusId = bonuses.get(i);
+                        if (CarvingMenu.this.container.getItem(BONUS_SLOT_START + i).isEmpty()) {
+                            int finalI = i;
+                            BonusUtil.resolve(bonusId)
+                                    .ifPresent(bonus -> CarvingMenu.this.container.setItem(
+                                            BONUS_SLOT_START + finalI, new ItemStack(bonus)));
+                        }
+                    }
                 }
             }
         }
@@ -165,8 +204,23 @@ public class CarvingMenu extends AbstractContainerMenu {
                     }
                     equipment.add(piece);
                 }
-                if (hasAnyEquipment) {
-                    stack.set(ModDataComponents.SOUL_DATA.get(), soulData.withEquipment(equipment));
+
+                List<Identifier> bonuses = new ArrayList<>();
+                for (int i = 0; i < BONUS_SLOT_COUNT; i++) {
+                    ItemStack piece = CarvingMenu.this.container.getItem(BONUS_SLOT_START + i);
+                    if (!piece.isEmpty() && piece.getItem() instanceof AbstractBonusItem) {
+                        Identifier bonusId = BuiltInRegistries.ITEM.getKey(piece.getItem());
+                        if (bonusId != null && !bonuses.contains(bonusId)) {
+                            bonuses.add(bonusId);
+                        }
+                    }
+                    CarvingMenu.this.container.setItem(BONUS_SLOT_START + i, ItemStack.EMPTY);
+                }
+
+                SoulData updated = hasAnyEquipment ? soulData.withEquipment(equipment) : soulData;
+                updated = updated.withBonuses(bonuses);
+                if (updated != soulData) {
+                    stack.set(ModDataComponents.SOUL_DATA.get(), updated);
                 }
 
                 for (int i = 0; i < EQUIPMENT_SLOT_COUNT; i++) {
@@ -192,6 +246,40 @@ public class CarvingMenu extends AbstractContainerMenu {
             }
             Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
             return equippable != null && equippable.slot() == this.equipmentSlot;
+        }
+
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            CarvingMenu.this.updateSoulData();
+        }
+    }
+
+    private class BonusSlot extends Slot {
+        public BonusSlot(Container container, int index, int x, int y) {
+            super(container, index, x, y);
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            if (!(stack.getItem() instanceof AbstractBonusItem)) {
+                return false;
+            }
+            for (int i = BONUS_SLOT_START; i < BONUS_SLOT_END; i++) {
+                if (i == this.getContainerSlot()) {
+                    continue;
+                }
+                ItemStack existing = CarvingMenu.this.container.getItem(i);
+                if (!existing.isEmpty() && existing.getItem() == stack.getItem()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public int getMaxStackSize() {
+            return 1;
         }
 
         @Override
@@ -229,6 +317,10 @@ public class CarvingMenu extends AbstractContainerMenu {
 
                 if (stackInSlot.getItem() instanceof SoulTotem) {
                     moved = this.moveItemStackTo(stackInSlot, TOTEM_SLOT, TOTEM_SLOT + 1, false);
+                }
+
+                if (!moved && stackInSlot.getItem() instanceof AbstractBonusItem) {
+                    moved = this.moveItemStackTo(stackInSlot, BONUS_SLOT_START, BONUS_SLOT_END, false);
                 }
 
                 if (!moved) {
@@ -287,7 +379,20 @@ public class CarvingMenu extends AbstractContainerMenu {
         for (int i = 0; i < EQUIPMENT_SLOT_COUNT; i++) {
             equipment.add(this.container.getItem(EQUIPMENT_SLOT_START + i).copy());
         }
-        totemStack.set(ModDataComponents.SOUL_DATA.get(), soulData.withEquipment(equipment));
+
+        List<Identifier> bonuses = new ArrayList<>();
+        for (int i = 0; i < BONUS_SLOT_COUNT; i++) {
+            ItemStack piece = this.container.getItem(BONUS_SLOT_START + i);
+            if (!piece.isEmpty() && piece.getItem() instanceof AbstractBonusItem) {
+                Identifier bonusId = BuiltInRegistries.ITEM.getKey(piece.getItem());
+                if (bonusId != null) {
+                    bonuses.add(bonusId);
+                }
+            }
+        }
+
+        totemStack.set(ModDataComponents.SOUL_DATA.get(),
+                soulData.withEquipment(equipment).withBonuses(bonuses));
     }
 
     private static int equipmentIndexFor(EquipmentSlot equipmentSlot) {

@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -19,6 +20,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
+import net.necrocraft.world.item.bonus.BonusUtil;
 import net.necrocraft.world.item.component.SoulData;
 import org.jetbrains.annotations.NotNull;
 
@@ -67,6 +69,7 @@ public class SoulTotem extends Item {
         minion.setOwner(player);
         minion.snapTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), 0.0F);
         equipMinion(minion, soulData);
+        applyBonuses(minion, soulData);
         ((ServerLevel) level).addFreshEntity(minion);
 
         return InteractionResult.SUCCESS;
@@ -79,6 +82,12 @@ public class SoulTotem extends Item {
             if (!piece.isEmpty()) {
                 minion.setItemSlot(EQUIPMENT_ORDER[i], piece.copy());
             }
+        }
+    }
+
+    private static void applyBonuses(AbstractMinion minion, SoulData soulData) {
+        for (Identifier bonusId : soulData.bonuses()) {
+            BonusUtil.resolve(bonusId).ifPresent(bonus -> bonus.applyEffectes(minion));
         }
     }
 
@@ -125,6 +134,19 @@ public class SoulTotem extends Item {
                             .append(piece.getHoverName())
                             .withStyle(ChatFormatting.DARK_GRAY));
                 }
+            }
+        }
+
+        List<Identifier> bonuses = soulData.bonuses();
+        if (!bonuses.isEmpty()) {
+            builder.accept(Component.empty());
+            builder.accept(Component.translatable("item.necrocraft.soul_totem.bonuses")
+                    .withStyle(ChatFormatting.GRAY));
+            for (Identifier bonusId : bonuses) {
+                BonusUtil.resolve(bonusId).ifPresent(bonus ->
+                        builder.accept(Component.literal(" - ")
+                                .append(new ItemStack(bonus).getHoverName())
+                                .withStyle(ChatFormatting.LIGHT_PURPLE)));
             }
         }
     }
