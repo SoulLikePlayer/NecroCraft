@@ -14,8 +14,18 @@ public class ModItems {
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(NecroCraft.MODID);
 
+
+    /**
+     * Ingredient
+     */
     public static final DeferredItem<@NotNull Item> NECROTIC_SHARD = ITEMS.registerItem(
             "necrotic_shard",
+            Item::new,
+            properties -> properties
+    );
+
+    public static final DeferredItem<@NotNull Item> NECROTIC_POWDER = ITEMS.registerItem(
+            "necrotic_powder",
             Item::new,
             properties -> properties
     );

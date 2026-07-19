@@ -120,7 +120,7 @@ public class SoulTotem extends Item {
         EntityType<?> entityType = capturedType.get().value();
         builder.accept(Component.translatable("item.necrocraft.soul_totem.summons",
                         entityType.getDescription())
-                .withStyle(ChatFormatting.GOLD));
+                .withStyle(ChatFormatting.DARK_GRAY));
 
         List<ItemStack> equipment = soulData.equipment();
         boolean hasEquipment = equipment.stream().anyMatch(piece -> !piece.isEmpty());

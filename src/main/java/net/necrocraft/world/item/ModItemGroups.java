@@ -20,6 +20,7 @@ public class ModItemGroups {
                     .title(Component.translatable("itemGroup.necrocraft"))
                     .displayItems(((itemDisplayParameters, output) -> {
                         output.accept(ModItems.NECROTIC_SHARD);
+                        output.accept(ModItems.NECROTIC_POWDER);
 
                         output.accept(ModItems.SOUL_TOTEM);
 

@@ -4,10 +4,11 @@
   "command.necrocraft.summon_minion.success": "Minion '%s' successfully summoned!",
 
   "item.necrocraft.necrotic_shard": "Necrotic Shard",
+  "item.necrocraft.necrotic_powder": "Necrotic Powder",
   "item.necrocraft.soul_totem": "Soul Totem",
   "item.necrocraft.solid_skin_bonus_item": "Solid Skin",
 
-  "block.necrocraft.soul_carving_block": "Soul Carving Block",
+  "block.necrocraft.soul_carving_block": "Soul Carving Table",
 
   "itemGroup.necrocraft": "NecroCraft",
 
@@ -16,6 +17,8 @@
   "item.necrocraft.soul_totem.summons": "Summons: %s",
   "container.necrocraft.soul_carving_table": "Soul Carving Table",
   "item.necrocraft.soul_totem.equipment": "Equipment :",
+  "item.necrocraft.soul_totem.bonuses": "Bonus :",
+
   "carving.necrocraft.slot.totem": "Soul Totem",
   "carving.necrocraft.slot.head": "Helmet",
   "carving.necrocraft.slot.chest": "Chestplate",
@@ -28,6 +31,5 @@
   "carving.necrocraft.page.equipment": "Equipment",
   "carving.necrocraft.page.bonus": "Bonus",
   "carving.necrocraft.page.equipment.tooltip": "Switch to the equipment page",
-  "carving.necrocraft.page.bonus.tooltip": "Switch to the bonus slots page",
-  "item.necrocraft.soul_totem.bonuses": "Bonus :"
+  "carving.necrocraft.page.bonus.tooltip": "Switch to the bonus slots page"
 }

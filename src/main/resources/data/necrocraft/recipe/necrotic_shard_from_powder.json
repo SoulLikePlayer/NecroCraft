@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "necrotic_shard",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "PPP",
+    "PPP"
+  ],
+  "key": {
+    "P": "necrocraft:necrotic_powder"
+  },
+  "result": {
+    "count": 1,
+    "id": "necrocraft:necrotic_shard"
+  }
+}
