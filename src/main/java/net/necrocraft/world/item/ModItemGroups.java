@@ -27,6 +27,7 @@ public class ModItemGroups {
                         output.accept(ModItems.SOUL_CARVING_TABLE);
 
                         output.accept(ModItems.SOLID_SKIN_BONUS_ITEM);
+                        output.accept(ModItems.POST_MORTEM_EXPLOSION_BONUS_ITEM);
                     }))
                     .build()
 

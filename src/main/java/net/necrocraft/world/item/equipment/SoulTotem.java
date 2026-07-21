@@ -86,6 +86,7 @@ public class SoulTotem extends Item {
     }
 
     private static void applyBonuses(AbstractMinion minion, SoulData soulData) {
+        minion.setBonuses(soulData.bonuses());
         for (Identifier bonusId : soulData.bonuses()) {
             BonusUtil.resolve(bonusId).ifPresent(bonus -> bonus.applyEffectes(minion));
         }

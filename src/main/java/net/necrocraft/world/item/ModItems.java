@@ -3,6 +3,7 @@ package net.necrocraft.world.item;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.world.item.bonus.impl.PostMortemExplosionBonusItem;
 import net.necrocraft.world.item.bonus.impl.SolidSkinBonusItem;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.level.block.ModBlock;
@@ -39,6 +40,12 @@ public class ModItems {
     public static DeferredItem<@NotNull Item> SOLID_SKIN_BONUS_ITEM = ITEMS.registerItem(
             "solid_skin_bonus_item",
             SolidSkinBonusItem::new,
+            properties -> properties
+    );
+
+    public static DeferredItem<@NotNull Item> POST_MORTEM_EXPLOSION_BONUS_ITEM = ITEMS.registerItem(
+            "post_mortem_explosion_bonus_item",
+            PostMortemExplosionBonusItem::new,
             properties -> properties
     );
 

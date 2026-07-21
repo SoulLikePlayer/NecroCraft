@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -24,9 +25,12 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.necrocraft.world.entity.ai.goal.FollowSummonerGoal;
 import net.necrocraft.world.entity.ai.goal.SummonerHurtByTargetGoal;
 import net.necrocraft.world.entity.ai.goal.SummonerHurtTargetGoal;
+import net.necrocraft.world.item.bonus.BonusUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -41,6 +45,8 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
 
     protected static final EntityDataAccessor<@NotNull Optional<EntityReference<@NotNull LivingEntity>>> DATA_SUMMONER_UUID_ID =
             SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
+
+    private List<Identifier> bonuses = new ArrayList<>();
 
     protected AbstractMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
         super(type, level);
@@ -74,6 +80,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
         super.addAdditionalSaveData(output);
         EntityReference<@NotNull LivingEntity> summoner = this.getOwnerReference();
         EntityReference.store(summoner, output, "summoner");
+        output.store("bonuses", Identifier.CODEC.listOf(), this.bonuses);
     }
 
     @Override
@@ -83,6 +90,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
         if (owner != null) {
             this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.of(owner));
         }
+        this.bonuses = new ArrayList<>(input.read("bonuses", Identifier.CODEC.listOf()).orElse(List.of()));
     }
 
     public EntityReference<@NotNull LivingEntity> getOwnerReference() {
@@ -163,8 +171,33 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
         }
     }
 
+    /**
+     * Définit les bonus actuellement portés par le minion (appelé par {@code SoulTotem} à l'invocation).
+     */
+    public void setBonuses(@NotNull List<Identifier> bonuses) {
+        this.bonuses = new ArrayList<>(bonuses);
+    }
+
+    public @NotNull List<Identifier> getBonuses() {
+        return this.bonuses;
+    }
+
     @Override
     public boolean isInvulnerableTo(@NotNull ServerLevel level, @NotNull DamageSource source) {
         return super.isInvulnerableTo(level, source);
+    }
+
+    @Override
+    public void die(@NotNull DamageSource damageSource) {
+        if (this.level() instanceof ServerLevel serverLevel) {
+            triggerPostMortemBonuses(serverLevel);
+        }
+        super.die(damageSource);
+    }
+
+    private void triggerPostMortemBonuses(ServerLevel serverLevel) {
+        for (Identifier bonusId : this.bonuses) {
+            BonusUtil.resolve(bonusId).ifPresent(bonus -> bonus.onDeath(this, serverLevel));
+        }
     }
 }

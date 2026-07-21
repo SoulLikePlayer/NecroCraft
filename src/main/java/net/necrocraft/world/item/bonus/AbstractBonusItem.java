@@ -1,5 +1,6 @@
 package net.necrocraft.world.item.bonus;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +16,7 @@ public abstract class AbstractBonusItem extends Item {
 
     public abstract void applyEffectes(@NotNull AbstractMinion minion);
 
-    public void removeEffects(@NotNull AbstractMinion minion){
+    public void removeEffects(@NotNull AbstractMinion minion){}
 
-    }
+    public void onDeath(@NotNull AbstractMinion minion, @NotNull ServerLevel level){}
 }
