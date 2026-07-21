@@ -4,6 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
@@ -159,5 +161,10 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
         } else {
             this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.empty());
         }
+    }
+
+    @Override
+    public boolean isInvulnerableTo(@NotNull ServerLevel level, @NotNull DamageSource source) {
+        return super.isInvulnerableTo(level, source);
     }
 }
