@@ -28,6 +28,7 @@ public class ModItemGroups {
 
                         output.accept(ModItems.SOLID_SKIN_BONUS_ITEM);
                         output.accept(ModItems.POST_MORTEM_EXPLOSION_BONUS_ITEM);
+                        output.accept(ModItems.HUNTER_BONUS_ITEM);
                     }))
                     .build()
 

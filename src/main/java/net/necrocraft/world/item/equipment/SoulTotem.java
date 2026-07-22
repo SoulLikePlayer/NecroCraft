@@ -147,7 +147,7 @@ public class SoulTotem extends Item {
                 BonusUtil.resolve(bonusId).ifPresent(bonus ->
                         builder.accept(Component.literal(" - ")
                                 .append(new ItemStack(bonus).getHoverName())
-                                .withStyle(ChatFormatting.LIGHT_PURPLE)));
+                                .withStyle(ChatFormatting.DARK_GRAY)));
             }
         }
     }

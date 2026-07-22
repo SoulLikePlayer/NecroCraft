@@ -17,6 +17,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,16 +27,12 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.necrocraft.world.entity.ai.goal.FollowSummonerGoal;
-import net.necrocraft.world.entity.ai.goal.SummonerHurtByTargetGoal;
-import net.necrocraft.world.entity.ai.goal.SummonerHurtTargetGoal;
+import net.necrocraft.world.entity.ai.goal.*;
 import net.necrocraft.world.inventory.MinionInventoryMenu;
 import net.necrocraft.world.item.bonus.BonusUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Abstract class who define what is a minion in NecroCraft.
@@ -71,6 +68,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
         this.targetSelector.addGoal(1, new SummonerHurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new SummonerHurtTargetGoal(this));
+        this.targetSelector.addGoal(3, new HuntPreyGoal(this, 16.0F));
     }
 
     /**
@@ -198,7 +196,55 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     @Override
     public boolean canPickUpLoot() {
-        return false;
+        return !this.getHuntableTargets().isEmpty();
+    }
+
+    @Override
+    protected void pickUpItem(ServerLevel level, ItemEntity entity) {
+        if(!this.canPickUpLoot()){
+            return;
+        }
+
+        ItemStack stack = entity.getItem();
+        int originalCount = stack.getCount();
+
+        ItemStack remainder = addToInventory(stack.copy());
+
+        this.onItemPickup(entity);
+        this.take(entity, originalCount - remainder.getCount());
+
+        if (remainder.isEmpty()) {
+            entity.discard();
+        } else {
+            entity.setItem(remainder);
+        }
+    }
+
+    private ItemStack addToInventory(@NotNull ItemStack stack) {
+        for (int i = 0; i < this.inventoryItems.size() && !stack.isEmpty(); i++) {
+            ItemStack slot = this.inventoryItems.get(i);
+            if (!slot.isEmpty() && ItemStack.isSameItemSameComponents(slot, stack)) {
+                int space = slot.getMaxStackSize() - slot.getCount();
+                if (space > 0) {
+                    int moved = Math.min(space, stack.getCount());
+                    slot.grow(moved);
+                    stack.shrink(moved);
+                    this.setChanged();
+                }
+            }
+        }
+
+        for (int i = 0; i < this.inventoryItems.size() && !stack.isEmpty(); i++) {
+            if (this.inventoryItems.get(i).isEmpty()) {
+                int moved = Math.min(stack.getMaxStackSize(), stack.getCount());
+                ItemStack toPlace = stack.copy();
+                toPlace.setCount(moved);
+                this.setItem(i, toPlace);
+                stack.shrink(moved);
+            }
+        }
+
+        return stack;
     }
 
     @Override
@@ -286,5 +332,13 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     @Override
     public void clearContent() {
         this.inventoryItems.clear();
+    }
+
+    public @NotNull Set<EntityType<?>> getHuntableTargets() {
+        Set<EntityType<?>> targets = new HashSet<>();
+        for (Identifier bonusId : this.bonuses) {
+            BonusUtil.resolve(bonusId).ifPresent(bonus -> targets.addAll(bonus.getHuntableTargets()));
+        }
+        return targets;
     }
 }

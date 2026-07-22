@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " n ",
+    "nsn",
+    " n "
+  ],
+  "key": {
+    "s": "minecraft:wooden_sword",
+    "n": "necrocraft:necrotic_powder"
+  },
+  "result": "necrocraft:hunter_bonus_item"
+}
