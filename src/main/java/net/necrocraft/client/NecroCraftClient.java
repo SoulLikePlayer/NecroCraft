@@ -3,11 +3,13 @@ package net.necrocraft.client;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.renderer.entity.SkeletonRenderer;
 import net.necrocraft.client.gui.screens.inventory.CarvingScreen;
+import net.necrocraft.client.gui.screens.inventory.MinionInventoryScreen;
 import net.necrocraft.client.renderer.entity.SkeletonMinionRenderer;
 import net.necrocraft.client.renderer.entity.ZombieMinionRenderer;
 import net.necrocraft.client.renderer.entity.state.SkeletonMinionRenderState;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.inventory.CarvingMenu;
+import net.necrocraft.world.inventory.MinionInventoryMenu;
 import net.necrocraft.world.inventory.ModMenuTypes;
 import net.necrocraft.world.level.block.SoulCarvingTableBlock;
 import net.neoforged.api.distmarker.Dist;
@@ -39,5 +41,6 @@ public class NecroCraftClient {
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.CARVING_MENU.get(), CarvingScreen::new);
+        event.register(ModMenuTypes.MINION_INVENTORY.get(), MinionInventoryScreen::new);
     }
 }

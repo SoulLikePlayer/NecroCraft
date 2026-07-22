@@ -1,20 +1,24 @@
 package net.necrocraft.world.entity.minion;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,10 +29,10 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.necrocraft.world.entity.ai.goal.FollowSummonerGoal;
 import net.necrocraft.world.entity.ai.goal.SummonerHurtByTargetGoal;
 import net.necrocraft.world.entity.ai.goal.SummonerHurtTargetGoal;
+import net.necrocraft.world.inventory.MinionInventoryMenu;
 import net.necrocraft.world.item.bonus.BonusUtil;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,16 +41,21 @@ import java.util.Optional;
  * Abstract class who define what is a minion in NecroCraft.
  * A minion is a summonable mob define by a summoner
  */
-public class AbstractMinion extends PathfinderMob implements OwnableEntity{
+public class AbstractMinion extends PathfinderMob implements OwnableEntity, Container {
     public static final int TELEPORT_WHEN_DISTANCE_IS_SQ = 144;
+
     private static final int MIN_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 2;
     private static final int MAX_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 3;
     private static final int MAX_VERTICAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 1;
+
+    private static final int INVENTORY_SIZE = 27;
 
     protected static final EntityDataAccessor<@NotNull Optional<EntityReference<@NotNull LivingEntity>>> DATA_SUMMONER_UUID_ID =
             SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
     private List<Identifier> bonuses = new ArrayList<>();
+
+    private final NonNullList<@NotNull ItemStack> inventoryItems = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
     protected AbstractMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
         super(type, level);
@@ -81,6 +90,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
         EntityReference<@NotNull LivingEntity> summoner = this.getOwnerReference();
         EntityReference.store(summoner, output, "summoner");
         output.store("bonuses", Identifier.CODEC.listOf(), this.bonuses);
+        ContainerHelper.saveAllItems(output, this.inventoryItems);
     }
 
     @Override
@@ -91,6 +101,8 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
             this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.of(owner));
         }
         this.bonuses = new ArrayList<>(input.read("bonuses", Identifier.CODEC.listOf()).orElse(List.of()));
+        this.inventoryItems.clear();
+        ContainerHelper.loadAllItems(input, this.inventoryItems);
     }
 
     public EntityReference<@NotNull LivingEntity> getOwnerReference() {
@@ -171,9 +183,6 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
         }
     }
 
-    /**
-     * Définit les bonus actuellement portés par le minion (appelé par {@code SoulTotem} à l'invocation).
-     */
     public void setBonuses(@NotNull List<Identifier> bonuses) {
         this.bonuses = new ArrayList<>(bonuses);
     }
@@ -188,9 +197,29 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
     }
 
     @Override
+    public boolean canPickUpLoot() {
+        return false;
+    }
+
+    @Override
+    protected @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
+        if (hand == InteractionHand.MAIN_HAND && !player.isSecondaryUseActive()) {
+            if (!this.level().isClientSide()) {
+                player.openMenu(new SimpleMenuProvider(
+                        (containerId, playerInventory, openingPlayer) -> new MinionInventoryMenu(containerId, playerInventory, this),
+                        this.getDisplayName()
+                ));
+            }
+            return InteractionResult.SUCCESS;
+        }
+        return super.mobInteract(player, hand);
+    }
+
+    @Override
     public void die(@NotNull DamageSource damageSource) {
         if (this.level() instanceof ServerLevel serverLevel) {
             triggerPostMortemBonuses(serverLevel);
+            Containers.dropContents(this.level(), this, this);
         }
         super.die(damageSource);
     }
@@ -199,5 +228,63 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity{
         for (Identifier bonusId : this.bonuses) {
             BonusUtil.resolve(bonusId).ifPresent(bonus -> bonus.onDeath(this, serverLevel));
         }
+    }
+
+
+    @Override
+    public int getContainerSize() {
+        return INVENTORY_SIZE;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for (ItemStack stack : this.inventoryItems) {
+            if (!stack.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public @NotNull ItemStack getItem(int slot) {
+        return this.inventoryItems.get(slot);
+    }
+
+    @Override
+    public @NotNull ItemStack removeItem(int slot, int amount) {
+        ItemStack result = ContainerHelper.removeItem(this.inventoryItems, slot, amount);
+        if (!result.isEmpty()) {
+            this.setChanged();
+        }
+        return result;
+    }
+
+    @Override
+    public @NotNull ItemStack removeItemNoUpdate(int slot) {
+        return ContainerHelper.takeItem(this.inventoryItems, slot);
+    }
+
+    @Override
+    public void setItem(int slot, @NotNull ItemStack stack) {
+        this.inventoryItems.set(slot, stack);
+        if (stack.getCount() > this.getMaxStackSize()) {
+            stack.setCount(this.getMaxStackSize());
+        }
+        this.setChanged();
+    }
+
+    @Override
+    public void setChanged() {
+    }
+
+    @Override
+    public boolean stillValid(@NotNull Player player) {
+        return this.isAlive() && player.distanceToSqr(this) <= 64.0D;
+    }
+
+    @Override
+    public void clearContent() {
+        this.inventoryItems.clear();
     }
 }
