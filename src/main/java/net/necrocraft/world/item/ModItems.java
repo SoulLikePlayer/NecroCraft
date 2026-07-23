@@ -6,6 +6,7 @@ import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.item.bonus.impl.HunterBonusItem;
 import net.necrocraft.world.item.bonus.impl.PostMortemExplosionBonusItem;
 import net.necrocraft.world.item.bonus.impl.SolidSkinBonusItem;
+import net.necrocraft.world.item.bonus.impl.StorageBonusItem;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.level.block.ModBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -49,6 +50,13 @@ public class ModItems {
             PostMortemExplosionBonusItem::new,
             properties -> properties
     );
+
+    public static DeferredItem<@NotNull Item> STORAGE_BONUS_ITEM = ITEMS.registerItem(
+            "storage_bonus_item",
+            StorageBonusItem::new,
+            properties -> properties
+    );
+
 
     public static DeferredItem<@NotNull Item> HUNTER_BONUS_ITEM = ITEMS.registerItem(
             "hunter_bonus_item",

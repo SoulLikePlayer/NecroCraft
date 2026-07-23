@@ -17,6 +17,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.animal.golem.CopperGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -29,6 +30,8 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.necrocraft.world.entity.ai.goal.*;
 import net.necrocraft.world.inventory.MinionInventoryMenu;
+import net.necrocraft.world.item.bonus.AbstractBonusItem;
+import net.necrocraft.world.item.bonus.BonusType;
 import net.necrocraft.world.item.bonus.BonusUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,6 +66,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         super.registerGoals();
 
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0D, true));
+        this.goalSelector.addGoal(4, new StoreItemsInContainerGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new FollowSummonerGoal(this, 1.0F, 10.0F, 2.0F));
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Player.class, 8.0F));
 
@@ -123,11 +127,11 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     public boolean shouldTryTeleportToOwner() {
         LivingEntity owner = this.getOwner();
-        return owner != null && this.distanceToSqr(this.getOwner()) >= (double)144.0F;
+        return owner != null && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
     }
 
     private void teleportToAroundBlockPos(BlockPos targetPos) {
-        for(int attempt = 0; attempt < 10; ++attempt) {
+        for (int attempt = 0; attempt < 10; ++attempt) {
             int xd = this.random.nextIntBetweenInclusive(-3, 3);
             int zd = this.random.nextIntBetweenInclusive(-3, 3);
             if (Math.abs(xd) >= 2 || Math.abs(zd) >= 2) {
@@ -144,7 +148,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         if (!this.canTeleportTo(new BlockPos(x, y, z))) {
             return false;
         } else {
-            this.snapTo((double)x + (double)0.5F, (double)y, (double)z + (double)0.5F, this.getYRot(), this.getXRot());
+            this.snapTo((double) x + (double) 0.5F, (double) y, (double) z + (double) 0.5F, this.getYRot(), this.getXRot());
             this.navigation.stop();
             return true;
         }
@@ -201,7 +205,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     @Override
     protected void pickUpItem(ServerLevel level, ItemEntity entity) {
-        if(!this.canPickUpLoot()){
+        if (!this.canPickUpLoot()) {
             return;
         }
 
@@ -340,5 +344,15 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
             BonusUtil.resolve(bonusId).ifPresent(bonus -> targets.addAll(bonus.getHuntableTargets()));
         }
         return targets;
+    }
+
+    public boolean hasBonusType(@NotNull BonusType type){
+        for (Identifier bonusId : this.bonuses) {
+            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
+            if (bonus.isPresent() && bonus.get().getBonusTypes() == type) {
+                return true;
+            }
+        }
+        return false;
     }
 }
