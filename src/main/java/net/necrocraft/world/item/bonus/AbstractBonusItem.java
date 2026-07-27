@@ -25,5 +25,17 @@ public abstract class AbstractBonusItem extends Item {
         return Set.of();
     }
 
+    public boolean isSedentary() {
+        return false;
+    }
+
+    public boolean canAutoPlant() {
+        return false;
+    }
+
+    public boolean canAutoTill() {
+        return false;
+    }
+
     public void onDeath(@NotNull AbstractMinion minion, @NotNull ServerLevel level){}
 }

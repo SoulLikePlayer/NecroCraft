@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.EnderChestBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.necrocraft.world.item.bonus.BonusUtil;
@@ -28,11 +29,16 @@ public class StoreItemsInContainerGoal extends Goal {
     private static final int SEARCH_COOLDOWN = 100;
     private static final double REACH_DISTANCE_SQ = 3.0D * 3.0D;
 
+    private static final int OPEN_ANIMATION_DELAY = 10;
+
     private final AbstractMinion minion;
     private final double speedModifier;
 
     private BlockPos targetContainerPos;
     private int searchCooldown;
+
+    private int openDelayTicks = -1;
+    private boolean containerVisuallyOpened = false;
 
     public StoreItemsInContainerGoal(AbstractMinion minion, double speedModifier) {
         this.minion = minion;
@@ -42,7 +48,6 @@ public class StoreItemsInContainerGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        NecroCraft.LOGGER.info(String.valueOf(hasStorageBonus()));
         if (!hasStorageBonus()) {
             return false;
         }
@@ -68,12 +73,19 @@ public class StoreItemsInContainerGoal extends Goal {
 
     @Override
     public void start() {
+        this.openDelayTicks = -1;
         moveTowardTarget();
     }
 
     @Override
     public void stop() {
+        if (this.containerVisuallyOpened && this.targetContainerPos != null
+                && this.minion.level() instanceof ServerLevel serverLevel) {
+            setContainerVisuallyOpen(serverLevel, this.targetContainerPos, false);
+        }
         this.targetContainerPos = null;
+        this.openDelayTicks = -1;
+        this.minion.clearOpenedChestPos();
         this.minion.getNavigation().stop();
     }
 
@@ -88,19 +100,38 @@ public class StoreItemsInContainerGoal extends Goal {
             if (this.minion.getNavigation().isDone()) {
                 moveTowardTarget();
             }
-        } else {
-            this.minion.getNavigation().stop();
-            this.minion.getLookControl().setLookAt(
-                    this.targetContainerPos.getX() + 0.5D,
-                    this.targetContainerPos.getY() + 0.5D,
-                    this.targetContainerPos.getZ() + 0.5D
-            );
-
-            if (this.minion.level() instanceof ServerLevel serverLevel) {
-                depositInventory(serverLevel, this.targetContainerPos);
-            }
-            this.targetContainerPos = null;
+            return;
         }
+
+        this.minion.getNavigation().stop();
+        this.minion.getLookControl().setLookAt(
+                this.targetContainerPos.getX() + 0.5D,
+                this.targetContainerPos.getY() + 0.5D,
+                this.targetContainerPos.getZ() + 0.5D
+        );
+
+        if (this.openDelayTicks < 0) {
+            this.minion.setOpenedChestPos(this.targetContainerPos);
+            if (this.minion.level() instanceof ServerLevel serverLevel) {
+                setContainerVisuallyOpen(serverLevel, this.targetContainerPos, true);
+            }
+            this.openDelayTicks = OPEN_ANIMATION_DELAY;
+            return;
+        }
+
+        if (this.openDelayTicks > 0) {
+            this.openDelayTicks--;
+            return;
+        }
+
+        if (this.minion.level() instanceof ServerLevel serverLevel) {
+            depositInventory(serverLevel, this.targetContainerPos);
+            setContainerVisuallyOpen(serverLevel, this.targetContainerPos, false);
+        }
+
+        this.minion.clearOpenedChestPos();
+        this.targetContainerPos = null;
+        this.openDelayTicks = -1;
     }
 
     private void moveTowardTarget() {
@@ -143,12 +174,34 @@ public class StoreItemsInContainerGoal extends Goal {
         return block instanceof ChestBlock || block instanceof EnderChestBlock || block instanceof BarrelBlock;
     }
 
+    private void setContainerVisuallyOpen(ServerLevel level, BlockPos pos, boolean open) {
+        BlockState state = level.getBlockState(pos);
+        Block block = state.getBlock();
+
+        if (block instanceof BarrelBlock) {
+            level.setBlock(pos, state.setValue(BarrelBlock.OPEN, open), Block.UPDATE_CLIENTS);
+            level.playSound(null, pos,
+                    open ? SoundEvents.BARREL_OPEN : SoundEvents.BARREL_CLOSE,
+                    SoundSource.BLOCKS, 0.5F, open ? 1.0F : 0.9F);
+        } else if (block instanceof EnderChestBlock) {
+            level.blockEvent(pos, block, 1, open ? 1 : 0);
+            level.playSound(null, pos,
+                    open ? SoundEvents.ENDER_CHEST_OPEN : SoundEvents.ENDER_CHEST_CLOSE,
+                    SoundSource.BLOCKS, 0.5F, open ? 1.0F : 0.9F);
+        } else if (block instanceof ChestBlock) {
+            level.blockEvent(pos, block, 1, open ? 1 : 0);
+            level.playSound(null, pos,
+                    open ? SoundEvents.CHEST_OPEN : SoundEvents.CHEST_CLOSE,
+                    SoundSource.BLOCKS, 0.5F, open ? 1.0F : 0.9F);
+        }
+
+        this.containerVisuallyOpened = open;
+    }
+
     private void depositInventory(ServerLevel level, BlockPos pos) {
         if (!(level.getBlockEntity(pos) instanceof Container container)) {
             return;
         }
-
-        boolean depositedSomething = false;
 
         for (int slot = 0; slot < this.minion.getContainerSize(); slot++) {
             ItemStack stack = this.minion.getItem(slot);
@@ -158,13 +211,6 @@ public class StoreItemsInContainerGoal extends Goal {
 
             ItemStack remainder = insertIntoContainer(container, stack);
             this.minion.setItem(slot, remainder);
-            if (remainder.getCount() != stack.getCount()) {
-                depositedSomething = true;
-            }
-        }
-
-        if (depositedSomething) {
-            level.playSound(null, pos, SoundEvents.CHEST_CLOSE, SoundSource.NEUTRAL, 0.5F, 1.0F);
         }
     }
 

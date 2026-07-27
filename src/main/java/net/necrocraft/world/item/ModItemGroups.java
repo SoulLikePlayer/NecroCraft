@@ -30,6 +30,9 @@ public class ModItemGroups {
                         output.accept(ModItems.POST_MORTEM_EXPLOSION_BONUS_ITEM);
                         output.accept(ModItems.HUNTER_BONUS_ITEM);
                         output.accept(ModItems.STORAGE_BONUS_ITEM);
+                        output.accept(ModItems.FARMER_BONUS_ITEM);
+                        output.accept(ModItems.AUTO_TILLER_BONUS_ITEM);
+                        output.accept(ModItems.AUTO_PLANTER_BONUS_ITEM);
                     }))
                     .build()
 

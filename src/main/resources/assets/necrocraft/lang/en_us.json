@@ -9,6 +9,10 @@
   "item.necrocraft.solid_skin_bonus_item": "Solid Skin",
   "item.necrocraft.post_mortem_explosion_bonus_item": "Explosion Heart",
   "item.necrocraft.hunter_bonus_item": "Hunter Instinct",
+  "item.necrocraft.farmer_bonus_item": "Farmer Instinct",
+  "item.necrocraft.storage_bonus_item": "Storage Dead Finger",
+  "item.necrocraft.auto_planter_bonus_item": "Green Thumb",
+  "item.necrocraft.auto_tiller_bonus_item": "Farmer Brain",
 
   "block.necrocraft.soul_carving_block": "Soul Carving Table",
 

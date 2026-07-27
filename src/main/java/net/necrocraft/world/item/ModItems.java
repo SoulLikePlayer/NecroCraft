@@ -3,10 +3,7 @@ package net.necrocraft.world.item;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.necrocraft.core.NecroCraft;
-import net.necrocraft.world.item.bonus.impl.HunterBonusItem;
-import net.necrocraft.world.item.bonus.impl.PostMortemExplosionBonusItem;
-import net.necrocraft.world.item.bonus.impl.SolidSkinBonusItem;
-import net.necrocraft.world.item.bonus.impl.StorageBonusItem;
+import net.necrocraft.world.item.bonus.impl.*;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.level.block.ModBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -61,6 +58,24 @@ public class ModItems {
     public static DeferredItem<@NotNull Item> HUNTER_BONUS_ITEM = ITEMS.registerItem(
             "hunter_bonus_item",
             HunterBonusItem::new,
+            properties -> properties
+    );
+
+    public static DeferredItem<@NotNull Item> FARMER_BONUS_ITEM = ITEMS.registerItem(
+            "farmer_bonus_item",
+            FarmerBonusItem::new,
+            properties -> properties
+    );
+
+    public static DeferredItem<@NotNull Item> AUTO_PLANTER_BONUS_ITEM = ITEMS.registerItem(
+            "auto_planter_bonus_item",
+            AutoPlanterBonusItem::new,
+            properties -> properties
+    );
+
+    public static DeferredItem<@NotNull Item> AUTO_TILLER_BONUS_ITEM = ITEMS.registerItem(
+            "auto_tiller_bonus_item",
+            AutoTillerBonusItem::new,
             properties -> properties
     );
 

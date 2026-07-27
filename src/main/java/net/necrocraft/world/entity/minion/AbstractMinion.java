@@ -17,23 +17,31 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.animal.golem.CopperGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.necrocraft.world.entity.ai.goal.*;
+import net.necrocraft.world.entity.ai.goal.farmer.FarmCropsGoal;
+import net.necrocraft.world.entity.ai.goal.farmer.PlantSeedsGoal;
+import net.necrocraft.world.entity.ai.goal.farmer.TillFarmlandGoal;
+import net.necrocraft.world.entity.ai.goal.hunter.HuntPreyGoal;
 import net.necrocraft.world.inventory.MinionInventoryMenu;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.BonusType;
 import net.necrocraft.world.item.bonus.BonusUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -41,7 +49,7 @@ import java.util.*;
  * Abstract class who define what is a minion in NecroCraft.
  * A minion is a summonable mob define by a summoner
  */
-public class AbstractMinion extends PathfinderMob implements OwnableEntity, Container {
+public class AbstractMinion extends PathfinderMob implements OwnableEntity, Container, ContainerUser {
     public static final int TELEPORT_WHEN_DISTANCE_IS_SQ = 144;
 
     private static final int MIN_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 2;
@@ -57,6 +65,8 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     private final NonNullList<@NotNull ItemStack> inventoryItems = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
+    private @Nullable BlockPos openedChestPos;
+
     protected AbstractMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
         super(type, level);
     }
@@ -65,14 +75,17 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     protected void registerGoals() {
         super.registerGoals();
 
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0D, true));
-        this.goalSelector.addGoal(4, new StoreItemsInContainerGoal(this, 1.0D));
-        this.goalSelector.addGoal(6, new FollowSummonerGoal(this, 1.0F, 10.0F, 2.0F));
+        this.goalSelector.addGoal(1, new GatedGoal(new MeleeAttackGoal(this, 1.0D, true), () -> !this.isSedentary()));
+        this.goalSelector.addGoal(2, new FarmCropsGoal(this, 1.0D, 6));
+        this.goalSelector.addGoal(3, new GatedGoal(new PlantSeedsGoal(this, 1.0D, 6), this::canAutoPlant));
+        this.goalSelector.addGoal(4, new GatedGoal(new TillFarmlandGoal(this, 1.0D, 6), this::canAutoTill));
+        this.goalSelector.addGoal(5, new StoreItemsInContainerGoal(this, 1.0D));
+        this.goalSelector.addGoal(7, new GatedGoal(new FollowSummonerGoal(this, 1.0F, 10.0F, 2.0F), () -> !this.isSedentary()));
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Player.class, 8.0F));
 
-        this.targetSelector.addGoal(1, new SummonerHurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new SummonerHurtTargetGoal(this));
-        this.targetSelector.addGoal(3, new HuntPreyGoal(this, 16.0F));
+        this.targetSelector.addGoal(1, new GatedGoal(new SummonerHurtByTargetGoal(this), () -> !this.isSedentary()));
+        this.targetSelector.addGoal(2, new GatedGoal(new SummonerHurtTargetGoal(this), () -> !this.isSedentary()));
+        this.targetSelector.addGoal(3, new GatedGoal(new HuntPreyGoal(this, 16.0F), () -> !this.isSedentary()));
     }
 
     /**
@@ -127,7 +140,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     public boolean shouldTryTeleportToOwner() {
         LivingEntity owner = this.getOwner();
-        return owner != null && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
+        return owner != null && !this.isSedentary() && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
     }
 
     private void teleportToAroundBlockPos(BlockPos targetPos) {
@@ -175,6 +188,32 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     protected boolean canFlyToOwner() {
         return false;
+    }
+
+    public void setOpenedChestPos(@org.jetbrains.annotations.Nullable BlockPos openedChestPos) {
+        this.openedChestPos = openedChestPos;
+    }
+
+    public void clearOpenedChestPos() {
+        this.openedChestPos = null;
+    }
+
+    @Override
+    public boolean hasContainerOpen(@NotNull ContainerOpenersCounter container, @NotNull BlockPos blockPos) {
+        if (this.openedChestPos == null) {
+            return false;
+        } else {
+            BlockState blockState = this.level().getBlockState(this.openedChestPos);
+            return this.openedChestPos.equals(blockPos)
+                    || blockState.getBlock() instanceof ChestBlock
+                    && blockState.getValue(ChestBlock.TYPE) != ChestType.SINGLE
+                    && ChestBlock.getConnectedBlockPos(this.openedChestPos, blockState).equals(blockPos);
+        }
+    }
+
+    @Override
+    public double getContainerInteractionRange() {
+        return 3.0D;
     }
 
     public void setOwner(LivingEntity owner) {
@@ -354,5 +393,62 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
             }
         }
         return false;
+    }
+
+    public boolean isSedentary() {
+        for (Identifier bonusId : this.bonuses) {
+            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
+            if (bonus.isPresent() && bonus.get().isSedentary()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean canAutoPlant() {
+        for (Identifier bonusId : this.bonuses) {
+            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
+            if (bonus.isPresent() && bonus.get().canAutoPlant()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean canAutoTill() {
+        for (Identifier bonusId : this.bonuses) {
+            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
+            if (bonus.isPresent() && bonus.get().canAutoTill()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public @NotNull ItemStack storeItemStack(@NotNull ItemStack stack) {
+        return addToInventory(stack);
+    }
+
+    public boolean hasItem(@NotNull Item item) {
+        for (ItemStack stack : this.inventoryItems) {
+            if (!stack.isEmpty() && stack.is(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean consumeItem(@NotNull Item item, int amount) {
+        int remaining = amount;
+        for (int i = 0; i < this.inventoryItems.size() && remaining > 0; i++) {
+            ItemStack slot = this.inventoryItems.get(i);
+            if (!slot.isEmpty() && slot.is(item)) {
+                int take = Math.min(remaining, slot.getCount());
+                slot.shrink(take);
+                remaining -= take;
+                this.setChanged();
+            }
+        }
+        return remaining == 0;
     }
 }

@@ -1,4 +1,4 @@
-package net.necrocraft.world.entity.ai.goal;
+package net.necrocraft.world.entity.ai.goal.hunter;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
