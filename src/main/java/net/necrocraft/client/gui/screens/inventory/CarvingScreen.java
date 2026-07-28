@@ -166,6 +166,9 @@ public class CarvingScreen extends AbstractContainerScreen<@NotNull CarvingMenu>
     }
 
     @Override
+    protected void extractLabels(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY) {}
+
+    @Override
     public void extractBackground(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         int xo = this.leftPos;
         int yo = this.topPos;
