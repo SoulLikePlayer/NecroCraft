@@ -17,6 +17,12 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.EnumSet;
 
+/**
+ * Makes a "sedentary" farmer minion (see {@link AbstractMinion#isSedentary()})
+ * seek out the nearest fully grown crop within range, walk to it, harvest it,
+ * store the drops in its own inventory, and replant a seed from that
+ * inventory if one is available.
+ */
 public class FarmCropsGoal extends Goal {
 
     private static final int RESCAN_INTERVAL_TICKS = 20;
@@ -30,6 +36,11 @@ public class FarmCropsGoal extends Goal {
     private @Nullable BlockPos targetCropPos;
     private int rescanCooldown;
 
+    /**
+     * @param minion           the minion that should farm crops
+     * @param speedModifier    movement speed multiplier applied while walking to a crop
+     * @param horizontalRadius horizontal search radius (in blocks) for mature crops
+     */
     public FarmCropsGoal(AbstractMinion minion, double speedModifier, int horizontalRadius) {
         this.minion = minion;
         this.speedModifier = speedModifier;
@@ -37,6 +48,13 @@ public class FarmCropsGoal extends Goal {
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
+    /**
+     * Determines whether the goal should start: the minion must be sedentary,
+     * the rescan cooldown must have elapsed, and a mature crop must be found
+     * within range.
+     *
+     * @return {@code true} if a target crop was found and the goal should start
+     */
     @Override
     public boolean canUse() {
         if (!this.minion.isSedentary()) {
@@ -51,6 +69,10 @@ public class FarmCropsGoal extends Goal {
         return this.targetCropPos != null;
     }
 
+    /**
+     * @return {@code true} if the minion is still sedentary and the target
+     *         position still holds a fully grown crop
+     */
     @Override
     public boolean canContinueToUse() {
         if (this.targetCropPos == null || !this.minion.isSedentary()) {
@@ -60,17 +82,23 @@ public class FarmCropsGoal extends Goal {
         return state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state);
     }
 
+    /** Starts moving the minion toward the target crop. */
     @Override
     public void start() {
         moveTowardTarget();
     }
 
+    /** Clears the target crop and stops the minion's navigation. */
     @Override
     public void stop() {
         this.targetCropPos = null;
         this.minion.getNavigation().stop();
     }
 
+    /**
+     * Each tick, looks at the target crop and either walks toward it (if out
+     * of interaction range) or harvests and replants it (once in range).
+     */
     @Override
     public void tick() {
         if (this.targetCropPos == null) {
@@ -94,6 +122,7 @@ public class FarmCropsGoal extends Goal {
         }
     }
 
+    /** Orders the minion's navigation to move to the currently targeted crop. */
     private void moveTowardTarget() {
         if (this.targetCropPos != null) {
             this.minion.getNavigation().moveTo(
@@ -105,6 +134,15 @@ public class FarmCropsGoal extends Goal {
         }
     }
 
+    /**
+     * Harvests the mature crop at {@code pos}, storing its drops in the
+     * minion's inventory (dropping anything that doesn't fit on the ground),
+     * removes the crop block, and replants a seed from the minion's
+     * inventory if a matching one is available and consumed successfully.
+     *
+     * @param level the server level containing the crop
+     * @param pos   the position of the mature crop
+     */
     private void harvestAndReplant(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof CropBlock crop) || !crop.isMaxAge(state)) {
@@ -127,6 +165,12 @@ public class FarmCropsGoal extends Goal {
         }
     }
 
+    /**
+     * Scans a box around the minion (see {@link #horizontalRadius} and
+     * {@link #VERTICAL_RADIUS}) for the closest fully grown crop.
+     *
+     * @return the nearest mature crop position, or {@code null} if none was found
+     */
     private @Nullable BlockPos findNearestMatureCrop() {
         Level level = this.minion.level();
         BlockPos origin = this.minion.blockPosition();

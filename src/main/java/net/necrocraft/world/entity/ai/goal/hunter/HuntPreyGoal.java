@@ -11,12 +11,22 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Makes a "hunter" minion periodically scan a surrounding area for the
+ * closest living entity of one of its huntable types (see
+ * {@link AbstractMinion#getHuntableTargets()}) and target it, provided the
+ * minion has no current target.
+ */
 public class HuntPreyGoal extends TargetGoal {
     private final AbstractMinion minion;
     private final float range;
     private LivingEntity prey;
     private int cooldown;
 
+    /**
+     * @param minion the minion that should hunt nearby prey
+     * @param range  the radius (in blocks) to search around the minion for prey
+     */
     public HuntPreyGoal(AbstractMinion minion, float range) {
         super(minion, false);
         this.minion = minion;
@@ -24,6 +34,15 @@ public class HuntPreyGoal extends TargetGoal {
         this.setFlags(EnumSet.of(Flag.TARGET));
     }
 
+    /**
+     * Determines whether the goal should start: the minion must not already
+     * have a target, the hunt cooldown must have elapsed, the minion must
+     * have at least one huntable entity type configured, and a living
+     * instance of one of those types must be found within {@link #range}.
+     * The closest such entity is selected as {@link #prey}.
+     *
+     * @return {@code true} if prey was found and the goal should start
+     */
     @Override
     public boolean canUse() {
         if (this.minion.getTarget() != null) {
@@ -50,6 +69,7 @@ public class HuntPreyGoal extends TargetGoal {
         return this.prey != null;
     }
 
+    /** Sets the minion's target to the selected prey. */
     @Override
     public void start() {
         this.mob.setTarget(this.prey);

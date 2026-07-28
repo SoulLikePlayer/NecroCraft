@@ -15,6 +15,11 @@ import org.jspecify.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Map;
 
+/**
+ * Makes a sedentary farmer minion seek out the nearest empty (unplanted)
+ * farmland block within range, walk to it, and plant a seed from its own
+ * inventory on top of it.
+ */
 public class PlantSeedsGoal extends Goal {
 
     private static final int RESCAN_INTERVAL_TICKS = 20;
@@ -28,6 +33,11 @@ public class PlantSeedsGoal extends Goal {
     private @Nullable BlockPos targetFarmlandPos;
     private int rescanCooldown;
 
+    /**
+     * @param minion           the minion that should plant seeds
+     * @param speedModifier    movement speed multiplier applied while walking to farmland
+     * @param horizontalRadius horizontal search radius (in blocks) for empty farmland
+     */
     public PlantSeedsGoal(AbstractMinion minion, double speedModifier, int horizontalRadius) {
         this.minion = minion;
         this.speedModifier = speedModifier;
@@ -35,6 +45,13 @@ public class PlantSeedsGoal extends Goal {
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
+    /**
+     * Determines whether the goal should start: the minion must be sedentary,
+     * the rescan cooldown must have elapsed, the minion must carry at least
+     * one seed, and empty farmland must be found within range.
+     *
+     * @return {@code true} if a target farmland tile was found and the goal should start
+     */
     @Override
     public boolean canUse() {
         if (!this.minion.isSedentary()) {
@@ -54,6 +71,10 @@ public class PlantSeedsGoal extends Goal {
         return this.targetFarmlandPos != null;
     }
 
+    /**
+     * @return {@code true} if the minion is still sedentary, the target
+     *         farmland is still empty, and the minion still carries a seed
+     */
     @Override
     public boolean canContinueToUse() {
         if (this.targetFarmlandPos == null || !this.minion.isSedentary()) {
@@ -62,17 +83,23 @@ public class PlantSeedsGoal extends Goal {
         return isEmptyFarmland(this.minion.level(), this.targetFarmlandPos) && hasAnySeed();
     }
 
+    /** Starts moving the minion toward the target farmland. */
     @Override
     public void start() {
         moveTowardTarget();
     }
 
+    /** Clears the target farmland and stops the minion's navigation. */
     @Override
     public void stop() {
         this.targetFarmlandPos = null;
         this.minion.getNavigation().stop();
     }
 
+    /**
+     * Each tick, looks at the target farmland and either walks toward it (if
+     * out of interaction range) or plants a seed on it (once in range).
+     */
     @Override
     public void tick() {
         if (this.targetFarmlandPos == null) {
@@ -96,6 +123,7 @@ public class PlantSeedsGoal extends Goal {
         }
     }
 
+    /** Orders the minion's navigation to move to the currently targeted farmland. */
     private void moveTowardTarget() {
         if (this.targetFarmlandPos != null) {
             this.minion.getNavigation().moveTo(
@@ -107,6 +135,14 @@ public class PlantSeedsGoal extends Goal {
         }
     }
 
+    /**
+     * Plants the first seed the minion carries (in crop-to-seed map iteration
+     * order) above the given farmland block, consuming one seed from the
+     * minion's inventory.
+     *
+     * @param level       the server level containing the farmland
+     * @param farmlandPos the position of the empty farmland block
+     */
     private void plantSeed(ServerLevel level, BlockPos farmlandPos) {
         if (!isEmptyFarmland(level, farmlandPos)) {
             return;
@@ -120,6 +156,10 @@ public class PlantSeedsGoal extends Goal {
         }
     }
 
+    /**
+     * @return {@code true} if the minion's inventory contains at least one
+     *         of any known crop seed
+     */
     private boolean hasAnySeed() {
         for (Item seed : FarmingUtil.cropToSeedMap().values()) {
             if (this.minion.hasItem(seed)) {
@@ -129,6 +169,11 @@ public class PlantSeedsGoal extends Goal {
         return false;
     }
 
+    /**
+     * @param level the level to read block states from
+     * @param pos   the farmland position to check
+     * @return {@code true} if {@code pos} is farmland with nothing planted above it
+     */
     private boolean isEmptyFarmland(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() != Blocks.FARMLAND) {
@@ -137,6 +182,12 @@ public class PlantSeedsGoal extends Goal {
         return level.getBlockState(pos.above()).isAir();
     }
 
+    /**
+     * Scans a box around the minion (see {@link #horizontalRadius} and
+     * {@link #VERTICAL_RADIUS}) for the closest empty farmland block.
+     *
+     * @return the nearest empty farmland position, or {@code null} if none was found
+     */
     private @Nullable BlockPos findNearestEmptyFarmland() {
         Level level = this.minion.level();
         BlockPos origin = this.minion.blockPosition();

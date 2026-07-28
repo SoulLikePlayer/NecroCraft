@@ -21,7 +21,12 @@ import net.necrocraft.world.item.bonus.impl.StorageBonusItem;
 
 import java.util.EnumSet;
 
-
+/**
+ * Makes a minion equipped with a {@link StorageBonusItem} bonus walk its
+ * carried inventory to the nearest chest, barrel or ender chest and deposit
+ * it there, playing the appropriate open/close sound and (for chests and
+ * barrels) toggling the block's visual open state while it does so.
+ */
 public class StoreItemsInContainerGoal extends Goal {
 
     private static final int SEARCH_HORIZONTAL_RADIUS = 8;
@@ -40,12 +45,23 @@ public class StoreItemsInContainerGoal extends Goal {
     private int openDelayTicks = -1;
     private boolean containerVisuallyOpened = false;
 
+    /**
+     * @param minion        the minion that should deposit its inventory into containers
+     * @param speedModifier movement speed multiplier applied while walking to the container
+     */
     public StoreItemsInContainerGoal(AbstractMinion minion, double speedModifier) {
         this.minion = minion;
         this.speedModifier = speedModifier;
         this.setFlags(EnumSet.of(Flag.MOVE));
     }
 
+    /**
+     * Determines whether the goal should start: the minion must have the
+     * storage bonus, carry at least one item, and a search must locate a
+     * reachable container (subject to {@link #SEARCH_COOLDOWN}).
+     *
+     * @return {@code true} if a target container was found and the goal should start
+     */
     @Override
     public boolean canUse() {
         if (!hasStorageBonus()) {
@@ -63,6 +79,10 @@ public class StoreItemsInContainerGoal extends Goal {
         return this.targetContainerPos != null;
     }
 
+    /**
+     * @return {@code true} if the minion still has the storage bonus, still
+     *         carries items, and its target position still holds a valid container
+     */
     @Override
     public boolean canContinueToUse() {
         return hasStorageBonus()
@@ -71,12 +91,17 @@ public class StoreItemsInContainerGoal extends Goal {
                 && isValidContainer(this.minion.level(), this.targetContainerPos);
     }
 
+    /** Resets the open-animation timer and starts moving toward the target container. */
     @Override
     public void start() {
         this.openDelayTicks = -1;
         moveTowardTarget();
     }
 
+    /**
+     * Closes the container visually if it was opened, then clears all
+     * goal state (target position, opened-chest marker, navigation).
+     */
     @Override
     public void stop() {
         if (this.containerVisuallyOpened && this.targetContainerPos != null
@@ -89,6 +114,11 @@ public class StoreItemsInContainerGoal extends Goal {
         this.minion.getNavigation().stop();
     }
 
+    /**
+     * Drives the goal's state machine each tick: walks toward the container
+     * until in reach, opens it (with a short animation delay), deposits the
+     * minion's inventory, then closes the container and clears the target.
+     */
     @Override
     public void tick() {
         if (this.targetContainerPos == null) {
@@ -134,6 +164,7 @@ public class StoreItemsInContainerGoal extends Goal {
         this.openDelayTicks = -1;
     }
 
+    /** Orders the minion's navigation to move to the currently targeted container. */
     private void moveTowardTarget() {
         this.minion.getNavigation().moveTo(
                 this.targetContainerPos.getX() + 0.5D,
@@ -143,6 +174,12 @@ public class StoreItemsInContainerGoal extends Goal {
         );
     }
 
+    /**
+     * Scans a box around the minion (see {@link #SEARCH_HORIZONTAL_RADIUS} and
+     * {@link #SEARCH_VERTICAL_RADIUS}) for the closest valid container block.
+     *
+     * @return the nearest valid container position, or {@code null} if none was found
+     */
     private BlockPos findNearestContainer() {
         BlockPos origin = this.minion.blockPosition();
         Level level = this.minion.level();
@@ -169,11 +206,25 @@ public class StoreItemsInContainerGoal extends Goal {
         return best;
     }
 
+    /**
+     * @param level the level to read the block state from
+     * @param pos   the position to check
+     * @return {@code true} if the block at {@code pos} is a chest, ender chest or barrel
+     */
     private boolean isValidContainer(Level level, BlockPos pos) {
         Block block = level.getBlockState(pos).getBlock();
         return block instanceof ChestBlock || block instanceof EnderChestBlock || block instanceof BarrelBlock;
     }
 
+    /**
+     * Toggles the open/closed visual state (and matching sound) of the
+     * container block at {@code pos}, dispatching to the correct behavior
+     * for barrels, ender chests and regular chests.
+     *
+     * @param level the server level containing the block
+     * @param pos   the position of the container block
+     * @param open  {@code true} to open the container, {@code false} to close it
+     */
     private void setContainerVisuallyOpen(ServerLevel level, BlockPos pos, boolean open) {
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
@@ -198,6 +249,13 @@ public class StoreItemsInContainerGoal extends Goal {
         this.containerVisuallyOpened = open;
     }
 
+    /**
+     * Empties every non-empty slot of the minion's inventory into the given
+     * container, leaving back whatever could not fit.
+     *
+     * @param level the server level containing the container
+     * @param pos   the position of the target container
+     */
     private void depositInventory(ServerLevel level, BlockPos pos) {
         if (!(level.getBlockEntity(pos) instanceof Container container)) {
             return;
@@ -214,6 +272,14 @@ public class StoreItemsInContainerGoal extends Goal {
         }
     }
 
+    /**
+     * Inserts as much of {@code stack} as possible into {@code container},
+     * first topping up existing matching stacks, then filling empty slots.
+     *
+     * @param container the container to insert into
+     * @param stack     the stack to insert (mutated in place as items are moved)
+     * @return whatever portion of {@code stack} could not be inserted (may be empty)
+     */
     private ItemStack insertIntoContainer(Container container, ItemStack stack) {
         for (int i = 0; i < container.getContainerSize() && !stack.isEmpty(); i++) {
             ItemStack slot = container.getItem(i);
@@ -242,6 +308,10 @@ public class StoreItemsInContainerGoal extends Goal {
         return stack;
     }
 
+    /**
+     * @return {@code true} if the minion currently carries a bonus that
+     *         resolves to a {@link StorageBonusItem}
+     */
     private boolean hasStorageBonus() {
         for (Identifier bonusId : this.minion.getBonuses()) {
             if (BonusUtil.resolve(bonusId).filter(StorageBonusItem.class::isInstance).isPresent()) {

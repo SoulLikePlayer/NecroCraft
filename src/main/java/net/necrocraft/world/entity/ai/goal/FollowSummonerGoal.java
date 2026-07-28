@@ -12,6 +12,12 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.EnumSet;
 
+/**
+ * Makes a minion walk toward, and stay near, its owner, pathing to them once
+ * they stray further than {@code startDistance} away and stopping once back
+ * within {@code stopDistance}. Falls back to teleporting when the minion is
+ * unable to path to a far-away owner (see {@link AbstractMinion#shouldTryTeleportToOwner()}).
+ */
 public class FollowSummonerGoal extends Goal {
     private final AbstractMinion minion;
     private @Nullable LivingEntity owner;
@@ -22,6 +28,13 @@ public class FollowSummonerGoal extends Goal {
     private final float startDistance;
     private float oldWaterCost;
 
+    /**
+     * @param minion         the minion that should follow its summoner
+     * @param speedModifier  movement speed multiplier applied while pathing to the owner
+     * @param startDistance  distance beyond which the minion starts following its owner
+     * @param stopDistance   distance within which the minion stops following its owner
+     * @throws IllegalArgumentException if the minion's navigation is neither ground- nor flying-based
+     */
     public FollowSummonerGoal(AbstractMinion minion, double speedModifier, float startDistance, float stopDistance) {
         this.minion = minion;
         this.speedModifier = speedModifier;
@@ -34,6 +47,13 @@ public class FollowSummonerGoal extends Goal {
         }
     }
 
+    /**
+     * Determines whether the minion should start following its owner: it must
+     * have an owner, be able to move toward them, and currently be farther
+     * away than {@code startDistance}.
+     *
+     * @return {@code true} if the goal should start
+     */
     public boolean canUse() {
         LivingEntity owner = this.minion.getOwner();
         if (owner == null) {
@@ -48,6 +68,13 @@ public class FollowSummonerGoal extends Goal {
         }
     }
 
+    /**
+     * Determines whether the goal should keep running: it stops once the
+     * navigation is finished, the minion can no longer reach its owner, or
+     * the minion has come back within {@code stopDistance}.
+     *
+     * @return {@code true} if the goal should continue
+     */
     public boolean canContinueToUse() {
         if (this.navigation.isDone()) {
             return false;
@@ -56,18 +83,31 @@ public class FollowSummonerGoal extends Goal {
         }
     }
 
+    /**
+     * Resets the path recalculation timer and temporarily removes the water
+     * pathfinding penalty so the minion can cross water to reach its owner.
+     */
     public void start() {
         this.timeToRecalcPath = 0;
         this.oldWaterCost = this.minion.getPathfindingMalus(PathType.WATER);
         this.minion.setPathfindingMalus(PathType.WATER, 0.0F);
     }
 
+    /**
+     * Clears the tracked owner, stops navigation and restores the original
+     * water pathfinding penalty.
+     */
     public void stop() {
         this.owner = null;
         this.navigation.stop();
         this.minion.setPathfindingMalus(PathType.WATER, this.oldWaterCost);
     }
 
+    /**
+     * Each tick, looks at the owner (unless they are far enough away that a
+     * teleport is imminent) and, on the path-recalculation interval, either
+     * attempts to teleport to the owner or recomputes the path toward them.
+     */
     public void tick() {
         boolean isOwnerFarAway = this.minion.shouldTryTeleportToOwner();
         if (!isOwnerFarAway) {

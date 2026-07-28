@@ -18,11 +18,27 @@ import net.minecraft.world.entity.EntityType;
 import net.necrocraft.world.entity.ModEntity;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 
+/**
+ * Registers and handles the {@code /summon-minion} command, which lets a
+ * game master spawn a tamed {@link AbstractMinion} owned by the executing player.
+ */
 public class NecroCraftCommands {
 
+    /**
+     * Autocomplete suggestions offered for the {@code type} argument of
+     * {@code /summon-minion} (currently {@code "zombie"} and {@code "skeleton"}).
+     */
     private static final SuggestionProvider<CommandSourceStack> MINION_SUGGESTIONS =
             (ctx, builder) -> SharedSuggestionProvider.suggest(new String[]{"zombie", "skeleton"}, builder);
 
+    /**
+     * Registers the {@code /summon-minion} command against the given dispatcher.
+     * <p>
+     * The command requires {@link PermissionLevel#GAMEMASTERS} and takes a single
+     * mandatory {@code type} argument identifying which minion to summon.
+     *
+     * @param dispatcher the Brigadier command dispatcher to register the command with
+     */
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 Commands.literal("summon-minion")
@@ -34,6 +50,17 @@ public class NecroCraftCommands {
         );
     }
 
+    /**
+     * Executes the {@code /summon-minion} command: spawns the requested minion
+     * type at the executing player's position and assigns that player as its owner.
+     * <p>
+     * Fails (with a translated error message sent back to the source) if the
+     * command was not run by a player, or if {@code type} does not match a
+     * known minion type.
+     *
+     * @param ctx the Brigadier command context, providing the source and the {@code type} argument
+     * @return {@code 1} on success, {@code 0} if the command failed (wrong source or unknown type)
+     */
     private static int summonMinion(CommandContext<CommandSourceStack> ctx) {
         CommandSourceStack source = ctx.getSource();
         String minionType = StringArgumentType.getString(ctx, "type");

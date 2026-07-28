@@ -46,10 +46,19 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 
 /**
- * Abstract class who define what is a minion in NecroCraft.
- * A minion is a summonable mob define by a summoner
+ * Abstract base class defining what a minion is in NecroCraft: a summonable
+ * mob owned by a summoner, carrying its own 27-slot inventory, an
+ * {@link net.necrocraft.world.item.bonus.AbstractBonusItem} loadout that
+ * unlocks behaviors (farming, hunting, storing, sedentary mode...), and the
+ * ability to teleport back to its owner when left too far behind.
+ * <p>
+ * Concrete subclasses (e.g. {@link ZombieMinion}, {@link SkeletonMinion})
+ * only need to supply mob-specific sounds; all shared behavior (goals,
+ * inventory, ownership, persistence) lives here.
  */
 public class AbstractMinion extends PathfinderMob implements OwnableEntity, Container, ContainerUser {
+
+    /** Squared distance to the owner beyond which the minion attempts to teleport to them. */
     public static final int TELEPORT_WHEN_DISTANCE_IS_SQ = 144;
 
     private static final int MIN_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 2;
@@ -58,19 +67,41 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     private static final int INVENTORY_SIZE = 27;
 
+    /** Synced reference to the living entity that owns/summoned this minion, if any. */
     protected static final EntityDataAccessor<@NotNull Optional<EntityReference<@NotNull LivingEntity>>> DATA_SUMMONER_UUID_ID =
             SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
+    /** Identifiers of the bonus items currently equipped on this minion, driving its optional behaviors. */
     private List<Identifier> bonuses = new ArrayList<>();
 
+    /** The minion's own carried inventory. */
     private final NonNullList<@NotNull ItemStack> inventoryItems = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
+    /** Position of the container currently visually opened by this minion, if any (see {@link StoreItemsInContainerGoal}). */
     private @Nullable BlockPos openedChestPos;
 
+    /**
+     * @param type  the entity type this minion is instantiated from
+     * @param level the level the minion is created in
+     */
     protected AbstractMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
         super(type, level);
     }
 
+    /**
+     * Registers this minion's AI goals and targeting goals on top of the
+     * vanilla ones. Most goals are wrapped in a {@link GatedGoal} so they
+     * only activate when relevant bonuses are equipped or the minion is not
+     * {@link #isSedentary() sedentary}:
+     * <ul>
+     *     <li>Melee attack, following the owner, and combat-assist targeting
+     *     are disabled while sedentary.</li>
+     *     <li>Auto-planting and auto-tilling require the corresponding bonus
+     *     (see {@link #canAutoPlant()}, {@link #canAutoTill()}).</li>
+     *     <li>Crop farming and storing items in containers run unconditionally
+     *     (their own {@code canUse()} checks handle relevance).</li>
+     * </ul>
+     */
     @Override
     protected void registerGoals() {
         super.registerGoals();
@@ -89,9 +120,9 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
     /**
-     * Define all the data that sync at the creation of the mob
+     * Defines all the data that is synced at the creation of the mob.
      *
-     * @param entityData : the builder of the data that need to be defined
+     * @param entityData the builder used to declare synced data entries
      */
     @Override
     protected void defineSynchedData(SynchedEntityData.@NotNull Builder entityData) {
@@ -99,6 +130,12 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         entityData.define(DATA_SUMMONER_UUID_ID, Optional.empty());
     }
 
+    /**
+     * Writes this minion's owner reference, bonus list and inventory contents
+     * to persistent storage.
+     *
+     * @param output the save-data sink to write to
+     */
     @Override
     protected void addAdditionalSaveData(@NotNull ValueOutput output) {
         super.addAdditionalSaveData(output);
@@ -108,6 +145,12 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         ContainerHelper.saveAllItems(output, this.inventoryItems);
     }
 
+    /**
+     * Restores this minion's owner reference, bonus list and inventory
+     * contents from persistent storage.
+     *
+     * @param input the save-data source to read from
+     */
     @Override
     protected void readAdditionalSaveData(@NotNull ValueInput input) {
         super.readAdditionalSaveData(input);
@@ -120,16 +163,25 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         ContainerHelper.loadAllItems(input, this.inventoryItems);
     }
 
+    /** @return the synced reference to this minion's owner, or {@code null} if it has none */
     public EntityReference<@NotNull LivingEntity> getOwnerReference() {
         return this.entityData
                 .get(DATA_SUMMONER_UUID_ID)
                 .orElse(null);
     }
 
+    /**
+     * @param entity the entity to check
+     * @return {@code true} if {@code entity} is this minion's owner
+     */
     public boolean isSummonedBy(LivingEntity entity) {
         return entity == this.getOwner();
     }
 
+    /**
+     * Attempts to teleport this minion to a random walkable position near
+     * its owner. Does nothing if the minion has no owner.
+     */
     public void tryToTeleportToOwner() {
         LivingEntity owner = this.getOwner();
         if (owner != null) {
@@ -138,11 +190,24 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     }
 
+    /**
+     * @return {@code true} if the minion has an owner, is not sedentary, and
+     *         is at least {@link #TELEPORT_WHEN_DISTANCE_IS_SQ} (squared blocks) away from them
+     */
     public boolean shouldTryTeleportToOwner() {
         LivingEntity owner = this.getOwner();
         return owner != null && !this.isSedentary() && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
     }
 
+    /**
+     * Tries up to 10 random offsets around {@code targetPos} (within
+     * {@link #MIN_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING} to
+     * {@link #MAX_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING} blocks
+     * horizontally and {@link #MAX_VERTICAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING}
+     * blocks vertically) and teleports to the first valid one found.
+     *
+     * @param targetPos the position to teleport around (typically the owner's position)
+     */
     private void teleportToAroundBlockPos(BlockPos targetPos) {
         for (int attempt = 0; attempt < 10; ++attempt) {
             int xd = this.random.nextIntBetweenInclusive(-3, 3);
@@ -157,6 +222,15 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     }
 
+    /**
+     * Teleports the minion to the given coordinates if they are a valid
+     * teleport destination.
+     *
+     * @param x target world X coordinate
+     * @param y target world Y coordinate
+     * @param z target world Z coordinate
+     * @return {@code true} if the teleport happened, {@code false} if the position was invalid
+     */
     private boolean maybeTeleportTo(int x, int y, int z) {
         if (!this.canTeleportTo(new BlockPos(x, y, z))) {
             return false;
@@ -167,6 +241,14 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         }
     }
 
+    /**
+     * Checks whether {@code pos} is a safe teleport target: it must be
+     * walkable, not sitting on leaves (unless the minion can fly to its
+     * owner), and free of collisions once the minion's bounding box is moved there.
+     *
+     * @param pos the candidate teleport position
+     * @return {@code true} if the minion can safely teleport to {@code pos}
+     */
     private boolean canTeleportTo(BlockPos pos) {
         PathType pathType = WalkNodeEvaluator.getPathTypeStatic(this, pos);
         if (pathType != PathType.WALKABLE) {
@@ -182,22 +264,45 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         }
     }
 
+    /**
+     * @return {@code true} if the minion cannot currently move toward its
+     *         owner because it is a passenger, can be leashed, or its owner
+     *         is a spectator
+     */
     public final boolean unableToMoveToOwner() {
         return this.isPassenger() || this.mayBeLeashed() || this.getOwner() != null && this.getOwner().isSpectator();
     }
 
+    /**
+     * @return {@code true} if this minion type is allowed to teleport onto
+     *         leaf blocks when returning to its owner; {@code false} by default
+     */
     protected boolean canFlyToOwner() {
         return false;
     }
 
+    /**
+     * @param openedChestPos the position of the container this minion is
+     *                       currently visually opening, or {@code null} to clear it
+     */
     public void setOpenedChestPos(@org.jetbrains.annotations.Nullable BlockPos openedChestPos) {
         this.openedChestPos = openedChestPos;
     }
 
+    /** Clears the currently tracked opened-container position. */
     public void clearOpenedChestPos() {
         this.openedChestPos = null;
     }
 
+    /**
+     * Reports whether this minion is considered to have {@code blockPos}'s
+     * container open, accounting for double chests (where either half of the
+     * chest counts as the same container).
+     *
+     * @param container the opener counter for the container in question
+     * @param blockPos  the position of the container being queried
+     * @return {@code true} if this minion currently has that container open
+     */
     @Override
     public boolean hasContainerOpen(@NotNull ContainerOpenersCounter container, @NotNull BlockPos blockPos) {
         if (this.openedChestPos == null) {
@@ -211,11 +316,17 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         }
     }
 
+    /** @return the maximum distance (in blocks) at which this minion can interact with a container */
     @Override
     public double getContainerInteractionRange() {
         return 3.0D;
     }
 
+    /**
+     * Sets (or clears) this minion's owner.
+     *
+     * @param owner the new owner, or {@code null} to remove ownership
+     */
     public void setOwner(LivingEntity owner) {
         if (owner != null) {
             this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.of(EntityReference.of(owner)));
@@ -224,24 +335,44 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         }
     }
 
+    /**
+     * Replaces this minion's equipped bonus list.
+     *
+     * @param bonuses the new list of bonus item identifiers
+     */
     public void setBonuses(@NotNull List<Identifier> bonuses) {
         this.bonuses = new ArrayList<>(bonuses);
     }
 
+    /** @return the identifiers of the bonus items currently equipped on this minion */
     public @NotNull List<Identifier> getBonuses() {
         return this.bonuses;
     }
 
+    /**
+     * @param level  the level the minion is in
+     * @param source the damage source to check
+     * @return {@code true} if this minion is invulnerable to {@code source} (delegates to vanilla behavior)
+     */
     @Override
     public boolean isInvulnerableTo(@NotNull ServerLevel level, @NotNull DamageSource source) {
         return super.isInvulnerableTo(level, source);
     }
 
+    /** @return {@code true} if this minion has at least one huntable target type configured, allowing it to pick up dropped loot */
     @Override
     public boolean canPickUpLoot() {
         return !this.getHuntableTargets().isEmpty();
     }
 
+    /**
+     * Picks up an item entity into this minion's own inventory (rather than
+     * equipment slots), storing as much as fits and leaving the remainder on
+     * the ground item entity.
+     *
+     * @param level  the server level the pickup occurs in
+     * @param entity the item entity being picked up
+     */
     @Override
     protected void pickUpItem(ServerLevel level, ItemEntity entity) {
         if (!this.canPickUpLoot()) {
@@ -263,6 +394,14 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         }
     }
 
+    /**
+     * Inserts as much of {@code stack} as possible into this minion's
+     * inventory, first topping up existing matching stacks, then filling
+     * empty slots.
+     *
+     * @param stack the stack to insert (mutated in place as items are moved)
+     * @return whatever portion of {@code stack} could not be inserted (may be empty)
+     */
     private ItemStack addToInventory(@NotNull ItemStack stack) {
         for (int i = 0; i < this.inventoryItems.size() && !stack.isEmpty(); i++) {
             ItemStack slot = this.inventoryItems.get(i);
@@ -290,6 +429,14 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return stack;
     }
 
+    /**
+     * Opens this minion's inventory menu for the interacting player when
+     * right-clicked with an empty main hand interaction (and not sneaking).
+     *
+     * @param player the interacting player
+     * @param hand   the hand used to interact
+     * @return {@link InteractionResult#SUCCESS} if the menu was opened, otherwise the vanilla result
+     */
     @Override
     protected @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
         if (hand == InteractionHand.MAIN_HAND && !player.isSecondaryUseActive()) {
@@ -304,6 +451,13 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return super.mobInteract(player, hand);
     }
 
+    /**
+     * On death, triggers any equipped bonuses' post-mortem effects and drops
+     * this minion's carried inventory on the ground before proceeding with
+     * vanilla death handling.
+     *
+     * @param damageSource the source of the killing blow
+     */
     @Override
     public void die(@NotNull DamageSource damageSource) {
         if (this.level() instanceof ServerLevel serverLevel) {
@@ -313,6 +467,12 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         super.die(damageSource);
     }
 
+    /**
+     * Invokes {@code onDeath} on every equipped bonus that resolves
+     * successfully.
+     *
+     * @param serverLevel the server level the minion died in
+     */
     private void triggerPostMortemBonuses(ServerLevel serverLevel) {
         for (Identifier bonusId : this.bonuses) {
             BonusUtil.resolve(bonusId).ifPresent(bonus -> bonus.onDeath(this, serverLevel));
@@ -320,11 +480,13 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
 
+    /** @return the fixed number of slots in this minion's inventory ({@value #INVENTORY_SIZE}) */
     @Override
     public int getContainerSize() {
         return INVENTORY_SIZE;
     }
 
+    /** @return {@code true} if every slot in this minion's inventory is empty */
     @Override
     public boolean isEmpty() {
         for (ItemStack stack : this.inventoryItems) {
@@ -335,11 +497,22 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return true;
     }
 
+    /**
+     * @param slot the inventory slot index
+     * @return the item stack in that slot
+     */
     @Override
     public @NotNull ItemStack getItem(int slot) {
         return this.inventoryItems.get(slot);
     }
 
+    /**
+     * Removes up to {@code amount} items from {@code slot}.
+     *
+     * @param slot   the inventory slot index
+     * @param amount the maximum number of items to remove
+     * @return the removed item stack (may be smaller than {@code amount} or empty)
+     */
     @Override
     public @NotNull ItemStack removeItem(int slot, int amount) {
         ItemStack result = ContainerHelper.removeItem(this.inventoryItems, slot, amount);
@@ -349,11 +522,25 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return result;
     }
 
+    /**
+     * Removes the entire stack from {@code slot} without triggering a
+     * container-changed update.
+     *
+     * @param slot the inventory slot index
+     * @return the removed item stack
+     */
     @Override
     public @NotNull ItemStack removeItemNoUpdate(int slot) {
         return ContainerHelper.takeItem(this.inventoryItems, slot);
     }
 
+    /**
+     * Places {@code stack} into {@code slot}, clamping its count to this
+     * container's max stack size.
+     *
+     * @param slot  the inventory slot index
+     * @param stack the item stack to place
+     */
     @Override
     public void setItem(int slot, @NotNull ItemStack stack) {
         this.inventoryItems.set(slot, stack);
@@ -363,20 +550,32 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         this.setChanged();
     }
 
+    /** No-op: this container does not need to notify external listeners of changes. */
     @Override
     public void setChanged() {
     }
 
+    /**
+     * @param player the player checking validity
+     * @return {@code true} if this minion is alive and the player is within 8 blocks (64 squared) of it
+     */
     @Override
     public boolean stillValid(@NotNull Player player) {
         return this.isAlive() && player.distanceToSqr(this) <= 64.0D;
     }
 
+    /** Empties this minion's inventory of all items. */
     @Override
     public void clearContent() {
         this.inventoryItems.clear();
     }
 
+    /**
+     * Aggregates the huntable entity types contributed by all of this
+     * minion's equipped bonuses.
+     *
+     * @return the combined set of entity types this minion may hunt
+     */
     public @NotNull Set<EntityType<?>> getHuntableTargets() {
         Set<EntityType<?>> targets = new HashSet<>();
         for (Identifier bonusId : this.bonuses) {
@@ -385,6 +584,10 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return targets;
     }
 
+    /**
+     * @param type the bonus type to look for
+     * @return {@code true} if any of this minion's equipped bonuses matches {@code type}
+     */
     public boolean hasBonusType(@NotNull BonusType type){
         for (Identifier bonusId : this.bonuses) {
             Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
@@ -395,6 +598,11 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return false;
     }
 
+    /**
+     * @return {@code true} if any equipped bonus marks this minion as
+     *         sedentary (disabling combat/following goals in favor of
+     *         stationary farming behavior)
+     */
     public boolean isSedentary() {
         for (Identifier bonusId : this.bonuses) {
             Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
@@ -405,6 +613,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return false;
     }
 
+    /** @return {@code true} if any equipped bonus grants this minion the ability to automatically plant seeds */
     public boolean canAutoPlant() {
         for (Identifier bonusId : this.bonuses) {
             Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
@@ -415,6 +624,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return false;
     }
 
+    /** @return {@code true} if any equipped bonus grants this minion the ability to automatically till soil */
     public boolean canAutoTill() {
         for (Identifier bonusId : this.bonuses) {
             Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
@@ -425,10 +635,21 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return false;
     }
 
+    /**
+     * Stores as much of the given item stack as possible in this minion's
+     * inventory.
+     *
+     * @param stack the stack to store
+     * @return whatever portion could not be stored (may be empty)
+     */
     public @NotNull ItemStack storeItemStack(@NotNull ItemStack stack) {
         return addToInventory(stack);
     }
 
+    /**
+     * @param item the item to look for
+     * @return {@code true} if this minion's inventory contains at least one of {@code item}
+     */
     public boolean hasItem(@NotNull Item item) {
         for (ItemStack stack : this.inventoryItems) {
             if (!stack.isEmpty() && stack.is(item)) {
@@ -438,6 +659,14 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return false;
     }
 
+    /**
+     * Removes up to {@code amount} of {@code item} from this minion's
+     * inventory, across as many slots as needed.
+     *
+     * @param item   the item to consume
+     * @param amount the desired quantity to remove
+     * @return {@code true} if the full {@code amount} was successfully removed
+     */
     public boolean consumeItem(@NotNull Item item, int amount) {
         int remaining = amount;
         for (int i = 0; i < this.inventoryItems.size() && remaining > 0; i++) {

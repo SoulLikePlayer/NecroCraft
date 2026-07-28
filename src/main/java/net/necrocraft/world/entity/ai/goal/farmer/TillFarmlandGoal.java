@@ -20,6 +20,12 @@ import org.jspecify.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Map;
 
+/**
+ * Makes a minion carrying a hoe (equipped or in inventory) find nearby
+ * tillable soil that is close to water, walk to it, till it into farmland
+ * (damaging the hoe in the process), and immediately plant a seed on it if
+ * one is available.
+ */
 public class TillFarmlandGoal extends Goal {
 
     private static final int RESCAN_INTERVAL_TICKS = 20;
@@ -34,6 +40,11 @@ public class TillFarmlandGoal extends Goal {
     private @Nullable BlockPos targetSoilPos;
     private int rescanCooldown;
 
+    /**
+     * @param minion           the minion that should till soil
+     * @param speedModifier    movement speed multiplier applied while walking to the soil
+     * @param horizontalRadius horizontal search radius (in blocks) for tillable soil
+     */
     public TillFarmlandGoal(AbstractMinion minion, double speedModifier, int horizontalRadius) {
         this.minion = minion;
         this.speedModifier = speedModifier;
@@ -41,6 +52,13 @@ public class TillFarmlandGoal extends Goal {
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
+    /**
+     * Determines whether the goal should start: the rescan cooldown must have
+     * elapsed, the minion must carry a hoe, and tillable soil near water must
+     * be found within range.
+     *
+     * @return {@code true} if a target soil block was found and the goal should start
+     */
     @Override
     public boolean canUse() {
         if (this.rescanCooldown > 0) {
@@ -57,6 +75,10 @@ public class TillFarmlandGoal extends Goal {
         return this.targetSoilPos != null;
     }
 
+    /**
+     * @return {@code true} if the target soil is still tillable and the
+     *         minion still carries a hoe
+     */
     @Override
     public boolean canContinueToUse() {
         if (this.targetSoilPos == null) {
@@ -65,17 +87,23 @@ public class TillFarmlandGoal extends Goal {
         return isTillableSoil(this.minion.level(), this.targetSoilPos) && hasHoe();
     }
 
+    /** Starts moving the minion toward the target soil. */
     @Override
     public void start() {
         moveTowardTarget();
     }
 
+    /** Clears the target soil and stops the minion's navigation. */
     @Override
     public void stop() {
         this.targetSoilPos = null;
         this.minion.getNavigation().stop();
     }
 
+    /**
+     * Each tick, looks at the target soil and either walks toward it (if out
+     * of interaction range) or tills and plants it (once in range).
+     */
     @Override
     public void tick() {
         if (this.targetSoilPos == null) {
@@ -99,6 +127,7 @@ public class TillFarmlandGoal extends Goal {
         }
     }
 
+    /** Orders the minion's navigation to move to the currently targeted soil. */
     private void moveTowardTarget() {
         if (this.targetSoilPos != null) {
             this.minion.getNavigation().moveTo(
@@ -110,6 +139,14 @@ public class TillFarmlandGoal extends Goal {
         }
     }
 
+    /**
+     * Tills the soil at {@code pos} into farmland (damaging the minion's hoe),
+     * plays the tilling sound, and plants the first available seed from the
+     * minion's inventory on top of it, if any.
+     *
+     * @param level the server level containing the soil
+     * @param pos   the position of the tillable soil block
+     */
     private void tillAndPlant(ServerLevel level, BlockPos pos) {
         if (!isTillableSoil(level, pos)) {
             return;
@@ -130,10 +167,18 @@ public class TillFarmlandGoal extends Goal {
         }
     }
 
+    /** @return {@code true} if the minion holds or carries a hoe */
     private boolean hasHoe() {
         return findHoeHandSlot() != null || findHoeInventorySlot() >= 0;
     }
 
+    /**
+     * Applies one point of durability damage to the minion's hoe, preferring
+     * an equipped hoe over one found in the inventory.
+     *
+     * @param level the server level, used for the item-breaking callback
+     * @return {@code true} if a hoe was found and damaged, {@code false} if the minion has no hoe
+     */
     private boolean damageHoe(ServerLevel level) {
         EquipmentSlot handSlot = findHoeHandSlot();
         if (handSlot != null) {
@@ -154,6 +199,7 @@ public class TillFarmlandGoal extends Goal {
         return false;
     }
 
+    /** @return the equipment slot (main hand or offhand) holding a hoe, or {@code null} if none */
     private @Nullable EquipmentSlot findHoeHandSlot() {
         if (FarmingUtil.isHoe(this.minion.getItemBySlot(EquipmentSlot.MAINHAND))) {
             return EquipmentSlot.MAINHAND;
@@ -164,6 +210,7 @@ public class TillFarmlandGoal extends Goal {
         return null;
     }
 
+    /** @return the inventory slot index holding a hoe, or {@code -1} if none */
     private int findHoeInventorySlot() {
         for (int slot = 0; slot < this.minion.getContainerSize(); slot++) {
             ItemStack stack = this.minion.getItem(slot);
@@ -174,6 +221,12 @@ public class TillFarmlandGoal extends Goal {
         return -1;
     }
 
+    /**
+     * @param level the level to read block states from
+     * @param pos   the position to check
+     * @return {@code true} if {@code pos} is tillable soil, has air above it,
+     *         and is within {@link #MAX_WATER_DISTANCE} of water
+     */
     private boolean isTillableSoil(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         if (!FarmingUtil.isTillableSoil(state)) {
@@ -185,6 +238,12 @@ public class TillFarmlandGoal extends Goal {
         return isNearWater(level, pos);
     }
 
+    /**
+     * @param level the level to check fluid states in
+     * @param pos   the position to search around
+     * @return {@code true} if a water block exists within {@link #MAX_WATER_DISTANCE}
+     *         blocks horizontally (and one block vertically) of {@code pos}
+     */
     private boolean isNearWater(Level level, BlockPos pos) {
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         for (int dx = -MAX_WATER_DISTANCE; dx <= MAX_WATER_DISTANCE; dx++) {
@@ -200,6 +259,12 @@ public class TillFarmlandGoal extends Goal {
         return false;
     }
 
+    /**
+     * Scans a box around the minion (see {@link #horizontalRadius} and
+     * {@link #VERTICAL_RADIUS}) for the closest tillable soil block near water.
+     *
+     * @return the nearest tillable soil position, or {@code null} if none was found
+     */
     private @Nullable BlockPos findNearestTillableSoil() {
         Level level = this.minion.level();
         BlockPos origin = this.minion.blockPosition();

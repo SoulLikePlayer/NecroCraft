@@ -19,9 +19,28 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 
+/**
+ * Handles the "soul capture" mechanic: when a capturable mob dies at the hands
+ * of a player holding an empty {@code Soul Totem} in their offhand, the mob's
+ * type is stored on the totem so it can later be used to summon a minion of
+ * that type.
+ */
 @EventBusSubscriber(modid = NecroCraft.MODID)
 public class ModEvent {
 
+    /**
+     * Listens for any living entity's death and, if the killed entity is
+     * registered as capturable (see {@link MinionRegistry#isCapturable(EntityType)}),
+     * the killer is a player, and that player holds an unbound {@code Soul Totem}
+     * in their offhand, stamps the totem with the killed entity's type as
+     * {@link SoulData} and plays a capture effect at the player's position.
+     * <p>
+     * Does nothing on the client side, for non-capturable mobs, for non-player
+     * attackers, for players not holding a soul totem in their offhand, or if
+     * the totem already carries soul data.
+     *
+     * @param event the death event fired for the killed entity
+     */
     @SubscribeEvent
     public static void onMobDeath(LivingDeathEvent event) {
         if (event.getEntity().level().isClientSide()) return;
@@ -45,6 +64,16 @@ public class ModEvent {
         }
     }
 
+    /**
+     * Plays the particle and sound feedback for a successful soul capture
+     * (soul, smoke and soul-fire particles, plus totem/soul-escape sounds)
+     * at the given position.
+     *
+     * @param level the server level in which to spawn particles and play sounds
+     * @param x     the world X coordinate of the effect
+     * @param y     the world Y coordinate of the effect
+     * @param z     the world Z coordinate of the effect
+     */
     private static void spawnSoulCaptureEffect(ServerLevel level, double x, double y, double z) {
         level.sendParticles(
                 ParticleTypes.SOUL,
