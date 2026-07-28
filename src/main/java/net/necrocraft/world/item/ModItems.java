@@ -14,10 +14,6 @@ public class ModItems {
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(NecroCraft.MODID);
 
-
-    /**
-     * Ingredient
-     */
     public static final DeferredItem<@NotNull Item> NECROTIC_SHARD = ITEMS.registerItem(
             "necrotic_shard",
             Item::new,
@@ -39,6 +35,12 @@ public class ModItems {
     public static DeferredItem<@NotNull Item> SOLID_SKIN_BONUS_ITEM = ITEMS.registerItem(
             "solid_skin_bonus_item",
             SolidSkinBonusItem::new,
+            properties -> properties
+    );
+
+    public static DeferredItem<@NotNull Item> HEALTH_BONUS_ITEM = ITEMS.registerItem(
+            "health_bonus_item",
+            HealthBonusItem::new,
             properties -> properties
     );
 

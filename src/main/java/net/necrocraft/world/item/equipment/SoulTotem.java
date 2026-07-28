@@ -191,6 +191,7 @@ public class SoulTotem extends Item {
         for (Identifier bonusId : soulData.bonuses()) {
             BonusUtil.resolve(bonusId).ifPresent(bonus -> bonus.applyEffectes(minion));
         }
+        minion.setHealth(minion.getMaxHealth());
     }
 
     /**
