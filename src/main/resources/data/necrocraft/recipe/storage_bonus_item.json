@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "   ",
+    " cb",
+    "b  "
+  ],
+  "key": {
+    "b": "minecraft:bone",
+    "c": "minecraft:chest"
+  },
+  "result": "necrocraft:storage_bonus_item"
+}
