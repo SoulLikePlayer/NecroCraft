@@ -3,12 +3,14 @@ package net.necrocraft.client.renderer.entity;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.monster.skeleton.SkeletonModel;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.Items;
+import net.necrocraft.client.model.minion.skeleton.BoggedMinionModel;
 import net.necrocraft.client.model.minion.skeleton.SkeletonMinionModel;
 import net.necrocraft.client.renderer.entity.state.SkeletonMinionRenderState;
 import net.necrocraft.world.entity.minion.SkeletonMinion;
@@ -19,9 +21,9 @@ public abstract class AbstractSkeletonMinionRenderer<T extends SkeletonMinion, S
         this(context, armorSet, new SkeletonMinionModel<>(context.bakeLayer(body)));
     }
 
-    public AbstractSkeletonMinionRenderer(EntityRendererProvider.Context context, ArmorModelSet<@NotNull ModelLayerLocation> armorSet, SkeletonMinionModel<S> bodyModel) {
+    public AbstractSkeletonMinionRenderer(EntityRendererProvider.Context context, ArmorModelSet<ModelLayerLocation> armorSet, SkeletonMinionModel<S> bodyModel) {
         super(context, bodyModel, 0.5F);
-        this.addLayer(new HumanoidArmorLayer<>(this, ArmorModelSet.bake(armorSet, context.getModelSet(), SkeletonMinionModel::new), context.getEquipmentRenderer()));
+        this.addLayer(new HumanoidArmorLayer(this, ArmorModelSet.bake(armorSet, context.getModelSet(), SkeletonModel::new), context.getEquipmentRenderer()));
     }
 
     public void extractRenderState(T entity, S state, float partialTicks) {

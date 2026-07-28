@@ -1,11 +1,10 @@
 package net.necrocraft.client;
 
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
-import net.minecraft.client.renderer.entity.SkeletonRenderer;
+import net.minecraft.client.renderer.entity.*;
 import net.necrocraft.client.gui.screens.inventory.CarvingScreen;
 import net.necrocraft.client.gui.screens.inventory.MinionInventoryScreen;
-import net.necrocraft.client.renderer.entity.SkeletonMinionRenderer;
-import net.necrocraft.client.renderer.entity.ZombieMinionRenderer;
+import net.necrocraft.client.renderer.entity.*;
 import net.necrocraft.client.renderer.entity.state.SkeletonMinionRenderState;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.inventory.CarvingMenu;
@@ -22,8 +21,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
-import static net.necrocraft.world.entity.ModEntity.SKELETON_MINION;
-import static net.necrocraft.world.entity.ModEntity.ZOMBIE_MINION;
+import static net.necrocraft.world.entity.ModEntity.*;
 
 @Mod(value = NecroCraft.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = NecroCraft.MODID, value = Dist.CLIENT)
@@ -36,6 +34,11 @@ public class NecroCraftClient {
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event){
         event.registerEntityRenderer(ZOMBIE_MINION.get(), ZombieMinionRenderer::new);
         event.registerEntityRenderer(SKELETON_MINION.get(), SkeletonMinionRenderer::new);
+        event.registerEntityRenderer(DROWNED_MINION.get(), DrownedMinionRenderer::new);
+        event.registerEntityRenderer(STRAY_MINION.get(), StrayMinionRenderer::new);
+        event.registerEntityRenderer(PARCHED_MINION.get(), ParchedMinionRenderer::new);
+        event.registerEntityRenderer(BOGGED_MINION.get(), BoggedMinionRenderer::new);
+        event.registerEntityRenderer(HUSK_MINION.get(), HuskMinionRenderer::new);
     }
 
     @SubscribeEvent

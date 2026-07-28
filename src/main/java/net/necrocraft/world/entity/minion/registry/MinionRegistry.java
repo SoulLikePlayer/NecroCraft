@@ -65,5 +65,10 @@ public class MinionRegistry {
     static {
         register(EntityTypes.ZOMBIE, ModEntity.ZOMBIE_MINION);
         register(EntityTypes.SKELETON, ModEntity.SKELETON_MINION);
+        register(EntityTypes.BOGGED, ModEntity.BOGGED_MINION);
+        register(EntityTypes.DROWNED, ModEntity.DROWNED_MINION);
+        register(EntityTypes.HUSK, ModEntity.HUSK_MINION);
+        register(EntityTypes.PARCHED, ModEntity.PARCHED_MINION);
+        register(EntityTypes.STRAY, ModEntity.STRAY_MINION);
     }
 }

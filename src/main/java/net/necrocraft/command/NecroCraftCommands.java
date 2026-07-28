@@ -75,6 +75,11 @@ public class NecroCraftCommands {
         AbstractMinion minion = switch (minionType.toLowerCase()) {
             case "zombie" -> ModEntity.ZOMBIE_MINION.get().create(level, EntitySpawnReason.COMMAND);
             case "skeleton" -> ModEntity.SKELETON_MINION.get().create(level, EntitySpawnReason.COMMAND);
+            case "bogged" -> ModEntity.BOGGED_MINION.get().create(level, EntitySpawnReason.COMMAND);
+            case "drowned" -> ModEntity.DROWNED_MINION.get().create(level, EntitySpawnReason.COMMAND);
+            case "husk" -> ModEntity.HUSK_MINION.get().create(level, EntitySpawnReason.COMMAND);
+            case "parched" -> ModEntity.PARCHED_MINION.get().create(level, EntitySpawnReason.COMMAND);
+            case "stray" -> ModEntity.STRAY_MINION.get().create(level, EntitySpawnReason.COMMAND);
             default -> null;
         };
 
