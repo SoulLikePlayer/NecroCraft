@@ -29,7 +29,7 @@ public class NecroCraftCommands {
      * {@code /summon-minion} (currently {@code "zombie"} and {@code "skeleton"}).
      */
     private static final SuggestionProvider<CommandSourceStack> MINION_SUGGESTIONS =
-            (ctx, builder) -> SharedSuggestionProvider.suggest(new String[]{"zombie", "skeleton"}, builder);
+            (ctx, builder) -> SharedSuggestionProvider.suggest(new String[]{"zombie", "skeleton", "bogged", "stray", "drowned", "husk", "parched"}, builder);
 
     /**
      * Registers the {@code /summon-minion} command against the given dispatcher.
