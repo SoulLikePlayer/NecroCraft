@@ -1,10 +1,12 @@
 package net.necrocraft.world.entity.minion.impl;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -20,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.necrocraft.world.effect.ModMobEffects;
 import org.jetbrains.annotations.NotNull;
 
 public class DrownedMinion extends ZombieMinion{
@@ -39,7 +42,32 @@ public class DrownedMinion extends ZombieMinion{
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(6, new DrownedMinionSwimUpGoal(this, 1.0F, this.level().getSeaLevel()));
+        this.goalSelector.addGoal(6, new DrownedMinionSwimUpGoal(this, 1.5F, this.level().getSeaLevel()));
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        LivingEntity owner = getOwner();
+        if (owner == null) {
+            return;
+        }
+
+        if (this.isInWater() && owner.isInWater() && this.distanceTo(owner) <= 20) {
+            int nearbyMinions = this.level().getEntitiesOfClass(
+                    DrownedMinion.class,
+                    this.getBoundingBox().inflate(20.0D),
+                    other -> other.getOwner() == owner
+            ).size();
+
+            int amplifier = Mth.clamp(nearbyMinions - 1, 0, 4);
+
+            int duration = 100;
+
+            owner.addEffect(new MobEffectInstance(ModMobEffects.CURSE_OF_THE_SEA, duration, amplifier, false, false, true));
+            this.addEffect(new MobEffectInstance(ModMobEffects.CURSE_OF_THE_SEA, duration, amplifier, false, false, true));
+        }
     }
 
     /**

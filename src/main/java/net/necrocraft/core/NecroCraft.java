@@ -2,6 +2,7 @@ package net.necrocraft.core;
 
 import com.mojang.logging.LogUtils;
 import net.necrocraft.command.NecroCraftCommands;
+import net.necrocraft.world.effect.ModMobEffects;
 import net.necrocraft.world.entity.ModEntity;
 import net.necrocraft.world.inventory.ModMenuTypes;
 import net.necrocraft.world.item.ModDataComponents;
@@ -29,6 +30,7 @@ public class NecroCraft {
         ModMenuTypes.MENU_TYPES.register(modEventBus);
         ModItemGroups.CREATIVE_MODE_TABS.register(modEventBus);
         ModDataComponents.DATA_COMPONENTS.register(modEventBus);
+        ModMobEffects.MOB_EFFECTS.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 

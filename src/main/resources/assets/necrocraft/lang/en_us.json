@@ -25,7 +25,7 @@
   "item.necrocraft.soul_totem.empty": "No soul captured",
   "item.necrocraft.soul_totem.unknown": "Unknown captured creature",
   "item.necrocraft.soul_totem.summons": "Summons: %s",
-  "container.necrocraft.soul_carving_table": "Soul Carving Table",
+
   "item.necrocraft.soul_totem.equipment": "Equipment :",
   "item.necrocraft.soul_totem.bonuses": "Bonus :",
 
@@ -41,5 +41,7 @@
   "carving.necrocraft.page.equipment": "Equipment",
   "carving.necrocraft.page.bonus": "Bonus",
   "carving.necrocraft.page.equipment.tooltip": "Switch to the equipment page",
-  "carving.necrocraft.page.bonus.tooltip": "Switch to the bonus slots page"
+  "carving.necrocraft.page.bonus.tooltip": "Switch to the bonus slots page",
+
+  "effect.necrocraft.curse_of_the_sea": "Curse Of The Sea"
 }
