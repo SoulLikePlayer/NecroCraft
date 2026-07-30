@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "necrocraft:zombie_minions"
+    "necrocraft:zombie_minions",
+    "necrocraft:drowned_minions",
+    "necrocraft:husk_minions"
   ]
 }

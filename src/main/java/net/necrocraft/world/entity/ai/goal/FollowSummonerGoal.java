@@ -3,11 +3,13 @@ package net.necrocraft.world.entity.ai.goal;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.navigation.AmphibiousPathNavigation;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.necrocraft.world.entity.minion.AbstractMinion;
+import net.necrocraft.world.entity.minion.impl.DrownedMinion;
 import org.jspecify.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -42,7 +44,9 @@ public class FollowSummonerGoal extends Goal {
         this.startDistance = startDistance;
         this.stopDistance = stopDistance;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
-        if (!(minion.getNavigation() instanceof GroundPathNavigation) && !(minion.getNavigation() instanceof FlyingPathNavigation)) {
+        if (!(minion.getNavigation() instanceof GroundPathNavigation)
+                && !(minion.getNavigation() instanceof FlyingPathNavigation)
+                && !(minion.getNavigation() instanceof AmphibiousPathNavigation)) {
             throw new IllegalArgumentException("Unsupported mob type for FollowSummonMinion");
         }
     }

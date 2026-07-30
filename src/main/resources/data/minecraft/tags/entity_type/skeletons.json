@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "necrocraft:skeleton_minions"
+    "necrocraft:skeleton_minions",
+    "necrocraft:bogged_minions",
+    "necrocraft:stray_minions",
+    "necrocraft:parched_minions"
   ]
 }
