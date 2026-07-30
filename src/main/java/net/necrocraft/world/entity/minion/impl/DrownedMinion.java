@@ -1,4 +1,4 @@
-package net.necrocraft.world.entity.minion;
+package net.necrocraft.world.entity.minion.impl;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;

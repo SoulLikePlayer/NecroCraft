@@ -36,6 +36,8 @@ import net.necrocraft.world.entity.ai.goal.farmer.FarmCropsGoal;
 import net.necrocraft.world.entity.ai.goal.farmer.PlantSeedsGoal;
 import net.necrocraft.world.entity.ai.goal.farmer.TillFarmlandGoal;
 import net.necrocraft.world.entity.ai.goal.hunter.HuntPreyGoal;
+import net.necrocraft.world.entity.minion.impl.SkeletonMinion;
+import net.necrocraft.world.entity.minion.impl.ZombieMinion;
 import net.necrocraft.world.inventory.MinionInventoryMenu;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.BonusType;

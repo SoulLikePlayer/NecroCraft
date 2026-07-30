@@ -1,4 +1,4 @@
-package net.necrocraft.world.entity.minion;
+package net.necrocraft.world.entity.minion.impl;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
@@ -10,23 +10,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * A tamed minion variant of the vanilla {@code Zombie}, reusing the
- * zombie's ambient, hurt, death and step sounds.
- */
-public class ZombieMinion extends AbstractMinion{
+public class ParchedMinion extends SkeletonMinion {
 
     /**
      * @param type  the entity type this minion is instantiated from
      * @param level the level the minion is created in
      */
-    public ZombieMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
+    public ParchedMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
         super(type, level);
     }
 
     /** @return the ambient sound played while the minion is idle */
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.ZOMBIE_AMBIENT;
+        return SoundEvents.PARCHED_AMBIENT;
     }
 
     /**
@@ -34,17 +30,17 @@ public class ZombieMinion extends AbstractMinion{
      * @return the sound played when the minion takes damage
      */
     protected SoundEvent getHurtSound(@NotNull DamageSource source) {
-        return SoundEvents.ZOMBIE_HURT;
+        return SoundEvents.PARCHED_HURT;
     }
 
     /** @return the sound played when the minion dies */
     protected SoundEvent getDeathSound() {
-        return SoundEvents.ZOMBIE_DEATH;
+        return SoundEvents.PARCHED_DEATH;
     }
 
     /** @return the sound played on each footstep */
     protected SoundEvent getStepSound() {
-        return SoundEvents.ZOMBIE_STEP;
+        return SoundEvents.PARCHED_STEP;
     }
 
     /**

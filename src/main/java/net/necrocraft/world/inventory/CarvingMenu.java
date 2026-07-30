@@ -15,12 +15,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.Equippable;
 import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
+import net.necrocraft.world.item.bonus.BonusType;
 import net.necrocraft.world.item.bonus.BonusUtil;
 import net.necrocraft.world.item.component.SoulData;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.level.block.ModBlock;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,23 +90,8 @@ public class CarvingMenu extends AbstractContainerMenu {
             EquipmentSlot.OFFHAND
     };
 
-    static {
-        if (EQUIPMENT_ORDER.length != EQUIPMENT_SLOT_COUNT) {
-            throw new ExceptionInInitializerError("EQUIPMENT_ORDER.length (" + EQUIPMENT_ORDER.length
-                    + ") ne correspond pas à EQUIPMENT_SLOT_COUNT (" + EQUIPMENT_SLOT_COUNT + ")");
-        }
-        if (EQUIPMENT_SLOT_POSITIONS.length != EQUIPMENT_SLOT_COUNT) {
-            throw new ExceptionInInitializerError("EQUIPMENT_SLOT_POSITIONS.length (" + EQUIPMENT_SLOT_POSITIONS.length
-                    + ") ne correspond pas à EQUIPMENT_SLOT_COUNT (" + EQUIPMENT_SLOT_COUNT + ")");
-        }
-        if (BONUS_SLOT_POSITIONS.length != BONUS_SLOT_COUNT) {
-            throw new ExceptionInInitializerError("BONUS_SLOT_POSITIONS.length (" + BONUS_SLOT_POSITIONS.length
-                    + ") ne correspond pas à BONUS_SLOT_COUNT (" + BONUS_SLOT_COUNT + ")");
-        }
-    }
 
     private final ContainerLevelAccess access;
-    private final Player player;
     private final Container container;
 
     public CarvingMenu(int containerId, Inventory inventory) {
@@ -119,7 +104,6 @@ public class CarvingMenu extends AbstractContainerMenu {
         container.startOpen(inventory.player);
 
         this.access = access;
-        this.player = inventory.player;
         this.container = container;
 
         this.addSlot(new TotemSlot(container, TOTEM_SLOT, TOTEM_SLOT_X, TOTEM_SLOT_Y));
@@ -164,7 +148,7 @@ public class CarvingMenu extends AbstractContainerMenu {
         }
 
         @Override
-        public void set(ItemStack itemStack) {
+        public void set(@NotNull ItemStack itemStack) {
             super.set(itemStack);
             if (!itemStack.isEmpty()){
                 SoulData soulData = itemStack.get(ModDataComponents.SOUL_DATA.get());
@@ -210,7 +194,7 @@ public class CarvingMenu extends AbstractContainerMenu {
                     ItemStack piece = CarvingMenu.this.container.getItem(BONUS_SLOT_START + i);
                     if (!piece.isEmpty() && piece.getItem() instanceof AbstractBonusItem) {
                         Identifier bonusId = BuiltInRegistries.ITEM.getKey(piece.getItem());
-                        if (bonusId != null && !bonuses.contains(bonusId)) {
+                        if (!bonuses.contains(bonusId)) {
                             bonuses.add(bonusId);
                         }
                     }
@@ -240,7 +224,7 @@ public class CarvingMenu extends AbstractContainerMenu {
         }
 
         @Override
-        public boolean mayPlace(ItemStack stack) {
+        public boolean mayPlace(@NotNull ItemStack stack) {
             if (this.equipmentSlot == EquipmentSlot.MAINHAND || this.equipmentSlot == EquipmentSlot.OFFHAND) {
                 return true;
             }
@@ -262,16 +246,27 @@ public class CarvingMenu extends AbstractContainerMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            if (!(stack.getItem() instanceof AbstractBonusItem)) {
+            if (!(stack.getItem() instanceof AbstractBonusItem bonus_item_watend)) {
                 return false;
             }
             for (int i = BONUS_SLOT_START; i < BONUS_SLOT_END; i++) {
                 if (i == this.getContainerSlot()) {
                     continue;
                 }
-                ItemStack existing = CarvingMenu.this.container.getItem(i);
-                if (!existing.isEmpty() && existing.getItem() == stack.getItem()) {
-                    return false;
+                ItemStack placed_bonus = CarvingMenu.this.container.getItem(i);
+                if (!placed_bonus.isEmpty()) {
+                    if(placed_bonus.getItem() == stack.getItem()){
+                        return false;
+                    }
+
+                    if (!(placed_bonus.getItem() instanceof AbstractBonusItem bonus_item_placed)) {
+                        continue;
+                    }
+
+                    BonusType wanted = bonus_item_watend.getBonusTypes();
+                    if (wanted != BonusType.PASSIVE && bonus_item_placed.getBonusTypes() == wanted) {
+                        return false;
+                    }
                 }
             }
             return true;
@@ -290,21 +285,22 @@ public class CarvingMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public boolean stillValid(Player player) {
+    public boolean stillValid(@NotNull Player player) {
         return stillValid(this.access, player, ModBlock.SOUL_CARVING_TABLE_BLOCK.get());
     }
 
     @Override
-    public void removed(Player player) {
+    public void removed(@NotNull Player player) {
+        player.getInventory().placeItemBackInInventory(this.slots.get(TOTEM_SLOT).getItem());
         super.removed(player);
         this.container.stopOpen(player);
     }
 
     @Override
-    public ItemStack quickMoveStack(Player player, int index) {
+    public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
         ItemStack result = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
-        if (slot != null && slot.hasItem()) {
+        if (slot.hasItem()) {
             ItemStack stackInSlot = slot.getItem();
             result = stackInSlot.copy();
 
@@ -385,9 +381,7 @@ public class CarvingMenu extends AbstractContainerMenu {
             ItemStack piece = this.container.getItem(BONUS_SLOT_START + i);
             if (!piece.isEmpty() && piece.getItem() instanceof AbstractBonusItem) {
                 Identifier bonusId = BuiltInRegistries.ITEM.getKey(piece.getItem());
-                if (bonusId != null) {
-                    bonuses.add(bonusId);
-                }
+                bonuses.add(bonusId);
             }
         }
 

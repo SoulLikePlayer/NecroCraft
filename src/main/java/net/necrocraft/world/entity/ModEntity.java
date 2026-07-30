@@ -2,9 +2,8 @@ package net.necrocraft.world.entity;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.monster.skeleton.Stray;
 import net.necrocraft.core.NecroCraft;
-import net.necrocraft.world.entity.minion.*;
+import net.necrocraft.world.entity.minion.impl.*;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 

@@ -2,12 +2,10 @@ package net.necrocraft.client.renderer.entity;
 
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.StrayRenderer;
-import net.minecraft.client.renderer.entity.layers.SkeletonClothingLayer;
 import net.minecraft.resources.Identifier;
 import net.necrocraft.client.renderer.entity.layers.SkeletonMinionClothingLayer;
 import net.necrocraft.client.renderer.entity.state.SkeletonMinionRenderState;
-import net.necrocraft.world.entity.minion.StrayMinion;
+import net.necrocraft.world.entity.minion.impl.StrayMinion;
 import org.jetbrains.annotations.NotNull;
 
 public class StrayMinionRenderer extends AbstractSkeletonMinionRenderer<StrayMinion, SkeletonMinionRenderState> {

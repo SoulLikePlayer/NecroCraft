@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.necrocraft.client.model.minion.zombie.ZombieMinionModel;
 import net.necrocraft.client.renderer.entity.state.ZombieMinionRenderState;
-import net.necrocraft.world.entity.minion.ZombieMinion;
+import net.necrocraft.world.entity.minion.impl.ZombieMinion;
 import org.jetbrains.annotations.NotNull;
 
 public class ZombieMinionRenderer extends AbstractZombieMinionRenderer<ZombieMinion, ZombieMinionRenderState, ZombieMinionModel<ZombieMinionRenderState>> {

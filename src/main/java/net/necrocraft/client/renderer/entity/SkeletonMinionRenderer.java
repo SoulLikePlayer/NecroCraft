@@ -4,7 +4,7 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import net.necrocraft.client.renderer.entity.state.SkeletonMinionRenderState;
-import net.necrocraft.world.entity.minion.SkeletonMinion;
+import net.necrocraft.world.entity.minion.impl.SkeletonMinion;
 import org.jetbrains.annotations.NotNull;
 
 public class SkeletonMinionRenderer extends AbstractSkeletonMinionRenderer<SkeletonMinion, SkeletonMinionRenderState> {

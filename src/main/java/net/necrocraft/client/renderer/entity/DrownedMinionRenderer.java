@@ -14,7 +14,7 @@ import net.minecraft.world.item.Items;
 import net.necrocraft.client.model.minion.zombie.DrownedMinionModel;
 import net.necrocraft.client.renderer.entity.layers.DrownedMinionOuterLayer;
 import net.necrocraft.client.renderer.entity.state.ZombieMinionRenderState;
-import net.necrocraft.world.entity.minion.DrownedMinion;
+import net.necrocraft.world.entity.minion.impl.DrownedMinion;
 
 public class DrownedMinionRenderer  extends AbstractZombieMinionRenderer<DrownedMinion, ZombieMinionRenderState, DrownedMinionModel> {
     private static final Identifier DROWNED_LOCATION = Identifier.withDefaultNamespace("textures/entity/zombie/drowned.png");
