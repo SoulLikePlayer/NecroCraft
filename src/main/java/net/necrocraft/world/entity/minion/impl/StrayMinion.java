@@ -69,6 +69,7 @@ public class StrayMinion extends SkeletonMinion{
     @Override
     public boolean doHurtTarget(@NotNull ServerLevel level, Entity target) {
         Objects.requireNonNull(target.asLivingEntity())
+                .addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 200, 0, true, true, true));
 
         return super.doHurtTarget(level, target);
     }

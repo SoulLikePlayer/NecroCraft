@@ -52,4 +52,6 @@ public class HuskMinion extends ZombieMinion{
     protected void playStepSound(@NotNull BlockPos pos, @NotNull BlockState blockState) {
         this.playSound(this.getStepSound(), 0.15F, 1.0F);
     }
+
+
 }
