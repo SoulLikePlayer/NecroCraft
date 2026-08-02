@@ -49,7 +49,11 @@ public class ModAttributeSupplierEvent {
 
         event.put(HUSK_MINION.get(), Husk.createAttributes().build());
 
-        event.put(PARCHED_MINION.get(), Parched.createAttributes().build());
+        event.put(PARCHED_MINION.get(),
+                Parched.createAttributes()
+                        .add(Attributes.MAX_HEALTH, (double)16.0F)
+                        .build()
+        );
 
         event.put(STRAY_MINION.get(), Stray.createAttributes().build());
     }
