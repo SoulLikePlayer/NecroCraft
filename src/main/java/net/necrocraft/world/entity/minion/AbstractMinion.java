@@ -40,8 +40,10 @@ import net.necrocraft.world.entity.minion.impl.SkeletonMinion;
 import net.necrocraft.world.entity.minion.impl.ZombieMinion;
 import net.necrocraft.world.inventory.MinionInventoryMenu;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
+import net.necrocraft.world.item.bonus.BonusTrigger;
 import net.necrocraft.world.item.bonus.BonusType;
 import net.necrocraft.world.item.bonus.BonusUtil;
+import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 
@@ -59,6 +61,7 @@ import java.util.*;
  * inventory, ownership, persistence) lives here.
  */
 public class AbstractMinion extends PathfinderMob implements OwnableEntity, Container, ContainerUser {
+    public static final ArrayList<DeferredItem<@NotNull AbstractBonusItem>> SYNCED_BONUS = new ArrayList<>();
 
     /** Squared distance to the owner beyond which the minion attempts to teleport to them. */
     public static final int TELEPORT_WHEN_DISTANCE_IS_SQ = 144;
@@ -454,30 +457,65 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
     /**
-     * On death, triggers any equipped bonuses' post-mortem effects and drops
-     * this minion's carried inventory on the ground before proceeding with
-     * vanilla death handling.
+     * On death, fires {@link BonusTrigger#ON_DEATH} on any equipped bonus
+     * that declares it, and drops this minion's carried inventory on the
+     * ground before proceeding with vanilla death handling.
      *
      * @param damageSource the source of the killing blow
      */
     @Override
     public void die(@NotNull DamageSource damageSource) {
-        if (this.level() instanceof ServerLevel serverLevel) {
-            triggerPostMortemBonuses(serverLevel);
+        if (this.level() instanceof ServerLevel) {
+            fireTrigger(BonusTrigger.ON_DEATH);
             Containers.dropContents(this.level(), this, this);
         }
         super.die(damageSource);
     }
 
     /**
-     * Invokes {@code onDeath} on every equipped bonus that resolves
-     * successfully.
+     * Calls {@link AbstractBonusItem#applyEffectes(AbstractMinion)} on every
+     * equipped bonus whose {@link AbstractBonusItem#getBonusTrigger()}
+     * matches {@code trigger}, regardless of minion type.
      *
-     * @param serverLevel the server level the minion died in
+     * @param trigger the trigger being fired
      */
-    private void triggerPostMortemBonuses(ServerLevel serverLevel) {
+    private void fireTrigger(@NotNull BonusTrigger trigger) {
         for (Identifier bonusId : this.bonuses) {
-            BonusUtil.resolve(bonusId).ifPresent(bonus -> bonus.onDeath(this, serverLevel));
+            BonusUtil.resolve(bonusId).ifPresent(bonus -> {
+                if (bonus.getBonusTrigger() == trigger) {
+                    bonus.applyEffectes(this);
+                }
+            });
+        }
+    }
+
+    /**
+     * Same as {@link #fireTrigger(BonusTrigger)}, but only for bonuses this
+     * concrete minion type has registered in {@link #getSyncedBonusItem()},
+     * and invoking {@link #hurtTargetEffectTrigger(AbstractBonusItem)} so the
+     * minion decides what "synced" means for it (e.g. {@link
+     * net.necrocraft.world.entity.minion.impl.ParchedMinion} applies {@link
+     * AbstractBonusItem#applySyncedEffect(AbstractMinion)}).
+     *
+     * @param trigger the trigger being fired
+     */
+    private void fireSyncedTrigger(@NotNull BonusTrigger trigger) {
+        for (Identifier bonusId : this.bonuses) {
+            boolean isSynced = false;
+            for (DeferredItem<@NotNull AbstractBonusItem> synced : this.getSyncedBonusItem()) {
+                if (synced.getId().equals(bonusId)) {
+                    isSynced = true;
+                    break;
+                }
+            }
+
+            if (isSynced) {
+                BonusUtil.resolve(bonusId).ifPresent(bonus -> {
+                    if (bonus.getBonusTrigger() == trigger) {
+                        hurtTargetEffectTrigger(bonus);
+                    }
+                });
+            }
         }
     }
 
@@ -617,20 +655,22 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     /** @return {@code true} if any equipped bonus grants this minion the ability to automatically plant seeds */
     public boolean canAutoPlant() {
-        for (Identifier bonusId : this.bonuses) {
-            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
-            if (bonus.isPresent() && bonus.get().canAutoPlant()) {
-                return true;
-            }
-        }
-        return false;
+        return hasBonusTrigger(BonusTrigger.AUTO_PLANT);
     }
 
     /** @return {@code true} if any equipped bonus grants this minion the ability to automatically till soil */
     public boolean canAutoTill() {
+        return hasBonusTrigger(BonusTrigger.AUTO_TILL);
+    }
+
+    /**
+     * @param trigger the trigger to look for
+     * @return {@code true} if any of this minion's equipped bonuses declares {@code trigger}
+     */
+    private boolean hasBonusTrigger(@NotNull BonusTrigger trigger) {
         for (Identifier bonusId : this.bonuses) {
             Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
-            if (bonus.isPresent() && bonus.get().canAutoTill()) {
+            if (bonus.isPresent() && bonus.get().getBonusTrigger() == trigger) {
                 return true;
             }
         }
@@ -682,4 +722,24 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         }
         return remaining == 0;
     }
+
+    public ArrayList<DeferredItem<@NotNull AbstractBonusItem>> getSyncedBonusItem() {
+        return SYNCED_BONUS;
+    }
+
+    @Override
+    public boolean doHurtTarget(@NotNull ServerLevel level, Entity target) {
+        fireSyncedTrigger(BonusTrigger.ON_DAMAGE);
+        return super.doHurtTarget(level, target);
+    }
+
+    /**
+     * Hook letting a concrete minion type react to a "synced" bonus at the
+     * given trigger point. No-op by default; {@link
+     * net.necrocraft.world.entity.minion.impl.ParchedMinion} overrides this
+     * to call {@link AbstractBonusItem#applySyncedEffect(AbstractMinion)}.
+     *
+     * @param bonus the equipped bonus that matched the fired trigger
+     */
+    public void hurtTargetEffectTrigger(AbstractBonusItem bonus){}
 }

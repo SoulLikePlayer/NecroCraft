@@ -67,7 +67,7 @@ public class HuskMinion extends ZombieMinion{
      * @return if everithing works
      */
     @Override
-    public boolean doHurtTarget(@NotNull ServerLevel level, Entity target) {
+    public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
         Objects.requireNonNull(target.asLivingEntity())
                 .addEffect(new MobEffectInstance(MobEffects.HUNGER, 200, 0, true, true, true));
 

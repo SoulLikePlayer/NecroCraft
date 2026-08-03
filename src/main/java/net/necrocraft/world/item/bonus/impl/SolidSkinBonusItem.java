@@ -55,15 +55,4 @@ public class SolidSkinBonusItem extends AbstractBonusItem {
         applyModifier(minion, Attributes.EXPLOSION_KNOCKBACK_RESISTANCE, EXPLOSION_KNOCKBACK_RESISTANCE_MODIFIER_ID,
                 RESISTANCE_BONUS, AttributeModifier.Operation.ADD_VALUE);
     }
-
-    @Override
-    public void removeEffects(@NotNull AbstractMinion minion) {
-        removeModifier(minion, Attributes.ARMOR, ARMOR_MODIFIER_ID);
-        removeModifier(minion, Attributes.ARMOR_TOUGHNESS, ARMOR_TOUGHNESS_MODIFIER_ID);
-        removeModifier(minion, Attributes.MOVEMENT_SPEED, SPEED_MODIFIER_ID);
-        removeModifier(minion, Attributes.KNOCKBACK_RESISTANCE, KNOCKBACK_RESISTANCE_MODIFIER_ID);
-        removeModifier(minion, Attributes.EXPLOSION_KNOCKBACK_RESISTANCE, EXPLOSION_KNOCKBACK_RESISTANCE_MODIFIER_ID);
-
-        minion.removeEffect(MobEffects.RESISTANCE);
-    }
 }

@@ -20,10 +20,14 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
+import net.necrocraft.world.item.bonus.AbstractBonusItem;
+import net.necrocraft.world.item.bonus.BonusTrigger;
 import net.necrocraft.world.item.bonus.BonusUtil;
 import net.necrocraft.world.item.component.SoulData;
+import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -179,19 +183,38 @@ public class SoulTotem extends Item {
         }
     }
 
-    /**
-     * Assigns the stored bonus list to the minion and applies each
-     * resolvable bonus's summon-time effects to it.
-     *
-     * @param minion   the minion to apply bonuses to
-     * @param soulData the soul data holding the stored bonus identifiers
-     */
     private static void applyBonuses(AbstractMinion minion, SoulData soulData) {
         minion.setBonuses(soulData.bonuses());
         for (Identifier bonusId : soulData.bonuses()) {
-            BonusUtil.resolve(bonusId).ifPresent(bonus -> bonus.applyEffectes(minion));
+            BonusUtil.resolve(bonusId).ifPresent(bonus -> {
+                if(bonus.getBonusTrigger() == BonusTrigger.NONE) {
+                    bonus.applyEffectes(minion);
+                    if (isSyncedBonus(minion, bonus)) {
+                        bonus.applySyncedEffect(minion);
+                    }
+                }
+            });
         }
+
         minion.setHealth(minion.getMaxHealth());
+    }
+
+    /**
+     * @param minion the minion whose synced bonus list is checked
+     * @param bonus  the resolved bonus item to test
+     * @return {@code true} if {@code bonus} is one of the minion type's synced bonus items
+     */
+    private static boolean isSyncedBonus(AbstractMinion minion, AbstractBonusItem bonus) {
+        ArrayList<DeferredItem<@NotNull AbstractBonusItem>> synced = minion.getSyncedBonusItem();
+        if (synced == null) {
+            return false;
+        }
+        for (DeferredItem<@NotNull AbstractBonusItem> deferred : synced) {
+            if (deferred.get() == bonus) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

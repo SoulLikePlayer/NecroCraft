@@ -68,7 +68,7 @@ public class BoggedMinion extends SkeletonMinion{
      * @return if everithing works
      */
     @Override
-    public boolean doHurtTarget(@NotNull ServerLevel level, Entity target) {
+    public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
         Objects.requireNonNull(target.asLivingEntity())
                 .addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0, true, true, true));
 

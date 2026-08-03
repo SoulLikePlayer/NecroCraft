@@ -10,6 +10,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
+import net.necrocraft.world.item.bonus.BonusTrigger;
 import net.necrocraft.world.item.bonus.BonusType;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,10 +33,16 @@ public class PostMortemExplosionBonusItem extends AbstractBonusItem {
     }
 
     @Override
-    public void applyEffectes(@NotNull AbstractMinion minion) {}
+    public @NotNull BonusTrigger getBonusTrigger() {
+        return BonusTrigger.ON_DEATH;
+    }
 
     @Override
-    public void onDeath(@NotNull AbstractMinion minion, @NotNull ServerLevel level) {
+    public void applyEffectes(@NotNull AbstractMinion minion) {
+        if (!(minion.level() instanceof ServerLevel level)) {
+            return;
+        }
+
         double x = minion.getX();
         double y = minion.getY() + (minion.getBbHeight() * 0.5D);
         double z = minion.getZ();

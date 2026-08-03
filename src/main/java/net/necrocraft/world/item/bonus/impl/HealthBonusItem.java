@@ -31,9 +31,4 @@ public class HealthBonusItem extends AbstractBonusItem {
         applyModifier(minion, Attributes.MAX_HEALTH,
                 HEALTH_MODIFIER_ID, HEALTH_MULTIPLIER, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     }
-
-    @Override
-    public void removeEffects(@NotNull AbstractMinion minion) {
-        removeModifier(minion, Attributes.MAX_HEALTH, HEALTH_MODIFIER_ID);
-    }
 }

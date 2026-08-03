@@ -1,6 +1,7 @@
 package net.necrocraft.world.entity.minion.impl;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -12,11 +13,20 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.necrocraft.world.item.ModItems;
+import net.necrocraft.world.item.bonus.AbstractBonusItem;
+import net.necrocraft.world.item.bonus.BonusUtil;
+import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class ParchedMinion extends SkeletonMinion {
+
+    static{
+        SYNCED_BONUS.add(ModItems.MUMMY_WRAPPING_BONUS_ITEM);
+    }
 
     /**
      * @param type  the entity type this minion is instantiated from
@@ -67,10 +77,15 @@ public class ParchedMinion extends SkeletonMinion {
      * @return if everithing works
      */
     @Override
-    public boolean doHurtTarget(@NotNull ServerLevel level, Entity target) {
+    public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
         Objects.requireNonNull(target.asLivingEntity())
                 .addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 0, true, true, true));
 
         return super.doHurtTarget(level, target);
+    }
+
+    @Override
+    public void hurtTargetEffectTrigger(AbstractBonusItem bonus) {
+        bonus.applySyncedEffect(this);
     }
 }
