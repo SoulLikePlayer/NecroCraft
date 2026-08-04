@@ -1,0 +1,35 @@
+{
+  "criteria": {
+    "necrotic_shard": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "necrocraft:necrotic_shard"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "background": "necrocraft:gui/advancements/backgrounds/necrocraft",
+    "description": {
+      "translate": "advancements.necrocraft.root.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "necrocraft:necrotic_shard"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.necrocraft.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "necrotic_shard"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

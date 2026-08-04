@@ -45,5 +45,8 @@
   "carving.necrocraft.page.equipment.tooltip": "Switch to the equipment page",
   "carving.necrocraft.page.bonus.tooltip": "Switch to the bonus slots page",
 
-  "effect.necrocraft.curse_of_the_sea": "Curse Of The Sea"
+  "effect.necrocraft.curse_of_the_sea": "Curse Of The Sea",
+
+  "advancements.necrocraft.root.title": "Necrocraft",
+  "advancements.necrocraft.root.description": "The first step towards necromancy"
 }
