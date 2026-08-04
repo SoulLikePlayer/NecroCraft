@@ -16,7 +16,6 @@ public class TridentShardBonusItem extends AbstractBonusItem {
 
     private static final double ATTACK_DAMAGE_BONUS = 3.0D;
 
-
     public TridentShardBonusItem(Properties properties) {
         super(properties);
     }

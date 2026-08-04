@@ -1,7 +1,9 @@
 package net.necrocraft.world.entity.minion.impl;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -17,16 +19,29 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.AmphibiousPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import net.necrocraft.world.effect.ModMobEffects;
+import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DrownedMinion extends ZombieMinion{
     private boolean searchingForLand;
+
+
+    static {
+        SYNCED_BONUS.add(ModItems.TRIDENT_SHARD_BONUS_ITEM);
+    }
 
     /**
      * @param type  the entity type this minion is instantiated from
@@ -42,6 +57,7 @@ public class DrownedMinion extends ZombieMinion{
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        this.goalSelector.addGoal(0, new TridentShardDashAttackGoal(this));
         this.goalSelector.addGoal(6, new DrownedMinionSwimUpGoal(this, 1.5F, this.level().getSeaLevel()));
     }
 
@@ -76,7 +92,7 @@ public class DrownedMinion extends ZombieMinion{
      * water instead of just walking along the bottom.
      */
     @Override
-    protected PathNavigation createNavigation(Level level) {
+    protected @NotNull PathNavigation createNavigation(@NotNull Level level) {
         return new AmphibiousPathNavigation(this, level);
     }
 
@@ -86,7 +102,7 @@ public class DrownedMinion extends ZombieMinion{
      * the bottom instead of swimming toward its owner or target.
      */
     @Override
-    protected void travelInWater(Vec3 input, double baseGravity, boolean isFalling, double oldY) {
+    protected void travelInWater(@NotNull Vec3 input, double baseGravity, boolean isFalling, double oldY) {
         if (this.isUnderWater() && this.wantsToSwim()) {
             this.moveRelative(0.01F, input);
             this.move(MoverType.SELF, this.getDeltaMovement());
@@ -176,6 +192,11 @@ public class DrownedMinion extends ZombieMinion{
         return this.searchingForLand;
     }
 
+    /** @return {@code true} if this minion has the Trident Shard bonus equipped, unlocking its dash attack */
+    public boolean hasTridentShardBonus() {
+        return this.getBonuses().contains(ModItems.TRIDENT_SHARD_BONUS_ITEM.getId());
+    }
+
     private static class DrownedMinionMoveControl<T extends DrownedMinion> extends MoveControl<@NotNull T> {
         public DrownedMinionMoveControl(T drownedMinion) {
             super(drownedMinion);
@@ -229,7 +250,9 @@ public class DrownedMinion extends ZombieMinion{
         }
 
         public boolean canUse() {
-            return !this.minion.level().isBrightOutside() && this.minion.isInWater() && this.minion.getY() < (double)(this.seaLevel - 2);
+            return !this.minion.level().isBrightOutside()
+                    && this.minion.isInWater()
+                    && this.minion.getY() < (double)(this.seaLevel - 2);
         }
 
         public boolean canContinueToUse() {
@@ -256,6 +279,204 @@ public class DrownedMinion extends ZombieMinion{
 
         public void stop() {
             this.minion.setSearchingForLand(false);
+        }
+    }
+
+    /**
+     * While the minion has the Trident Shard bonus equipped, is submerged,
+     * and has a target that is too far away to melee, this lets it dash
+     * through the water toward that target. Any living entity caught along
+     * the dash path (the owner excluded) is hurt and knocked back, and the
+     * target itself takes bonus damage if the dash connects.
+     */
+    private static class TridentShardDashAttackGoal extends Goal {
+        private static final Logger LOGGER = LogUtils.getLogger();
+
+        private static final double MAX_DISTANCE = 16.0D;
+        private static final double MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
+
+        private static final int DASH_DURATION_TICKS = 14;
+        private static final int POST_DASH_HIT_DURATION_TICKS = 6;
+
+        private static final double MIN_STEP_PER_TICK = 0.35D;
+        private static final double MAX_STEP_PER_TICK = 1.15D;
+        private static final int COOLDOWN_TICKS = 100;
+        private static final float TARGET_DAMAGE = 8.0F;
+        private static final float SWEEP_DAMAGE = 4.0F;
+        private static final float KNOCKBACK_STRENGTH = 0.8F;
+        private static final double HIT_RADIUS = 1.2D;
+        private static final int BUBBLE_PARTICLES_PER_TICK = 6;
+
+        private final DrownedMinion minion;
+        private final Set<LivingEntity> alreadyHit = new HashSet<>();
+        private Vec3 dashDirection = Vec3.ZERO;
+        private int dashTicksLeft;
+        private int postDashTicksLeft;
+        private int cooldown;
+        private boolean cooldownReadyLogged = true;
+
+        TridentShardDashAttackGoal(DrownedMinion minion) {
+            this.minion = minion;
+            this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            if (this.cooldown > 0) {
+                this.cooldown--;
+                if (this.cooldown <= 0) {
+                    LOGGER.info("[{}] Dash cooldown terminé, le dash peut de nouveau être déclenché", this.minion.getId());
+                    this.cooldownReadyLogged = true;
+                }
+                return false;
+            }
+
+            if (!this.minion.hasTridentShardBonus() || !this.minion.isInWater()) {
+                return false;
+            }
+
+            LivingEntity target = this.minion.getTarget();
+            if (target == null || !target.isAlive()) {
+                return false;
+            }
+
+            double distanceSq = this.minion.distanceToSqr(target);
+            boolean canDash = distanceSq <= MAX_DISTANCE_SQ;
+
+            if (canDash && this.cooldownReadyLogged) {
+                LOGGER.info("[{}] Conditions de dash réunies (distance={}, cible={})",
+                        this.minion.getId(), Math.sqrt(distanceSq), target.getName().getString());
+                this.cooldownReadyLogged = false;
+            }
+
+            return canDash;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return this.dashTicksLeft > 0 || this.postDashTicksLeft > 0;
+        }
+
+        @Override
+        public void start() {
+            LivingEntity target = this.minion.getTarget();
+            double distance = 0.0D;
+            if (target != null) {
+                Vec3 diff = target.position().subtract(this.minion.position());
+                distance = diff.length();
+                this.dashDirection = diff.lengthSqr() > 1.0E-4 ? diff.normalize() : Vec3.ZERO;
+            }
+            this.dashTicksLeft = DASH_DURATION_TICKS;
+            this.postDashTicksLeft = 0;
+            this.alreadyHit.clear();
+
+            this.minion.playSound(SoundEvents.TRIDENT_RIPTIDE_1.value(), 1.0F, 0.9F);
+
+            LOGGER.info("[{}] Dash START vers {} depuis {} (distance={}, direction={})",
+                    this.minion.getId(),
+                    target != null ? target.getName().getString() : "null",
+                    this.minion.position(),
+                    distance,
+                    this.dashDirection);
+        }
+
+        @Override
+        public void stop() {
+            LOGGER.info("[{}] Dash STOP à {} (entités touchées={})",
+                    this.minion.getId(), this.minion.position(), this.alreadyHit.size());
+
+            this.dashTicksLeft = 0;
+            this.postDashTicksLeft = 0;
+            this.cooldown = COOLDOWN_TICKS;
+            this.minion.setDeltaMovement(this.minion.getDeltaMovement().scale(0.2D));
+
+            LOGGER.info("[{}] Dash cooldown démarré ({} ticks)", this.minion.getId(), COOLDOWN_TICKS);
+        }
+
+        @Override
+        public void tick() {
+            boolean inMovementPhase = this.dashTicksLeft > 0;
+
+            if (inMovementPhase) {
+                LivingEntity target = this.minion.getTarget();
+
+                if (target != null) {
+                    Vec3 toTarget = target.position().subtract(this.minion.position());
+                    double distance = toTarget.length();
+                    if (distance > 1.0E-4) {
+                        this.dashDirection = toTarget.scale(1.0D / distance);
+                    }
+
+                    int remainingTicks = Math.max(this.dashTicksLeft, 1);
+                    double step = Mth.clamp(distance / remainingTicks, MIN_STEP_PER_TICK, MAX_STEP_PER_TICK);
+
+                    this.minion.setDeltaMovement(this.dashDirection.scale(step));
+                    this.minion.getLookControl().setLookAt(target, 30.0F, 30.0F);
+                } else {
+                    this.minion.setDeltaMovement(this.dashDirection.scale(MIN_STEP_PER_TICK));
+                }
+            } else {
+                this.minion.setDeltaMovement(this.minion.getDeltaMovement().scale(0.85D));
+            }
+
+            this.spawnBubbleTrail();
+            this.applyTouchDamage(inMovementPhase);
+
+            if (inMovementPhase) {
+                this.dashTicksLeft--;
+                if (this.dashTicksLeft <= 0) {
+                    this.postDashTicksLeft = POST_DASH_HIT_DURATION_TICKS;
+                }
+            } else {
+                this.postDashTicksLeft--;
+            }
+        }
+
+        private void spawnBubbleTrail() {
+            if (this.minion.level() instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(ParticleTypes.BUBBLE,
+                        this.minion.getX(), this.minion.getY() + this.minion.getBbHeight() * 0.5D, this.minion.getZ(),
+                        BUBBLE_PARTICLES_PER_TICK,
+                        this.minion.getBbWidth() * 0.3D, this.minion.getBbHeight() * 0.3D, this.minion.getBbWidth() * 0.3D,
+                        0.01D);
+            }
+        }
+        private void applyTouchDamage(boolean inMovementPhase) {
+            if (!(this.minion.level() instanceof ServerLevel serverLevel)) {
+                return;
+            }
+
+            LivingEntity target = this.minion.getTarget();
+            List<LivingEntity> hitEntities = serverLevel.getEntitiesOfClass(
+                    LivingEntity.class,
+                    this.minion.getBoundingBox().inflate(HIT_RADIUS),
+                    entity -> entity != this.minion
+                            && entity != this.minion.getOwner()
+                            && entity.isAlive()
+                            && !this.alreadyHit.contains(entity)
+            );
+
+            for (LivingEntity hit : hitEntities) {
+                this.alreadyHit.add(hit);
+                boolean isTarget = hit == target;
+                float damage = isTarget ? TARGET_DAMAGE : SWEEP_DAMAGE;
+
+                hit.hurtServer(serverLevel, this.minion.damageSources().mobAttack(this.minion), damage);
+
+                Vec3 away = hit.position().subtract(this.minion.position());
+                away = away.lengthSqr() > 1.0E-4 ? away.normalize() : this.dashDirection;
+                hit.knockback(-away.x, -away.y, -away.z, this.minion.damageSources().mobAttack(this.minion), KNOCKBACK_STRENGTH);
+                hit.setDeltaMovement(hit.getDeltaMovement().add(0.0D, 0.15D, 0.0D));
+
+                LOGGER.info("[{}] Dash HIT sur {} (cible principale={}, dégâts={}, phase={})",
+                        this.minion.getId(), hit.getName().getString(), isTarget, damage,
+                        inMovementPhase ? "déplacement" : "après-dash");
+
+                if (isTarget && inMovementPhase) {
+                    this.dashTicksLeft = 1;
+                    LOGGER.info("[{}] Cible principale touchée, fin anticipée de la phase de déplacement", this.minion.getId());
+                }
+            }
         }
     }
 }
