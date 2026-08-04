@@ -1,7 +1,7 @@
 package net.necrocraft.world.entity.minion.impl;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -13,16 +13,18 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.item.ModItems;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
-import net.necrocraft.world.item.bonus.BonusUtil;
-import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class ParchedMinion extends SkeletonMinion {
+
+    private @Nullable Entity currentHurtTarget;
 
     static{
         SYNCED_BONUS.add(ModItems.MUMMY_WRAPPING_BONUS_ITEM);
@@ -81,11 +83,31 @@ public class ParchedMinion extends SkeletonMinion {
         Objects.requireNonNull(target.asLivingEntity())
                 .addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 0, true, true, true));
 
+        this.currentHurtTarget = target;
         return super.doHurtTarget(level, target);
     }
 
     @Override
     public void hurtTargetEffectTrigger(AbstractBonusItem bonus) {
+        NecroCraft.LOGGER.info("hurt trigger by : {}", bonus.getDescriptionId());
         bonus.applySyncedEffect(this);
+
+        if (this.currentHurtTarget != null && this.level() instanceof ServerLevel serverLevel) {
+            spawnLifeDrainEffect(serverLevel, this.currentHurtTarget);
+        }
+    }
+
+    private void spawnLifeDrainEffect(@NotNull ServerLevel level, @NotNull Entity target) {
+        Vec3 from = target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D);
+        Vec3 to = this.position().add(0.0D, this.getBbHeight() * 0.5D, 0.0D);
+        Vec3 delta = to.subtract(from);
+
+        int steps = 10;
+        for (int i = 0; i <= steps; i++) {
+            double t = (double) i / steps;
+            Vec3 point = from.add(delta.scale(t));
+            level.sendParticles(ParticleTypes.SOUL, point.x, point.y, point.z,
+                    1, 0.02D, 0.02D, 0.02D, 0.0D);
+        }
     }
 }

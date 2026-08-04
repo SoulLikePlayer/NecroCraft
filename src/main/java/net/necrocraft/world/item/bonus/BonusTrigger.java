@@ -6,5 +6,4 @@ public enum BonusTrigger {
     ON_HIT,
     ON_DEATH,
     ON_DAMAGE,
-    NONE
 }

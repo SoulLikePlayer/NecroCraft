@@ -38,6 +38,8 @@ public class ModItemGroups {
                         output.accept(ModItems.AUTO_PLANTER_BONUS_ITEM);
 
                         output.accept(ModItems.MUMMY_WRAPPING_BONUS_ITEM);
+
+                        output.accept(ModItems.TRIDENT_SHARD_BONUS_ITEM);
                     }))
                     .build()
 

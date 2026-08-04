@@ -1,4 +1,4 @@
-package net.necrocraft.world.item.bonus.impl;
+package net.necrocraft.world.item.bonus.impl.synced;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -31,10 +31,9 @@ public class MummyWrappingBonusItem extends AbstractBonusItem {
     @Override
     public void applySyncedEffect(@NotNull AbstractMinion minion) {
         minion.heal(HEAL_AMOUNT_ON_HIT);
-        NecroCraft.LOGGER.info("Healed");
     }
 
-    public BonusTrigger getBonusTrigger(){
+    public @NotNull BonusTrigger getBonusTrigger(){
         return BonusTrigger.ON_DAMAGE;
     }
 }
