@@ -14,13 +14,13 @@ import org.jetbrains.annotations.NotNull;
 
 import static net.necrocraft.world.item.bonus.BonusUtil.applyModifier;
 
-public class BarnacleShellBonusItem extends AbstractBonusItem {
+public class ZombieNautillusShellBonusItem extends AbstractBonusItem {
     private static final Identifier ARMOR_MODIFIER_ID =
             Identifier.fromNamespaceAndPath("necrocraft", "barnacle_shell_modifier");
 
     private static final double ARMOR_BONUS = 9.0D;
 
-    public BarnacleShellBonusItem(Properties properties) {
+    public ZombieNautillusShellBonusItem(Properties properties) {
         super(properties);
     }
 

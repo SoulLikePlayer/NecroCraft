@@ -53,7 +53,7 @@ public class DrownedMinion extends ZombieMinion {
 
     static {
         SYNCED_BONUS.add(ModItems.TRIDENT_SHARD_BONUS_ITEM);
-        SYNCED_BONUS.add(ModItems.BARNACLE_SHELL_BONUS_ITEM);
+        SYNCED_BONUS.add(ModItems.ZOMBIE_NAUTILUS_SHELL_BONUS_ITEM);
     }
 
     /**

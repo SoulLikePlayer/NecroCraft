@@ -6,7 +6,7 @@ import net.minecraft.world.item.Rarity;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.impl.*;
-import net.necrocraft.world.item.bonus.impl.synced.BarnacleShellBonusItem;
+import net.necrocraft.world.item.bonus.impl.synced.ZombieNautillusShellBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.MummyWrappingBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.TridentShardBonusItem;
 import net.necrocraft.world.item.equipment.SoulTotem;
@@ -63,9 +63,9 @@ public class ModItems {
                     .rarity(Rarity.UNCOMMON)
     );
 
-    public static DeferredItem<@NotNull AbstractBonusItem> BARNACLE_SHELL_BONUS_ITEM = ITEMS.registerItem(
-            "barnacle_shell_bonus_item",
-            BarnacleShellBonusItem::new,
+    public static DeferredItem<@NotNull AbstractBonusItem> ZOMBIE_NAUTILUS_SHELL_BONUS_ITEM = ITEMS.registerItem(
+            "zombie_nautilus_shell",
+            ZombieNautillusShellBonusItem::new,
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
     );
