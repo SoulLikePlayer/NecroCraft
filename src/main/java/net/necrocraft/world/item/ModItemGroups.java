@@ -40,6 +40,7 @@ public class ModItemGroups {
                         output.accept(ModItems.MUMMY_WRAPPING_BONUS_ITEM);
 
                         output.accept(ModItems.TRIDENT_SHARD_BONUS_ITEM);
+                        output.accept(ModItems.BARNACLE_SHELL_BONUS_ITEM);
                     }))
                     .build()
 

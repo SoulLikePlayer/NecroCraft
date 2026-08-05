@@ -6,6 +6,7 @@ import net.minecraft.world.item.Rarity;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.impl.*;
+import net.necrocraft.world.item.bonus.impl.synced.BarnacleShellBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.MummyWrappingBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.TridentShardBonusItem;
 import net.necrocraft.world.item.equipment.SoulTotem;
@@ -58,6 +59,13 @@ public class ModItems {
     public static DeferredItem<@NotNull AbstractBonusItem> TRIDENT_SHARD_BONUS_ITEM = ITEMS.registerItem(
             "trident_shard_bonus_item",
             TridentShardBonusItem::new,
+            properties -> properties
+                    .rarity(Rarity.UNCOMMON)
+    );
+
+    public static DeferredItem<@NotNull AbstractBonusItem> BARNACLE_SHELL_BONUS_ITEM = ITEMS.registerItem(
+            "barnacle_shell_bonus_item",
+            BarnacleShellBonusItem::new,
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
     );

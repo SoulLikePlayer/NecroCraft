@@ -30,6 +30,7 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import net.necrocraft.world.effect.ModMobEffects;
 import net.necrocraft.world.item.ModItems;
+import net.neoforged.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -52,6 +53,7 @@ public class DrownedMinion extends ZombieMinion {
 
     static {
         SYNCED_BONUS.add(ModItems.TRIDENT_SHARD_BONUS_ITEM);
+        SYNCED_BONUS.add(ModItems.BARNACLE_SHELL_BONUS_ITEM);
     }
 
     /**

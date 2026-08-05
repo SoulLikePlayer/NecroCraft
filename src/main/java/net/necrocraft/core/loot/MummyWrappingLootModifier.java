@@ -17,7 +17,7 @@ public class MummyWrappingLootModifier extends LootModifier {
             RecordCodecBuilder.mapCodec(inst -> codecStart(inst)
                     .apply(inst, MummyWrappingLootModifier::new));
 
-    private static final float CHANCE = 0.15f;
+    private static final float CHANCE = 0.65f;
 
     public MummyWrappingLootModifier(LootItemCondition[] conditions, int priority) {
         super(conditions, priority);

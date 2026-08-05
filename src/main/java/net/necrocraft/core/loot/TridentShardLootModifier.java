@@ -17,7 +17,7 @@ public class TridentShardLootModifier extends LootModifier {
             RecordCodecBuilder.mapCodec(inst -> codecStart(inst)
                     .apply(inst, TridentShardLootModifier::new));
 
-    private static final float CHANCE = 1f;
+    private static final float CHANCE = 0.60f;
 
     public TridentShardLootModifier(LootItemCondition[] conditions, int priority) {
         super(conditions, priority);

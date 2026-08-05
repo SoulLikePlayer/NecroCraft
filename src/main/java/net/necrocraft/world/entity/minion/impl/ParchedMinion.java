@@ -86,28 +86,4 @@ public class ParchedMinion extends SkeletonMinion {
         this.currentHurtTarget = target;
         return super.doHurtTarget(level, target);
     }
-
-    @Override
-    public void hurtTargetEffectTrigger(AbstractBonusItem bonus) {
-        NecroCraft.LOGGER.info("hurt trigger by : {}", bonus.getDescriptionId());
-        bonus.applySyncedEffect(this);
-
-        if (this.currentHurtTarget != null && this.level() instanceof ServerLevel serverLevel) {
-            spawnLifeDrainEffect(serverLevel, this.currentHurtTarget);
-        }
-    }
-
-    private void spawnLifeDrainEffect(@NotNull ServerLevel level, @NotNull Entity target) {
-        Vec3 from = target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D);
-        Vec3 to = this.position().add(0.0D, this.getBbHeight() * 0.5D, 0.0D);
-        Vec3 delta = to.subtract(from);
-
-        int steps = 10;
-        for (int i = 0; i <= steps; i++) {
-            double t = (double) i / steps;
-            Vec3 point = from.add(delta.scale(t));
-            level.sendParticles(ParticleTypes.SOUL, point.x, point.y, point.z,
-                    1, 0.02D, 0.02D, 0.02D, 0.0D);
-        }
-    }
 }

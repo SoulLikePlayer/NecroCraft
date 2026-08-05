@@ -512,7 +512,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
             if (isSynced) {
                 BonusUtil.resolve(bonusId).ifPresent(bonus -> {
                     if (bonus.getBonusTrigger() == trigger) {
-                        hurtTargetEffectTrigger(bonus);
+                        bonus.applySyncedEffect(this);
                     }
                 });
             }
@@ -728,18 +728,14 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
     @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+        fireSyncedTrigger(BonusTrigger.ON_DAMAGE);
+        return super.hurtServer(level, source, damage);
+    }
+
+    @Override
     public boolean doHurtTarget(@NotNull ServerLevel level, Entity target) {
         fireSyncedTrigger(BonusTrigger.ON_DAMAGE);
         return super.doHurtTarget(level, target);
     }
-
-    /**
-     * Hook letting a concrete minion type react to a "synced" bonus at the
-     * given trigger point. No-op by default; {@link
-     * net.necrocraft.world.entity.minion.impl.ParchedMinion} overrides this
-     * to call {@link AbstractBonusItem#applySyncedEffect(AbstractMinion)}.
-     *
-     * @param bonus the equipped bonus that matched the fired trigger
-     */
-    public void hurtTargetEffectTrigger(AbstractBonusItem bonus){}
 }
