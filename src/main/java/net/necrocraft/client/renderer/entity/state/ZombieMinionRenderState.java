@@ -5,4 +5,6 @@ import net.minecraft.client.renderer.entity.state.UndeadRenderState;
 public class ZombieMinionRenderState extends UndeadRenderState {
     public boolean isAggressive;
     public boolean isConverting;
+
+    public byte dashPhase = 0;
 }

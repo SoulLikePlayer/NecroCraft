@@ -12,26 +12,38 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.necrocraft.client.model.minion.zombie.DrownedMinionModel;
+import net.necrocraft.client.renderer.entity.layers.DrownedMinionDashRiptideLayer;
 import net.necrocraft.client.renderer.entity.layers.DrownedMinionOuterLayer;
 import net.necrocraft.client.renderer.entity.state.ZombieMinionRenderState;
 import net.necrocraft.world.entity.minion.impl.DrownedMinion;
 
-public class DrownedMinionRenderer  extends AbstractZombieMinionRenderer<DrownedMinion, ZombieMinionRenderState, DrownedMinionModel> {
+public class DrownedMinionRenderer extends AbstractZombieMinionRenderer<DrownedMinion, ZombieMinionRenderState, DrownedMinionModel> {
     private static final Identifier DROWNED_LOCATION = Identifier.withDefaultNamespace("textures/entity/zombie/drowned.png");
 
     public DrownedMinionRenderer(EntityRendererProvider.Context context) {
         super(context, new DrownedMinionModel(context.bakeLayer(ModelLayers.DROWNED)), ArmorModelSet.bake(ModelLayers.DROWNED_ARMOR, context.getModelSet(), DrownedMinionModel::new));
+
         this.addLayer(new DrownedMinionOuterLayer(this, context.getModelSet()));
+        this.addLayer(new DrownedMinionDashRiptideLayer(this));
     }
 
+    @Override
     public ZombieMinionRenderState createRenderState() {
         return new ZombieMinionRenderState();
     }
 
+    @Override
+    public void extractRenderState(DrownedMinion entity, ZombieMinionRenderState state, float partialTick) {
+        super.extractRenderState(entity, state, partialTick);
+        state.dashPhase = entity.getDashPhase();
+    }
+
+    @Override
     public Identifier getTextureLocation(ZombieMinionRenderState state) {
         return DROWNED_LOCATION;
     }
 
+    @Override
     protected void setupRotations(ZombieMinionRenderState state, PoseStack poseStack, float bodyRot, float entityScale) {
         super.setupRotations(state, poseStack, bodyRot, entityScale);
         float swimAmount = state.swimAmount;
@@ -40,11 +52,13 @@ public class DrownedMinionRenderer  extends AbstractZombieMinionRenderer<Drowned
             float rotationX = Mth.lerp(swimAmount, 0.0F, targetRotationX);
             poseStack.rotateAround(Axis.XP.rotationDegrees(rotationX), 0.0F, state.boundingBoxHeight / 2.0F / entityScale, 0.0F);
         }
-
     }
 
+    @Override
     protected HumanoidModel.ArmPose getArmPose(DrownedMinion mob, HumanoidArm arm) {
         ItemStack item = mob.getItemHeldByArm(arm);
-        return mob.getMainArm() == arm && mob.isAggressive() && item.is(Items.TRIDENT) ? HumanoidModel.ArmPose.THROW_TRIDENT : super.getArmPose(mob, arm);
+        return mob.getMainArm() == arm && mob.isAggressive() && item.is(Items.TRIDENT)
+                ? HumanoidModel.ArmPose.THROW_TRIDENT
+                : super.getArmPose(mob, arm);
     }
 }
