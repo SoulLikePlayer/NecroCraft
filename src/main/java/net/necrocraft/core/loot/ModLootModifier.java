@@ -15,4 +15,7 @@ public class ModLootModifier {
 
     public static final Supplier<MapCodec<MummyWrappingLootModifier>> MUMMY_WRAPPING_MODIFIER =
             LOOT_MODIFIERS.register("mummy_wrapping_modifier", () -> MummyWrappingLootModifier.CODEC);
+
+    public static final Supplier<MapCodec<TridentShardLootModifier>> TRIDENT_SHARD_MODIFIER =
+            LOOT_MODIFIERS.register("trident_shard_modifier", () -> TridentShardLootModifier.CODEC);
 }

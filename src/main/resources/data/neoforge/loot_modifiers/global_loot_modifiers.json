@@ -1,6 +1,8 @@
 {
+  "type": "neoforge:global_loot_modifiers",
   "replace": false,
   "entries": [
-    "necrocraft:mummy_wrapping_modifier"
+    "necrocraft:mummy_wrapping_modifier",
+    "necrocraft:trident_shard_modifier"
   ]
 }

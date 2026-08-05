@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "necrocraft:item/mummy_wrapping"
+    "layer0": "necrocraft:item/trident_shard"
   }
 }
