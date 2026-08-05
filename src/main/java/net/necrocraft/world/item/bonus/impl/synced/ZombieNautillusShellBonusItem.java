@@ -31,7 +31,7 @@ public class ZombieNautillusShellBonusItem extends AbstractBonusItem {
 
     @Override
     public @NotNull BonusTrigger getBonusTrigger() {
-        return BonusTrigger.ON_DAMAGE;
+        return BonusTrigger.ON_HIT;
     }
 
     @Override

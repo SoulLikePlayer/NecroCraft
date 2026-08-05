@@ -729,7 +729,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
-        fireSyncedTrigger(BonusTrigger.ON_DAMAGE);
+        fireSyncedTrigger(BonusTrigger.ON_HIT);
         return super.hurtServer(level, source, damage);
     }
 
