@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "zombie_nautilus_shell",
+  "ingredients": [
+    "necrocraft:necrotic_powder",
+    "minecraft:nautilus_shell"
+  ],
+  "result": {
+    "id": "necrocraft:zombie_nautilus_shell"
+  }
+}

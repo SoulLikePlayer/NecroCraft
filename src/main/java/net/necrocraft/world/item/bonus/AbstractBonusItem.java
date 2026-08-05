@@ -7,10 +7,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public abstract class AbstractBonusItem extends Item {
     protected AbstractBonusItem(Properties properties){
         super(properties);
+    }
+
+    public static boolean conditionPassif(Supplier<Boolean> condition){
+        return condition.get();
     }
 
     public abstract @NotNull BonusType getBonusTypes();
