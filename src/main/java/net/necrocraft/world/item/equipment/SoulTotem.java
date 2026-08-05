@@ -22,6 +22,7 @@ import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.BonusTrigger;
+import net.necrocraft.world.item.bonus.BonusType;
 import net.necrocraft.world.item.bonus.BonusUtil;
 import net.necrocraft.world.item.component.SoulData;
 import net.neoforged.neoforge.registries.DeferredItem;

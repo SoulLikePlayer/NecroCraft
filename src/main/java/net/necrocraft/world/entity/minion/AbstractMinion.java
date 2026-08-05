@@ -492,7 +492,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     /**
      * Same as {@link #fireTrigger(BonusTrigger)}, but only for bonuses this
      * concrete minion type has registered in {@link #getSyncedBonusItem()},
-     * and invoking {@link #hurtTargetEffectTrigger(AbstractBonusItem)} so the
+     *
      * minion decides what "synced" means for it (e.g. {@link
      * net.necrocraft.world.entity.minion.impl.ParchedMinion} applies {@link
      * AbstractBonusItem#applySyncedEffect(AbstractMinion)}).

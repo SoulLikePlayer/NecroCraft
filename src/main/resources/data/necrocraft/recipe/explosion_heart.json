@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " n ",
+    "ntn",
+    " n "
+  ],
+  "key": {
+    "t": "minecraft:tnt",
+    "n": "necrocraft:necrotic_shard"
+  },
+  "result": "necrocraft:post_mortem_explosion_bonus_item"
+}

@@ -74,6 +74,7 @@ public class ModItems {
             "post_mortem_explosion_bonus_item",
             PostMortemExplosionBonusItem::new,
             properties -> properties
+                    .rarity(Rarity.RARE)
     );
 
     public static DeferredItem<@NotNull AbstractBonusItem> STORAGE_BONUS_ITEM = ITEMS.registerItem(
