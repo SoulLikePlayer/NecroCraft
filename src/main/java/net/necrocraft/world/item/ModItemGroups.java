@@ -41,6 +41,8 @@ public class ModItemGroups {
 
                         output.accept(ModItems.TRIDENT_SHARD_BONUS_ITEM);
                         output.accept(ModItems.ZOMBIE_NAUTILUS_SHELL_BONUS_ITEM);
+
+                        output.accept(ModItems.BLIZZARD_CAPE_BONUS_ITEM);
                     }))
                     .build()
 

@@ -84,6 +84,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     /** Position of the container currently visually opened by this minion, if any (see {@link StoreItemsInContainerGoal}). */
     private @Nullable BlockPos openedChestPos;
+    public int lastCombatTick = 0;
 
     /**
      * @param type  the entity type this minion is instantiated from
@@ -729,13 +730,23 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+        this.lastCombatTick = this.tickCount;
         fireSyncedTrigger(BonusTrigger.ON_HIT);
         return super.hurtServer(level, source, damage);
     }
 
     @Override
-    public boolean doHurtTarget(@NotNull ServerLevel level, Entity target) {
+    public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
+        this.lastCombatTick = this.tickCount;
         fireSyncedTrigger(BonusTrigger.ON_DAMAGE);
         return super.doHurtTarget(level, target);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (!this.level().isClientSide()) {
+            fireSyncedTrigger(BonusTrigger.ON_TICK);
+        }
     }
 }

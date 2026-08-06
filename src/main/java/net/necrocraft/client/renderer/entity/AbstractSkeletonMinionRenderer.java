@@ -22,7 +22,7 @@ public abstract class AbstractSkeletonMinionRenderer<T extends SkeletonMinion, S
 
     public AbstractSkeletonMinionRenderer(EntityRendererProvider.Context context, ArmorModelSet<ModelLayerLocation> armorSet, SkeletonMinionModel<S> bodyModel) {
         super(context, bodyModel, 0.5F);
-        this.addLayer(new HumanoidArmorLayer(this, ArmorModelSet.bake(armorSet, context.getModelSet(), SkeletonModel::new), context.getEquipmentRenderer()));
+        this.addLayer(new HumanoidArmorLayer(this, ArmorModelSet.bake(armorSet, context.getModelSet(), SkeletonMinionModel::new), context.getEquipmentRenderer()));
     }
 
     public void extractRenderState(T entity, S state, float partialTicks) {

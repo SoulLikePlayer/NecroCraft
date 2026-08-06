@@ -12,11 +12,16 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class StrayMinion extends SkeletonMinion{
+
+    static {
+        SYNCED_BONUS.add(ModItems.BLIZZARD_CAPE_BONUS_ITEM);
+    }
 
     /**
      * @param type  the entity type this minion is instantiated from
