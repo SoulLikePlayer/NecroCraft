@@ -6,7 +6,7 @@ import net.minecraft.world.item.Rarity;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.impl.*;
-import net.necrocraft.world.item.bonus.impl.synced.BlizzardCapeBonusItem;
+import net.necrocraft.world.item.bonus.impl.synced.StrayCapeBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.ZombieNautillusShellBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.MummyWrappingBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.TridentShardBonusItem;
@@ -71,9 +71,9 @@ public class ModItems {
                     .rarity(Rarity.UNCOMMON)
     );
 
-    public static DeferredItem<@NotNull AbstractBonusItem> BLIZZARD_CAPE_BONUS_ITEM = ITEMS.registerItem(
-            "blizzard_cape_bonus_item",
-            BlizzardCapeBonusItem::new,
+    public static DeferredItem<@NotNull AbstractBonusItem> STRAY_CAPE_BONUS_ITEM = ITEMS.registerItem(
+            "stray_cape_bonus_item",
+            StrayCapeBonusItem::new,
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
     );

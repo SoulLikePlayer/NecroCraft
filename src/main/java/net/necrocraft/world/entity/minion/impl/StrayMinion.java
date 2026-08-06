@@ -20,7 +20,7 @@ import java.util.Objects;
 public class StrayMinion extends SkeletonMinion{
 
     static {
-        SYNCED_BONUS.add(ModItems.BLIZZARD_CAPE_BONUS_ITEM);
+        SYNCED_BONUS.add(ModItems.STRAY_CAPE_BONUS_ITEM);
     }
 
     /**

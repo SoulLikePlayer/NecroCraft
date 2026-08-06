@@ -9,18 +9,16 @@ import net.necrocraft.world.item.bonus.BonusTrigger;
 import net.necrocraft.world.item.bonus.BonusType;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.classfile.Attribute;
-
 import static net.necrocraft.world.item.bonus.BonusUtil.applyModifier;
 
-public class BlizzardCapeBonusItem extends AbstractBonusItem {
+public class StrayCapeBonusItem extends AbstractBonusItem {
     private static final Identifier SPEED_MODIFIER_ID =
             Identifier.fromNamespaceAndPath("necrocraft", "speed_modifier_id");
 
     private static final double SPEED_BONUS = 3.0D;
     private static final int COMBAT_COOLDOWN_TICKS = 24;
 
-    public BlizzardCapeBonusItem(Properties properties) {
+    public StrayCapeBonusItem(Properties properties) {
         super(properties);
     }
 
