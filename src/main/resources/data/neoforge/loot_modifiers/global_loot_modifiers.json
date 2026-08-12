@@ -3,6 +3,7 @@
   "replace": false,
   "entries": [
     "necrocraft:mummy_wrapping_modifier",
-    "necrocraft:trident_shard_modifier"
+    "necrocraft:trident_shard_modifier",
+    "necrocraft:trial_vault_modifier"
   ]
 }

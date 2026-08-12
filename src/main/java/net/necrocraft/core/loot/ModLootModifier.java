@@ -18,4 +18,7 @@ public class ModLootModifier {
 
     public static final Supplier<MapCodec<TridentShardLootModifier>> TRIDENT_SHARD_MODIFIER =
             LOOT_MODIFIERS.register("trident_shard_modifier", () -> TridentShardLootModifier.CODEC);
+
+    public static final Supplier<MapCodec<TrialVaultLootModifier>> TRIAL_VAULT_MODIFIER =
+            LOOT_MODIFIERS.register("trial_vault_modifier", () -> TrialVaultLootModifier.CODEC);
 }
