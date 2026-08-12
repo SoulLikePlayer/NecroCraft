@@ -7,12 +7,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.*;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
@@ -22,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
@@ -59,32 +55,42 @@ import java.util.*;
  * Concrete subclasses (e.g. {@link ZombieMinion}, {@link SkeletonMinion})
  * only need to supply mob-specific sounds; all shared behavior (goals,
  * inventory, ownership, persistence) lives here.
+ * <p>
+ * Class layout, top to bottom: constants/fields, construction, AI goals,
+ * synced data, persistence, ownership, teleportation, container interaction
+ * (chest UI tracking), the bonus-trigger system, combat/lifecycle, the
+ * {@link Container} implementation backing the minion's inventory, and
+ * finally player interaction.
  */
 public class AbstractMinion extends PathfinderMob implements OwnableEntity, Container, ContainerUser {
     public static final ArrayList<DeferredItem<@NotNull AbstractBonusItem>> SYNCED_BONUS = new ArrayList<>();
 
-    /** Squared distance to the owner beyond which the minion attempts to teleport to them. */
+    /**
+     * Squared distance to the owner beyond which the minion attempts to teleport to them.
+     */
     public static final int TELEPORT_WHEN_DISTANCE_IS_SQ = 144;
-
+    /**
+     * Synced reference to the living entity that owns/summoned this minion, if any.
+     */
+    protected static final EntityDataAccessor<@NotNull Optional<EntityReference<@NotNull LivingEntity>>> DATA_SUMMONER_UUID_ID =
+            SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
     private static final int MIN_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 2;
     private static final int MAX_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 3;
     private static final int MAX_VERTICAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 1;
-
     private static final int INVENTORY_SIZE = 27;
-
-    /** Synced reference to the living entity that owns/summoned this minion, if any. */
-    protected static final EntityDataAccessor<@NotNull Optional<EntityReference<@NotNull LivingEntity>>> DATA_SUMMONER_UUID_ID =
-            SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
-
-    /** Identifiers of the bonus items currently equipped on this minion, driving its optional behaviors. */
-    private List<Identifier> bonuses = new ArrayList<>();
-
-    /** The minion's own carried inventory. */
+    /**
+     * The minion's own carried inventory.
+     */
     private final NonNullList<@NotNull ItemStack> inventoryItems = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
-
-    /** Position of the container currently visually opened by this minion, if any (see {@link StoreItemsInContainerGoal}). */
-    private @Nullable BlockPos openedChestPos;
     public int lastCombatTick = 0;
+    /**
+     * Identifiers of the bonus items currently equipped on this minion, driving its optional behaviors.
+     */
+    private List<Identifier> bonuses = new ArrayList<>();
+    /**
+     * Position of the container currently visually opened by this minion, if any (see {@link StoreItemsInContainerGoal}).
+     */
+    private @Nullable BlockPos openedChestPos;
 
     /**
      * @param type  the entity type this minion is instantiated from
@@ -92,6 +98,18 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      */
     protected AbstractMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
         super(type, level);
+    }
+
+    /**
+     * Fires {@link BonusTrigger#ON_SPAWN} once the minion is actually placed
+     * into the world, then defers to vanilla spawn finalization.
+     */
+    @Override
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData) {
+        SpawnGroupData result = super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+        fireTrigger(BonusTrigger.ON_SPAWN);
+        fireSyncedTrigger(BonusTrigger.ON_SPAWN);
+        return result;
     }
 
     /**
@@ -125,6 +143,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         this.targetSelector.addGoal(3, new GatedGoal(new HuntPreyGoal(this, 16.0F), () -> !this.isSedentary()));
     }
 
+
     /**
      * Defines all the data that is synced at the creation of the mob.
      *
@@ -135,6 +154,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         super.defineSynchedData(entityData);
         entityData.define(DATA_SUMMONER_UUID_ID, Optional.empty());
     }
+
 
     /**
      * Writes this minion's owner reference, bonus list and inventory contents
@@ -169,7 +189,10 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         ContainerHelper.loadAllItems(input, this.inventoryItems);
     }
 
-    /** @return the synced reference to this minion's owner, or {@code null} if it has none */
+
+    /**
+     * @return the synced reference to this minion's owner, or {@code null} if it has none
+     */
     public EntityReference<@NotNull LivingEntity> getOwnerReference() {
         return this.entityData
                 .get(DATA_SUMMONER_UUID_ID)
@@ -185,20 +208,38 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
     /**
+     * Sets (or clears) this minion's owner.
+     *
+     * @param owner the new owner, or {@code null} to remove ownership
+     */
+    public void setOwner(LivingEntity owner) {
+        if (owner != null) {
+            this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.of(EntityReference.of(owner)));
+        } else {
+            this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.empty());
+        }
+    }
+
+
+    /**
      * Attempts to teleport this minion to a random walkable position near
-     * its owner. Does nothing if the minion has no owner.
+     * its owner. Does nothing if the minion has no owner. Fires
+     * {@link BonusTrigger#ON_TELEPORT} whenever the teleport actually happens.
      */
     public void tryToTeleportToOwner() {
         LivingEntity owner = this.getOwner();
         if (owner != null) {
-            this.teleportToAroundBlockPos(owner.blockPosition());
+            boolean teleported = this.teleportToAroundBlockPos(owner.blockPosition());
+            if (teleported) {
+                fireTrigger(BonusTrigger.ON_TELEPORT);
+                fireSyncedTrigger(BonusTrigger.ON_TELEPORT);
+            }
         }
-
     }
 
     /**
      * @return {@code true} if the minion has an owner, is not sedentary, and
-     *         is at least {@link #TELEPORT_WHEN_DISTANCE_IS_SQ} (squared blocks) away from them
+     * is at least {@link #TELEPORT_WHEN_DISTANCE_IS_SQ} (squared blocks) away from them
      */
     public boolean shouldTryTeleportToOwner() {
         LivingEntity owner = this.getOwner();
@@ -213,19 +254,20 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * blocks vertically) and teleports to the first valid one found.
      *
      * @param targetPos the position to teleport around (typically the owner's position)
+     * @return {@code true} if a valid position was found and the teleport happened
      */
-    private void teleportToAroundBlockPos(BlockPos targetPos) {
+    private boolean teleportToAroundBlockPos(BlockPos targetPos) {
         for (int attempt = 0; attempt < 10; ++attempt) {
             int xd = this.random.nextIntBetweenInclusive(-3, 3);
             int zd = this.random.nextIntBetweenInclusive(-3, 3);
             if (Math.abs(xd) >= 2 || Math.abs(zd) >= 2) {
                 int yd = this.random.nextIntBetweenInclusive(-1, 1);
                 if (this.maybeTeleportTo(targetPos.getX() + xd, targetPos.getY() + yd, targetPos.getZ() + zd)) {
-                    return;
+                    return true;
                 }
             }
         }
-
+        return false;
     }
 
     /**
@@ -241,7 +283,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         if (!this.canTeleportTo(new BlockPos(x, y, z))) {
             return false;
         } else {
-            this.snapTo((double) x + (double) 0.5F, (double) y, (double) z + (double) 0.5F, this.getYRot(), this.getXRot());
+            this.snapTo((double) x + (double) 0.5F, y, (double) z + (double) 0.5F, this.getYRot(), this.getXRot());
             this.navigation.stop();
             return true;
         }
@@ -271,9 +313,9 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
     /**
-     * @return {@code true} if the minion cannot currently move toward its
-     *         owner because it is a passenger, can be leashed, or its owner
-     *         is a spectator
+     * @return {@code true} if this minion cannot currently move toward its
+     * owner because it is a passenger, can be leashed, or its owner
+     * is a spectator
      */
     public final boolean unableToMoveToOwner() {
         return this.isPassenger() || this.mayBeLeashed() || this.getOwner() != null && this.getOwner().isSpectator();
@@ -281,21 +323,24 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     /**
      * @return {@code true} if this minion type is allowed to teleport onto
-     *         leaf blocks when returning to its owner; {@code false} by default
+     * leaf blocks when returning to its owner; {@code false} by default
      */
     protected boolean canFlyToOwner() {
         return false;
     }
 
+
     /**
      * @param openedChestPos the position of the container this minion is
      *                       currently visually opening, or {@code null} to clear it
      */
-    public void setOpenedChestPos(@org.jetbrains.annotations.Nullable BlockPos openedChestPos) {
+    public void setOpenedChestPos(@Nullable BlockPos openedChestPos) {
         this.openedChestPos = openedChestPos;
     }
 
-    /** Clears the currently tracked opened-container position. */
+    /**
+     * Clears the currently tracked opened-container position.
+     */
     public void clearOpenedChestPos() {
         this.openedChestPos = null;
     }
@@ -322,23 +367,19 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         }
     }
 
-    /** @return the maximum distance (in blocks) at which this minion can interact with a container */
+    /**
+     * @return the maximum distance (in blocks) at which this minion can interact with a container
+     */
     @Override
     public double getContainerInteractionRange() {
         return 3.0D;
     }
 
     /**
-     * Sets (or clears) this minion's owner.
-     *
-     * @param owner the new owner, or {@code null} to remove ownership
+     * @return the identifiers of the bonus items currently equipped on this minion
      */
-    public void setOwner(LivingEntity owner) {
-        if (owner != null) {
-            this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.of(EntityReference.of(owner)));
-        } else {
-            this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.empty());
-        }
+    public @NotNull List<Identifier> getBonuses() {
+        return this.bonuses;
     }
 
     /**
@@ -350,9 +391,182 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         this.bonuses = new ArrayList<>(bonuses);
     }
 
-    /** @return the identifiers of the bonus items currently equipped on this minion */
-    public @NotNull List<Identifier> getBonuses() {
-        return this.bonuses;
+    /**
+     * Aggregates the huntable entity types contributed by all of this
+     * minion's equipped bonuses.
+     *
+     * @return the combined set of entity types this minion may hunt
+     */
+    public @NotNull Set<EntityType<?>> getHuntableTargets() {
+        Set<EntityType<?>> targets = new HashSet<>();
+        for (Identifier bonusId : this.bonuses) {
+            BonusUtil.resolve(bonusId).ifPresent(bonus -> targets.addAll(bonus.getHuntableTargets()));
+        }
+        return targets;
+    }
+
+    /**
+     * @param type the bonus type to look for
+     * @return {@code true} if any of this minion's equipped bonuses matches {@code type}
+     */
+    public boolean hasBonusType(@NotNull BonusType type) {
+        for (Identifier bonusId : this.bonuses) {
+            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
+            if (bonus.isPresent() && bonus.get().getBonusTypes() == type) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return {@code true} if any equipped bonus marks this minion as
+     * sedentary (disabling combat/following goals in favor of
+     * stationary farming behavior)
+     */
+    public boolean isSedentary() {
+        for (Identifier bonusId : this.bonuses) {
+            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
+            if (bonus.isPresent() && bonus.get().isSedentary()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return {@code true} if any equipped bonus grants this minion the ability to automatically plant seeds
+     */
+    public boolean canAutoPlant() {
+        return hasBonusTrigger(BonusTrigger.AUTO_PLANT);
+    }
+
+    /**
+     * @return {@code true} if any equipped bonus grants this minion the ability to automatically till soil
+     */
+    public boolean canAutoTill() {
+        return hasBonusTrigger(BonusTrigger.AUTO_TILL);
+    }
+
+    /**
+     * @param trigger the trigger to look for
+     * @return {@code true} if any of this minion's equipped bonuses declares {@code trigger}
+     */
+    private boolean hasBonusTrigger(@NotNull BonusTrigger trigger) {
+        for (Identifier bonusId : this.bonuses) {
+            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
+            if (bonus.isPresent() && bonus.get().getBonusTrigger() == trigger) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Calls {@link AbstractBonusItem#applyEffectes(AbstractMinion)} on every
+     * equipped bonus whose {@link AbstractBonusItem#getBonusTrigger()}
+     * matches {@code trigger}, regardless of minion type.
+     *
+     * @param trigger the trigger being fired
+     */
+    private void fireTrigger(@NotNull BonusTrigger trigger) {
+        for (Identifier bonusId : this.bonuses) {
+            BonusUtil.resolve(bonusId).ifPresent(bonus -> {
+                if (bonus.getBonusTrigger() == trigger) {
+                    bonus.applyEffectes(this);
+                }
+            });
+        }
+    }
+
+    /**
+     * Same as {@link #fireTrigger(BonusTrigger)}, but only for bonuses this
+     * concrete minion type has registered in {@link #getSyncedBonusItem()};
+     * <p>
+     * each minion decides what "synced" means for it (e.g. {@link
+     * net.necrocraft.world.entity.minion.impl.ParchedMinion} applies {@link
+     * AbstractBonusItem#applySyncedEffect(AbstractMinion)}).
+     *
+     * @param trigger the trigger being fired
+     */
+    private void fireSyncedTrigger(@NotNull BonusTrigger trigger) {
+        for (Identifier bonusId : this.bonuses) {
+            boolean isSynced = false;
+            for (DeferredItem<@NotNull AbstractBonusItem> synced : this.getSyncedBonusItem()) {
+                if (synced.getId().equals(bonusId)) {
+                    isSynced = true;
+                    break;
+                }
+            }
+
+            if (isSynced) {
+                BonusUtil.resolve(bonusId).ifPresent(bonus -> {
+                    if (bonus.getBonusTrigger() == trigger) {
+                        bonus.applySyncedEffect(this);
+                    }
+                });
+            }
+        }
+    }
+
+    public ArrayList<DeferredItem<@NotNull AbstractBonusItem>> getSyncedBonusItem() {
+        return SYNCED_BONUS;
+    }
+
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+        this.lastCombatTick = this.tickCount;
+        fireTrigger(BonusTrigger.ON_HIT);
+        fireSyncedTrigger(BonusTrigger.ON_HIT);
+        return super.hurtServer(level, source, damage);
+    }
+
+    @Override
+    public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
+        this.lastCombatTick = this.tickCount;
+        fireTrigger(BonusTrigger.ON_DAMAGE);
+        fireSyncedTrigger(BonusTrigger.ON_DAMAGE);
+        return super.doHurtTarget(level, target);
+    }
+
+    /**
+     * Fires {@link BonusTrigger#ON_KILL} whenever this minion lands the
+     * killing blow on another living entity.
+     *
+     * @param level  the server level the kill occurred in
+     * @param entity the entity that was killed
+     */
+    @Override
+    public boolean killedEntity(@NotNull ServerLevel level, @NotNull LivingEntity entity, @NotNull DamageSource source) {
+        fireTrigger(BonusTrigger.ON_KILL);
+        fireSyncedTrigger(BonusTrigger.ON_KILL);
+        return super.killedEntity(level, entity, source);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (!this.level().isClientSide()) {
+            fireSyncedTrigger(BonusTrigger.ON_TICK);
+        }
+    }
+
+    /**
+     * On death, fires {@link BonusTrigger#ON_DEATH} on any equipped bonus
+     * that declares it, and drops this minion's carried inventory on the
+     * ground before proceeding with vanilla death handling.
+     *
+     * @param damageSource the source of the killing blow
+     */
+    @Override
+    public void die(@NotNull DamageSource damageSource) {
+        if (this.level() instanceof ServerLevel) {
+            fireTrigger(BonusTrigger.ON_DEATH);
+            fireSyncedTrigger(BonusTrigger.ON_DEATH);
+            Containers.dropContents(this.level(), this, this);
+        }
+        super.die(damageSource);
     }
 
     /**
@@ -365,7 +579,9 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return super.isInvulnerableTo(level, source);
     }
 
-    /** @return {@code true} if this minion has at least one huntable target type configured, allowing it to pick up dropped loot */
+    /**
+     * @return {@code true} if this minion has at least one huntable target type configured, allowing it to pick up dropped loot
+     */
     @Override
     public boolean canPickUpLoot() {
         return !this.getHuntableTargets().isEmpty();
@@ -436,98 +652,62 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
     /**
-     * Opens this minion's inventory menu for the interacting player when
-     * right-clicked with an empty main hand interaction (and not sneaking).
+     * Stores as much of the given item stack as possible in this minion's
+     * inventory.
      *
-     * @param player the interacting player
-     * @param hand   the hand used to interact
-     * @return {@link InteractionResult#SUCCESS} if the menu was opened, otherwise the vanilla result
+     * @param stack the stack to store
+     * @return whatever portion could not be stored (may be empty)
      */
-    @Override
-    protected @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
-        if (hand == InteractionHand.MAIN_HAND && !player.isSecondaryUseActive()) {
-            if (!this.level().isClientSide()) {
-                player.openMenu(new SimpleMenuProvider(
-                        (containerId, playerInventory, openingPlayer) -> new MinionInventoryMenu(containerId, playerInventory, this),
-                        this.getDisplayName()
-                ));
-            }
-            return InteractionResult.SUCCESS;
-        }
-        return super.mobInteract(player, hand);
+    public @NotNull ItemStack storeItemStack(@NotNull ItemStack stack) {
+        return addToInventory(stack);
     }
 
     /**
-     * On death, fires {@link BonusTrigger#ON_DEATH} on any equipped bonus
-     * that declares it, and drops this minion's carried inventory on the
-     * ground before proceeding with vanilla death handling.
-     *
-     * @param damageSource the source of the killing blow
+     * @param item the item to look for
+     * @return {@code true} if this minion's inventory contains at least one of {@code item}
      */
-    @Override
-    public void die(@NotNull DamageSource damageSource) {
-        if (this.level() instanceof ServerLevel) {
-            fireTrigger(BonusTrigger.ON_DEATH);
-            Containers.dropContents(this.level(), this, this);
+    public boolean hasItem(@NotNull Item item) {
+        for (ItemStack stack : this.inventoryItems) {
+            if (!stack.isEmpty() && stack.is(item)) {
+                return true;
+            }
         }
-        super.die(damageSource);
+        return false;
     }
 
     /**
-     * Calls {@link AbstractBonusItem#applyEffectes(AbstractMinion)} on every
-     * equipped bonus whose {@link AbstractBonusItem#getBonusTrigger()}
-     * matches {@code trigger}, regardless of minion type.
+     * Removes up to {@code amount} of {@code item} from this minion's
+     * inventory, across as many slots as needed.
      *
-     * @param trigger the trigger being fired
+     * @param item   the item to consume
+     * @param amount the desired quantity to remove
+     * @return {@code true} if the full {@code amount} was successfully removed
      */
-    private void fireTrigger(@NotNull BonusTrigger trigger) {
-        for (Identifier bonusId : this.bonuses) {
-            BonusUtil.resolve(bonusId).ifPresent(bonus -> {
-                if (bonus.getBonusTrigger() == trigger) {
-                    bonus.applyEffectes(this);
-                }
-            });
+    public boolean consumeItem(@NotNull Item item, int amount) {
+        int remaining = amount;
+        for (int i = 0; i < this.inventoryItems.size() && remaining > 0; i++) {
+            ItemStack slot = this.inventoryItems.get(i);
+            if (!slot.isEmpty() && slot.is(item)) {
+                int take = Math.min(remaining, slot.getCount());
+                slot.shrink(take);
+                remaining -= take;
+                this.setChanged();
+            }
         }
+        return remaining == 0;
     }
 
     /**
-     * Same as {@link #fireTrigger(BonusTrigger)}, but only for bonuses this
-     * concrete minion type has registered in {@link #getSyncedBonusItem()},
-     *
-     * minion decides what "synced" means for it (e.g. {@link
-     * net.necrocraft.world.entity.minion.impl.ParchedMinion} applies {@link
-     * AbstractBonusItem#applySyncedEffect(AbstractMinion)}).
-     *
-     * @param trigger the trigger being fired
+     * @return the fixed number of slots in this minion's inventory ({@value #INVENTORY_SIZE})
      */
-    private void fireSyncedTrigger(@NotNull BonusTrigger trigger) {
-        for (Identifier bonusId : this.bonuses) {
-            boolean isSynced = false;
-            for (DeferredItem<@NotNull AbstractBonusItem> synced : this.getSyncedBonusItem()) {
-                if (synced.getId().equals(bonusId)) {
-                    isSynced = true;
-                    break;
-                }
-            }
-
-            if (isSynced) {
-                BonusUtil.resolve(bonusId).ifPresent(bonus -> {
-                    if (bonus.getBonusTrigger() == trigger) {
-                        bonus.applySyncedEffect(this);
-                    }
-                });
-            }
-        }
-    }
-
-
-    /** @return the fixed number of slots in this minion's inventory ({@value #INVENTORY_SIZE}) */
     @Override
     public int getContainerSize() {
         return INVENTORY_SIZE;
     }
 
-    /** @return {@code true} if every slot in this minion's inventory is empty */
+    /**
+     * @return {@code true} if every slot in this minion's inventory is empty
+     */
     @Override
     public boolean isEmpty() {
         for (ItemStack stack : this.inventoryItems) {
@@ -591,7 +771,9 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         this.setChanged();
     }
 
-    /** No-op: this container does not need to notify external listeners of changes. */
+    /**
+     * No-op: this container does not need to notify external listeners of changes.
+     */
     @Override
     public void setChanged() {
     }
@@ -605,148 +787,33 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return this.isAlive() && player.distanceToSqr(this) <= 64.0D;
     }
 
-    /** Empties this minion's inventory of all items. */
+    /**
+     * Empties this minion's inventory of all items.
+     */
     @Override
     public void clearContent() {
         this.inventoryItems.clear();
     }
 
     /**
-     * Aggregates the huntable entity types contributed by all of this
-     * minion's equipped bonuses.
+     * Opens this minion's inventory menu for the interacting player when
+     * right-clicked with an empty main hand interaction (and not sneaking).
      *
-     * @return the combined set of entity types this minion may hunt
+     * @param player the interacting player
+     * @param hand   the hand used to interact
+     * @return {@link InteractionResult#SUCCESS} if the menu was opened, otherwise the vanilla result
      */
-    public @NotNull Set<EntityType<?>> getHuntableTargets() {
-        Set<EntityType<?>> targets = new HashSet<>();
-        for (Identifier bonusId : this.bonuses) {
-            BonusUtil.resolve(bonusId).ifPresent(bonus -> targets.addAll(bonus.getHuntableTargets()));
-        }
-        return targets;
-    }
-
-    /**
-     * @param type the bonus type to look for
-     * @return {@code true} if any of this minion's equipped bonuses matches {@code type}
-     */
-    public boolean hasBonusType(@NotNull BonusType type){
-        for (Identifier bonusId : this.bonuses) {
-            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
-            if (bonus.isPresent() && bonus.get().getBonusTypes() == type) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @return {@code true} if any equipped bonus marks this minion as
-     *         sedentary (disabling combat/following goals in favor of
-     *         stationary farming behavior)
-     */
-    public boolean isSedentary() {
-        for (Identifier bonusId : this.bonuses) {
-            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
-            if (bonus.isPresent() && bonus.get().isSedentary()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** @return {@code true} if any equipped bonus grants this minion the ability to automatically plant seeds */
-    public boolean canAutoPlant() {
-        return hasBonusTrigger(BonusTrigger.AUTO_PLANT);
-    }
-
-    /** @return {@code true} if any equipped bonus grants this minion the ability to automatically till soil */
-    public boolean canAutoTill() {
-        return hasBonusTrigger(BonusTrigger.AUTO_TILL);
-    }
-
-    /**
-     * @param trigger the trigger to look for
-     * @return {@code true} if any of this minion's equipped bonuses declares {@code trigger}
-     */
-    private boolean hasBonusTrigger(@NotNull BonusTrigger trigger) {
-        for (Identifier bonusId : this.bonuses) {
-            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
-            if (bonus.isPresent() && bonus.get().getBonusTrigger() == trigger) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Stores as much of the given item stack as possible in this minion's
-     * inventory.
-     *
-     * @param stack the stack to store
-     * @return whatever portion could not be stored (may be empty)
-     */
-    public @NotNull ItemStack storeItemStack(@NotNull ItemStack stack) {
-        return addToInventory(stack);
-    }
-
-    /**
-     * @param item the item to look for
-     * @return {@code true} if this minion's inventory contains at least one of {@code item}
-     */
-    public boolean hasItem(@NotNull Item item) {
-        for (ItemStack stack : this.inventoryItems) {
-            if (!stack.isEmpty() && stack.is(item)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Removes up to {@code amount} of {@code item} from this minion's
-     * inventory, across as many slots as needed.
-     *
-     * @param item   the item to consume
-     * @param amount the desired quantity to remove
-     * @return {@code true} if the full {@code amount} was successfully removed
-     */
-    public boolean consumeItem(@NotNull Item item, int amount) {
-        int remaining = amount;
-        for (int i = 0; i < this.inventoryItems.size() && remaining > 0; i++) {
-            ItemStack slot = this.inventoryItems.get(i);
-            if (!slot.isEmpty() && slot.is(item)) {
-                int take = Math.min(remaining, slot.getCount());
-                slot.shrink(take);
-                remaining -= take;
-                this.setChanged();
-            }
-        }
-        return remaining == 0;
-    }
-
-    public ArrayList<DeferredItem<@NotNull AbstractBonusItem>> getSyncedBonusItem() {
-        return SYNCED_BONUS;
-    }
-
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
-        this.lastCombatTick = this.tickCount;
-        fireSyncedTrigger(BonusTrigger.ON_HIT);
-        return super.hurtServer(level, source, damage);
-    }
-
-    @Override
-    public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
-        this.lastCombatTick = this.tickCount;
-        fireSyncedTrigger(BonusTrigger.ON_DAMAGE);
-        return super.doHurtTarget(level, target);
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        if (!this.level().isClientSide()) {
-            fireSyncedTrigger(BonusTrigger.ON_TICK);
+    protected @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
+        if (hand == InteractionHand.MAIN_HAND && !player.isSecondaryUseActive()) {
+            if (!this.level().isClientSide()) {
+                player.openMenu(new SimpleMenuProvider(
+                        (containerId, playerInventory, openingPlayer) -> new MinionInventoryMenu(containerId, playerInventory, this),
+                        this.getDisplayName()
+                ));
+            }
+            return InteractionResult.SUCCESS;
         }
+        return super.mobInteract(player, hand);
     }
 }

@@ -116,6 +116,13 @@ public class ModItems {
             properties -> properties
     );
 
+    public static DeferredItem<@NotNull AbstractBonusItem> TRIAL_VAULT_BONUS_ITEM = ITEMS.registerItem(
+            "trial_vault_bonus_item",
+            TrialVaultBonusItem::new,
+            properties -> properties
+                    .rarity(Rarity.RARE)
+    );
+
     public static DeferredItem<@NotNull BlockItem> SOUL_CARVING_TABLE = ITEMS.registerSimpleBlockItem(
             ModBlock.SOUL_CARVING_TABLE_BLOCK
     );

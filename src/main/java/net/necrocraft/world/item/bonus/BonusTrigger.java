@@ -7,5 +7,8 @@ public enum BonusTrigger {
     ON_DEATH,
     ON_DAMAGE,
     ON_TICK,
+    ON_KILL,
+    ON_SPAWN,
+    ON_TELEPORT,
     NONE
 }

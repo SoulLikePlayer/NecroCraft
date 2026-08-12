@@ -36,6 +36,7 @@ public class ModItemGroups {
                         output.accept(ModItems.STORAGE_BONUS_ITEM);
                         output.accept(ModItems.AUTO_TILLER_BONUS_ITEM);
                         output.accept(ModItems.AUTO_PLANTER_BONUS_ITEM);
+                        output.accept(ModItems.TRIAL_VAULT_BONUS_ITEM);
 
                         output.accept(ModItems.MUMMY_WRAPPING_BONUS_ITEM);
 
