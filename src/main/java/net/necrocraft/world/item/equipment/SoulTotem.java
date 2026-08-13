@@ -2,10 +2,13 @@ package net.necrocraft.world.item.equipment;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -69,7 +72,8 @@ public class SoulTotem extends Item {
      * interaction is passed through. Otherwise, on the server, this charges
      * the player the appropriate experience cost, resolves and spawns the
      * corresponding minion type, positions it at the player, equips it with
-     * the stored gear, applies its stored bonuses, and adds it to the world.
+     * the stored gear, applies its stored bonuses, plays the summon effects,
+     * and adds it to the world.
      * <p>
      * Experience is refunded and the interaction fails if the captured entity
      * type has no registered minion mapping, or if the minion entity fails
@@ -118,6 +122,8 @@ public class SoulTotem extends Item {
         minion.snapTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), 0.0F);
         equipMinion(minion, soulData);
         applyBonuses(minion, soulData);
+
+        spawnSummonEffects((ServerLevel) level, minion);
         ((ServerLevel) level).addFreshEntity(minion);
 
         return InteractionResult.SUCCESS;
@@ -216,6 +222,31 @@ public class SoulTotem extends Item {
             }
         }
         return false;
+    }
+
+    /**
+     * Plays the visual and audio cues that accompany a minion's summon:
+     * a burst of soul particles centered on the minion, a ring of soul
+     * fire at its feet, and a soul-escape sound effect.
+     *
+     * @param level  the server level to spawn the effects in
+     * @param minion the freshly summoned minion to center the effects on
+     */
+    private static void spawnSummonEffects(ServerLevel level, AbstractMinion minion) {
+        double x = minion.getX();
+        double y = minion.getY() + minion.getBbHeight() / 2.0;
+        double z = minion.getZ();
+
+        level.sendParticles(ParticleTypes.SOUL,
+                x, y, z, 30,
+                0.4, 0.5, 0.4, 0.05);
+
+        level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
+                x, minion.getY() + 0.1, z, 15,
+                0.5, 0.02, 0.5, 0.01);
+
+        level.playSound(null, minion.blockPosition(),
+                SoundEvents.SOUL_ESCAPE.value(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
     /**

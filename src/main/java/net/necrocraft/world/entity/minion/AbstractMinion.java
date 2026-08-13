@@ -419,6 +419,10 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return false;
     }
 
+    public boolean hasBonus(@NotNull Identifier bonusId) {
+        return this.bonuses.contains(bonusId);
+    }
+
     /**
      * @return {@code true} if any equipped bonus marks this minion as
      * sedentary (disabling combat/following goals in favor of

@@ -13,6 +13,7 @@ import net.minecraft.world.item.component.SwingAnimation;
 import net.necrocraft.client.model.minion.zombie.ZombieMinionModel;
 import net.necrocraft.client.renderer.entity.state.ZombieMinionRenderState;
 import net.necrocraft.world.entity.minion.impl.ZombieMinion;
+import net.necrocraft.world.item.ModItems;
 
 public abstract class AbstractZombieMinionRenderer<T extends ZombieMinion, S extends ZombieMinionRenderState, M extends ZombieMinionModel<S>> extends HumanoidMobRenderer<T, S, M> {
     private static final Identifier ZOMBIE_LOCATION = Identifier.withDefaultNamespace("textures/entity/zombie/zombie.png");

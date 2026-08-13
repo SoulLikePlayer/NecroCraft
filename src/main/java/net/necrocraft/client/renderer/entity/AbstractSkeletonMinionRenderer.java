@@ -13,6 +13,8 @@ import net.minecraft.world.item.Items;
 import net.necrocraft.client.model.minion.skeleton.SkeletonMinionModel;
 import net.necrocraft.client.renderer.entity.state.SkeletonMinionRenderState;
 import net.necrocraft.world.entity.minion.impl.SkeletonMinion;
+import net.necrocraft.world.item.ModItems;
+import net.neoforged.neoforge.server.command.ModIdArgument;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractSkeletonMinionRenderer<T extends SkeletonMinion, S extends SkeletonMinionRenderState> extends HumanoidMobRenderer<T, S, @NotNull SkeletonMinionModel<S>> {
