@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " GN",
+    " SG",
+    "S  "
+  ],
+  "key": {
+    "S": "minecraft:stick",
+    "G": "minecraft:gold_nugget",
+    "N": "necrocraft:necrotic_shard"
+  },
+  "result": "necrocraft:revocation_scepter"
+}
