@@ -569,9 +569,13 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         if (this.level() instanceof ServerLevel) {
             fireTrigger(BonusTrigger.ON_DEATH);
             fireSyncedTrigger(BonusTrigger.ON_DEATH);
-            Containers.dropContents(this.level(), this, this);
+            dropItems();
         }
         super.die(damageSource);
+    }
+
+    public void dropItems(){
+        Containers.dropContents(this.level(), this, this);
     }
 
     /**
