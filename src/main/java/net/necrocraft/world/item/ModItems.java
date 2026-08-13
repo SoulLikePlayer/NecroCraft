@@ -10,6 +10,7 @@ import net.necrocraft.world.item.bonus.impl.synced.StrayCapeBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.ZombieNautillusShellBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.MummyWrappingBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.TridentShardBonusItem;
+import net.necrocraft.world.item.equipment.RevocationScepter;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.level.block.ModBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -35,6 +36,12 @@ public class ModItems {
     public static DeferredItem<@NotNull Item> SOUL_TOTEM = ITEMS.registerItem(
             "soul_totem",
             SoulTotem::new,
+            properties -> properties
+    );
+
+    public static DeferredItem<@NotNull Item> REVOCATION_SCEPTER =ITEMS.registerItem(
+            "revocation_scepter",
+            RevocationScepter::new,
             properties -> properties
     );
 

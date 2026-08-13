@@ -35,6 +35,7 @@ import net.necrocraft.world.entity.ai.goal.hunter.HuntPreyGoal;
 import net.necrocraft.world.entity.minion.impl.SkeletonMinion;
 import net.necrocraft.world.entity.minion.impl.ZombieMinion;
 import net.necrocraft.world.inventory.MinionInventoryMenu;
+import net.necrocraft.world.item.ModItems;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.BonusTrigger;
 import net.necrocraft.world.item.bonus.BonusType;
@@ -53,7 +54,7 @@ import java.util.*;
  * ability to teleport back to its owner when left too far behind.
  * <p>
  * Concrete subclasses (e.g. {@link ZombieMinion}, {@link SkeletonMinion})
- * only need to supply mob-specific sounds; all shared behavior (goals,
+ * only need to supply mob-specific sounds & specific behavior; all shared behavior (goals,
  * inventory, ownership, persistence) lives here.
  * <p>
  * Class layout, top to bottom: constants/fields, construction, AI goals,
@@ -809,10 +810,15 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      */
     @Override
     protected @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
-        if (hand == InteractionHand.MAIN_HAND && !player.isSecondaryUseActive()) {
+        boolean holdingRevocationScepter = player.getItemInHand(hand).is(ModItems.REVOCATION_SCEPTER);
+
+        if (hand == InteractionHand.MAIN_HAND
+                && !player.isSecondaryUseActive()
+                && !holdingRevocationScepter
+                && Objects.requireNonNull(this.getOwnerReference()).matches(player)) {
             if (!this.level().isClientSide()) {
                 player.openMenu(new SimpleMenuProvider(
-                        (containerId, playerInventory, openingPlayer) -> new MinionInventoryMenu(containerId, playerInventory, this),
+                        (containerId, playerInventory, _) -> new MinionInventoryMenu(containerId, playerInventory, this),
                         this.getDisplayName()
                 ));
             }

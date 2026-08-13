@@ -23,6 +23,7 @@ public class ModItemGroups {
                         output.accept(ModItems.NECROTIC_POWDER);
 
                         output.accept(ModItems.SOUL_TOTEM);
+                        output.accept(ModItems.REVOCATION_SCEPTER);
 
                         output.accept(ModItems.SOUL_CARVING_TABLE);
 
