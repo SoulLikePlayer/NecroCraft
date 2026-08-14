@@ -6,17 +6,23 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.world.effect.ModMobEffects;
 import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.ModItems;
 import net.necrocraft.world.item.component.SoulData;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 
 /**
@@ -61,6 +67,22 @@ public class ModEvent {
 
         if (event.getEntity().level() instanceof ServerLevel serverLevel) {
             spawnSoulCaptureEffect(serverLevel, player.getX(), player.getY() + 1.0, player.getZ());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onMobTargetChange(LivingChangeTargetEvent event) {
+        LivingEntity attacker = event.getEntity();
+        LivingEntity newTarget = event.getNewAboutToBeSetTarget();
+
+        if (!(newTarget instanceof Player player)) return;
+
+        if (!attacker.getType().builtInRegistryHolder().is(EntityTypeTags.UNDEAD)) return;
+
+        if (attacker instanceof WitherBoss) return;
+
+        if (player.hasEffect(ModMobEffects.SOUL_OF_UNDEAD)) {
+            event.setCanceled(true);
         }
     }
 

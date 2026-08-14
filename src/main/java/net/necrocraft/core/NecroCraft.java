@@ -9,6 +9,7 @@ import net.necrocraft.world.inventory.ModMenuTypes;
 import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.ModItemGroups;
 import net.necrocraft.world.item.ModItems;
+import net.necrocraft.world.item.alchemy.ModPotions;
 import net.necrocraft.world.level.block.ModBlock;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
@@ -27,6 +28,7 @@ public class NecroCraft {
     public NecroCraft(IEventBus modEventBus, ModContainer modContainer) {
         ModEntity.ENTITY_TYPES.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
+        ModPotions.POTIONS.register(modEventBus);
         ModBlock.BLOCKS.register(modEventBus);
         ModMenuTypes.MENU_TYPES.register(modEventBus);
         ModItemGroups.CREATIVE_MODE_TABS.register(modEventBus);

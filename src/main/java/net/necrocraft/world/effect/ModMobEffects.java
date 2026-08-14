@@ -16,4 +16,9 @@ public class ModMobEffects {
             MobEffectCategory.BENEFICIAL,
             0xADD8E6
     ));
+
+    public static final Holder<@NotNull MobEffect> SOUL_OF_UNDEAD = MOB_EFFECTS.register("soul_of_undead", () -> new SoulOfUndead(
+            MobEffectCategory.BENEFICIAL,
+            0xADD8E6
+    ));
 }

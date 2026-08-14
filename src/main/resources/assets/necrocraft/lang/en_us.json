@@ -8,6 +8,11 @@
   "item.necrocraft.soul_totem": "Soul Totem",
   "item.necrocraft.revocation_scepter": "Revocation Scepter",
 
+  "item.minecraft.potion.effect.potion_of_undeand": "Potion Of Undead",
+  "item.minecraft.splash_potion.effect.potion_of_undeand": "Splash Potion Of Undead",
+  "item.minecraft.lingering_potion.effect.potion_of_undeand": "Lingering Potion Of Undead",
+  "item.minecraft.tipped_arrow.effect.potion_of_undeand": "Arrow Of Undead",
+
   "item.necrocraft.solid_skin_bonus_item": "Solid Skin",
   "item.necrocraft.health_bonus_item": "Second Heart",
   "item.necrocraft.storage_bonus_item": "Storage Dead Finger",
@@ -54,6 +59,7 @@
   "carving.necrocraft.page.bonus.tooltip": "Switch to the bonus slots page",
 
   "effect.necrocraft.curse_of_the_sea": "Curse Of The Sea",
+  "effect.necrocraft.soul_of_undead": "Soul Of Undead",
 
   "advancements.necrocraft.root.title": "Necrocraft",
   "advancements.necrocraft.root.description": "The first step towards necromancy"
