@@ -1,15 +1,15 @@
 package net.necrocraft.world.item;
 
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.*;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.world.food.ModFoods;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.impl.*;
 import net.necrocraft.world.item.bonus.impl.synced.StrayCapeBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.ZombieNautillusShellBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.MummyWrappingBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.TridentShardBonusItem;
+import net.necrocraft.world.item.component.ModConsumables;
 import net.necrocraft.world.item.equipment.RevocationScepter;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.level.block.ModBlock;
@@ -43,6 +43,13 @@ public class ModItems {
             "revocation_scepter",
             RevocationScepter::new,
             properties -> properties
+    );
+
+    public static DeferredItem<@NotNull Item> NECROTIC_APPLE = ITEMS.registerItem(
+            "necrotic_apple",
+            Item::new,
+            properties -> properties
+                    .food(ModFoods.NECROTIC_APPLE, ModConsumables.NECROTIC_APPLE)
     );
 
     public static DeferredItem<@NotNull AbstractBonusItem> SOLID_SKIN_BONUS_ITEM = ITEMS.registerItem(

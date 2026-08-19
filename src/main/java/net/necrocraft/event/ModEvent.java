@@ -11,7 +11,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.necrocraft.core.NecroCraft;
@@ -67,22 +69,6 @@ public class ModEvent {
 
         if (event.getEntity().level() instanceof ServerLevel serverLevel) {
             spawnSoulCaptureEffect(serverLevel, player.getX(), player.getY() + 1.0, player.getZ());
-        }
-    }
-
-    @SubscribeEvent
-    public static void onMobTargetChange(LivingChangeTargetEvent event) {
-        LivingEntity attacker = event.getEntity();
-        LivingEntity newTarget = event.getNewAboutToBeSetTarget();
-
-        if (!(newTarget instanceof Player player)) return;
-
-        if (!attacker.getType().builtInRegistryHolder().is(EntityTypeTags.UNDEAD)) return;
-
-        if (attacker instanceof WitherBoss) return;
-
-        if (player.hasEffect(ModMobEffects.SOUL_OF_UNDEAD)) {
-            event.setCanceled(true);
         }
     }
 
