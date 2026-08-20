@@ -2,6 +2,8 @@ package net.necrocraft.client;
 
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.renderer.entity.*;
+import net.minecraft.resources.Identifier;
+import net.necrocraft.client.gui.SoulGaugeOverlay;
 import net.necrocraft.client.gui.screens.inventory.CarvingScreen;
 import net.necrocraft.client.gui.screens.inventory.MinionInventoryScreen;
 import net.necrocraft.client.renderer.entity.*;
@@ -17,6 +19,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -45,5 +48,17 @@ public class NecroCraftClient {
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.CARVING_MENU.get(), CarvingScreen::new);
         event.register(ModMenuTypes.MINION_INVENTORY.get(), MinionInventoryScreen::new);
+    }
+
+    @SubscribeEvent
+    public static void registerGuiLayers(RegisterGuiLayersEvent event){
+        Identifier soulGaugeId = Identifier.fromNamespaceAndPath(NecroCraft.MODID, "soul_gauge");
+        SoulGaugeOverlay soulGauge = new SoulGaugeOverlay(net.minecraft.client.Minecraft.getInstance());
+
+        event.registerAbove(net.neoforged.neoforge.client.gui.VanillaGuiLayers.HOTBAR, soulGaugeId,
+                (graphics, deltaTracker) -> {
+                    soulGauge.extractBackground(graphics, deltaTracker);
+                    soulGauge.extractRenderState(graphics, deltaTracker);
+                });
     }
 }

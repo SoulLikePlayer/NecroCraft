@@ -35,6 +35,7 @@ public class NecroCraft {
         ModDataComponents.DATA_COMPONENTS.register(modEventBus);
         ModMobEffects.MOB_EFFECTS.register(modEventBus);
         ModLootModifier.LOOT_MODIFIERS.register(modEventBus);
+        ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 

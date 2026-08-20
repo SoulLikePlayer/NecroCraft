@@ -13,8 +13,8 @@ public class ModPotions {
     public static final DeferredRegister<@NotNull Potion> POTIONS =
             DeferredRegister.create(Registries.POTION, NecroCraft.MODID);
 
-    public static final Holder<@NotNull Potion> POTION_OF_UNDEAD = POTIONS.register("potion_of_undeand", registryName -> new Potion(
+    public static final Holder<@NotNull Potion> POTION_OF_UNDEAD = POTIONS.register("potion_of_undead", registryName -> new Potion(
             registryName.getPath(),
-            new MobEffectInstance(ModMobEffects.SOUL_OF_UNDEAD, 3600)
+            new MobEffectInstance(ModMobEffects.SOUL_OF_UNDEAD, 200)
     ));
 }
