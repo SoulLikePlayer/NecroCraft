@@ -2,6 +2,7 @@ package net.necrocraft.event;
 
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.npc.villager.Villager;
@@ -13,10 +14,16 @@ import net.necrocraft.world.effect.ModMobEffects;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.*;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @EventBusSubscriber(modid = NecroCraft.MODID)
 public class SoulOfUndeadModEvent {
+    private static final Map<UUID, MobEffectInstance> PENDING_SOUL_RESPAWN = new ConcurrentHashMap<>();
 
     @SubscribeEvent
     public static void onVillagerTradeAttempt(PlayerInteractEvent.EntityInteract event){
@@ -44,7 +51,8 @@ public class SoulOfUndeadModEvent {
     public static void onMobEffectRemove(MobEffectEvent.Remove event) {
         LivingEntity entity = event.getEntity();
         if (event.getEffectInstance() == null) return;
-        if (!event.getEffectInstance().getEffect().is(ModMobEffects.SOUL_OF_UNDEAD)) return;
+        if (!event.getEffectInstance()
+                .getEffect().is(ModMobEffects.SOUL_OF_UNDEAD)) return;
 
         if (entity.getUseItem().getItem().equals(Items.MILK_BUCKET)) {
             event.setCanceled(true);
@@ -81,5 +89,33 @@ public class SoulOfUndeadModEvent {
         if (gauge > 100f) gauge = 100f;
         player.setData(ModAttachments.SOUL_GAUGE, gauge);
         NecroCraft.LOGGER.info("Soul Gauge : {}", gauge);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerDeathCaptureSoul(LivingDeathEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+
+        MobEffectInstance soulEffect = player.getEffect(ModMobEffects.SOUL_OF_UNDEAD);
+        if (soulEffect == null) return;
+
+        PENDING_SOUL_RESPAWN.put(player.getUUID(), new MobEffectInstance(
+                soulEffect.getEffect(),
+                soulEffect.getDuration(),
+                soulEffect.getAmplifier(),
+                soulEffect.isAmbient(),
+                soulEffect.isVisible(),
+                soulEffect.showIcon()
+        ));
+    }
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (!event.isWasDeath()) return;
+
+        Player newPlayer = event.getEntity();
+        MobEffectInstance pending = PENDING_SOUL_RESPAWN.remove(newPlayer.getUUID());
+        if (pending == null) return;
+
+        newPlayer.addEffect(pending);
     }
 }
