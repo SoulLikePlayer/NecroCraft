@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.necrocraft.mixin",
+  "refmap": "necrocraft.refmap.json",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "SoulOfUndeadHealHarmMixin",
+    "SoulOfUndeadImmunityMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

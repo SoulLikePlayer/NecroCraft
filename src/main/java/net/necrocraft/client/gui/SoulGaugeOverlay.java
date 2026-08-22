@@ -21,7 +21,7 @@ public class SoulGaugeOverlay implements ContextualBar {
     private static final int BAR_HEIGHT = 32;
 
     private static final int X_OFFSET_FROM_CENTER = 95;
-    private static final int BOTTOM_MARGIN = 10;
+    private static final int BOTTOM_MARGIN = 0;
 
     private final Minecraft minecraft;
 

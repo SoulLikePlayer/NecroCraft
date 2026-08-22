@@ -20,6 +20,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.necrocraft.core.ModAttachments;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
@@ -100,21 +101,37 @@ public class SoulTotem extends Item {
             return InteractionResult.SUCCESS;
         }
 
+        if(player.hasData(ModAttachments.SOUL_GAUGE)){
+            float gauge = player.getData(ModAttachments.SOUL_GAUGE);
+            if(gauge >= 5) {
+                player.setData(ModAttachments.SOUL_GAUGE, Math.max
+                        (0, gauge-5));
+                return minionInvocation(player, level, soulData);
+            }
+        }
+
         int xpCost = calculateXpCost(soulData);
         if (!consumeExperience(player, xpCost)) {
             return InteractionResult.FAIL;
         }
 
+        InteractionResult result = minionInvocation(player, level, soulData);
+        if(result.equals(InteractionResult.FAIL)){
+            refundExperience(player, xpCost);
+        }
+
+        return result;
+    }
+
+    private InteractionResult minionInvocation(Player player, Level level, SoulData soulData){
         Optional<Holder.Reference<@NotNull EntityType<?>>> capturedType = BuiltInRegistries.ENTITY_TYPE.get(soulData.entityType());
         EntityType<? extends @NotNull AbstractMinion> minionType = MinionRegistry.getMinionFor(capturedType);
         if (minionType == null) {
-            refundExperience(player, xpCost);
             return InteractionResult.FAIL;
         }
 
         AbstractMinion minion = minionType.create(level, EntitySpawnReason.MOB_SUMMONED);
         if (minion == null) {
-            refundExperience(player, xpCost);
             return InteractionResult.FAIL;
         }
 

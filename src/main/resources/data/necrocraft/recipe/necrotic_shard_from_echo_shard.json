@@ -9,7 +9,8 @@
   "key": {
     "E": [
       "minecraft:echo_shard",
-      "necrocraft:necrotic_shard"
+      "necrocraft:necrotic_shard",
+      "minecraft:amethyst_shard"
     ],
     "S": [
       "minecraft:soul_sand",
