@@ -62,5 +62,10 @@
   "effect.necrocraft.soul_of_undead": "Soul Of Undead",
 
   "advancements.necrocraft.root.title": "Necrocraft",
-  "advancements.necrocraft.root.description": "The first step towards necromancy"
+  "advancements.necrocraft.root.description": "The first step towards necromancy",
+
+  "key.category.necrocraft.necrocraft": "NecroCraft",
+
+  "key.necrocraft.soul_heal" : "Healing Ability",
+  "key.necrocraft.soul_empower": "Minion Empowered"
 }

@@ -1,6 +1,7 @@
 package net.necrocraft.core;
 
 import com.mojang.logging.LogUtils;
+import net.necrocraft.client.ModKeyMappings;
 import net.necrocraft.command.NecroCraftCommands;
 import net.necrocraft.core.loot.ModLootModifier;
 import net.necrocraft.world.effect.ModMobEffects;
