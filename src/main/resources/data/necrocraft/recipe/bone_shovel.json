@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " n ",
+    " s ",
+    " s "
+  ],
+  "key": {
+    "s": "minecraft:stick",
+    "n": "necrocraft:necrotic_powder"
+  },
+  "result": "necrocraft:bone_shovel"
+}

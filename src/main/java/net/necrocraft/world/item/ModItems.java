@@ -10,8 +10,12 @@ import net.necrocraft.world.item.bonus.impl.synced.ZombieNautillusShellBonusItem
 import net.necrocraft.world.item.bonus.impl.synced.MummyWrappingBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.TridentShardBonusItem;
 import net.necrocraft.world.item.component.ModConsumables;
+import net.necrocraft.world.item.equipment.bone.BoneAxe;
+import net.necrocraft.world.item.equipment.bone.BoneEquipment;
 import net.necrocraft.world.item.equipment.RevocationScepter;
 import net.necrocraft.world.item.equipment.SoulTotem;
+import net.necrocraft.world.item.equipment.bone.BoneHoe;
+import net.necrocraft.world.item.equipment.bone.BoneShovel;
 import net.necrocraft.world.level.block.ModBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -50,6 +54,41 @@ public class ModItems {
             Item::new,
             properties -> properties
                     .food(ModFoods.NECROTIC_APPLE, ModConsumables.NECROTIC_APPLE)
+    );
+
+    public static DeferredItem<@NotNull Item> BONE_SWORD = ITEMS.registerItem(
+            "bone_sword",
+            BoneEquipment::new,
+            properties -> properties
+                    .sword(ModToolMaterial.BONE, 3.0F, -2.4F)
+    );
+
+    public static DeferredItem<@NotNull Item> BONE_SHOVEL = ITEMS.registerItem(
+            "bone_shovel",
+            BoneShovel::new,
+            properties -> properties
+                    .shovel(ModToolMaterial.BONE, 1.5f, -3.0f)
+    );
+
+    public static DeferredItem<@NotNull Item> BONE_PICKAXE = ITEMS.registerItem(
+            "bone_pickaxe",
+            BoneEquipment::new,
+            properties -> properties
+                    .pickaxe(ModToolMaterial.BONE, 1.0f, -2.8f)
+    );
+
+    public static DeferredItem<@NotNull Item> BONE_AXE = ITEMS.registerItem(
+            "bone_axe",
+            BoneAxe::new,
+            properties -> properties
+                    .pickaxe(ModToolMaterial.BONE, 7.0f, -3.2f)
+    );
+
+    public static DeferredItem<@NotNull Item> BONE_HOE = ITEMS.registerItem(
+            "bone_hoe",
+            BoneHoe::new,
+            properties -> properties
+                    .hoe(ModToolMaterial.BONE, 7.0f, -3.2f)
     );
 
     public static DeferredItem<@NotNull AbstractBonusItem> SOLID_SKIN_BONUS_ITEM = ITEMS.registerItem(

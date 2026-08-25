@@ -4,6 +4,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.item.alchemy.ModPotions;
@@ -27,6 +28,12 @@ public class ModItemGroups {
                         output.accept(ModItems.SOUL_TOTEM);
                         output.accept(ModItems.REVOCATION_SCEPTER);
                         output.accept(ModItems.NECROTIC_APPLE);
+
+                        output.accept(ModItems.BONE_SWORD);
+                        output.accept(ModItems.BONE_SHOVEL);
+                        output.accept(ModItems.BONE_PICKAXE);
+                        output.accept(ModItems.BONE_AXE);
+                        output.accept(ModItems.BONE_HOE);
 
                         output.accept(ModItems.SOUL_CARVING_TABLE);
 

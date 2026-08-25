@@ -8,6 +8,11 @@
   "item.necrocraft.soul_totem": "Soul Totem",
   "item.necrocraft.revocation_scepter": "Revocation Scepter",
   "item.necrocraft.necrotic_apple": "Necrotic Apple",
+  "item.necrocraft.bone_sword": "Bone Sword",
+  "item.necrocraft.bone_axe": "Bone Axe",
+  "item.necrocraft.bone_hoe": "Bone Hoe",
+  "item.necrocraft.bone_pickaxe": "Bone Pickaxe",
+  "item.necrocraft.bone_shovel": "Bone Shovel",
 
   "item.minecraft.potion.effect.potion_of_undead": "Potion Of Undead",
   "item.minecraft.splash_potion.effect.potion_of_undead": "Splash Potion Of Undead",
@@ -40,6 +45,8 @@
   "item.necrocraft.soul_totem.empty": "No soul captured",
   "item.necrocraft.soul_totem.unknown": "Unknown captured creature",
   "item.necrocraft.soul_totem.summons": "Summons: %s",
+
+  "item.necrocraft.bone_equipement.gain_soul": " Gain souls with every hit",
 
   "item.necrocraft.soul_totem.equipment": "Equipment :",
   "item.necrocraft.soul_totem.bonuses": "Bonus :",
