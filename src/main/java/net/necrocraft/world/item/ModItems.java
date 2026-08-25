@@ -10,12 +10,12 @@ import net.necrocraft.world.item.bonus.impl.synced.ZombieNautillusShellBonusItem
 import net.necrocraft.world.item.bonus.impl.synced.MummyWrappingBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.TridentShardBonusItem;
 import net.necrocraft.world.item.component.ModConsumables;
-import net.necrocraft.world.item.equipment.bone.BoneAxe;
-import net.necrocraft.world.item.equipment.bone.BoneEquipment;
+import net.necrocraft.world.item.equipment.bone.classic.BoneAxe;
+import net.necrocraft.world.item.equipment.bone.classic.BoneEquipment;
 import net.necrocraft.world.item.equipment.RevocationScepter;
 import net.necrocraft.world.item.equipment.SoulTotem;
-import net.necrocraft.world.item.equipment.bone.BoneHoe;
-import net.necrocraft.world.item.equipment.bone.BoneShovel;
+import net.necrocraft.world.item.equipment.bone.classic.BoneHoe;
+import net.necrocraft.world.item.equipment.bone.classic.BoneShovel;
 import net.necrocraft.world.level.block.ModBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -89,6 +89,14 @@ public class ModItems {
             BoneHoe::new,
             properties -> properties
                     .hoe(ModToolMaterial.BONE, 7.0f, -3.2f)
+    );
+
+    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_SWORD = ITEMS.registerItem(
+            "netherified_bone_sword",
+            BoneEquipment::new,
+            properties -> properties
+                    .sword(ModToolMaterial.NETHERIFIED_BONE, 3.0F, -2.4F)
+                    .fireResistant()
     );
 
     public static DeferredItem<@NotNull AbstractBonusItem> SOLID_SKIN_BONUS_ITEM = ITEMS.registerItem(

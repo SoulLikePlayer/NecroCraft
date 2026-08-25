@@ -1,4 +1,4 @@
-package net.necrocraft.world.item.equipment.bone;
+package net.necrocraft.world.item.equipment.bone.classic;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;

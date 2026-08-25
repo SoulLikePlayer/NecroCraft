@@ -1,4 +1,4 @@
-package net.necrocraft.world.item.equipment.bone;
+package net.necrocraft.world.item.equipment.bone.classic;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

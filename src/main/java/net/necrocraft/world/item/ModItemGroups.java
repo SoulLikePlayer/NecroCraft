@@ -35,6 +35,8 @@ public class ModItemGroups {
                         output.accept(ModItems.BONE_AXE);
                         output.accept(ModItems.BONE_HOE);
 
+                        output.accept(ModItems.NETHERIFIED_BONE_SWORD);
+
                         output.accept(ModItems.SOUL_CARVING_TABLE);
 
                         output.accept(ModItems.POST_MORTEM_EXPLOSION_BONUS_ITEM);
