@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.necrocraft.core.ModAttachments;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.effect.ModMobEffects;
+import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.*;
@@ -113,14 +114,23 @@ public class SoulOfUndeadModEvent {
         if (!(event.getEntity() instanceof Villager)) return;
 
         DamageSource source = event.getSource();
-        if (!(source.getEntity() instanceof Player player)) return;
-        if (!player.hasEffect(ModMobEffects.SOUL_OF_UNDEAD)) return;
+        if (source.getEntity() instanceof Player player) {
+            if (!player.hasEffect(ModMobEffects.SOUL_OF_UNDEAD)) return;
 
-        float gauge = player.getData(ModAttachments.SOUL_GAUGE);
-        gauge += 5f;
-        if (gauge > 100f) gauge = 100f;
-        player.setData(ModAttachments.SOUL_GAUGE, gauge);
-        NecroCraft.LOGGER.info("Soul Gauge : {}", gauge);
+            float gauge = player.getData(ModAttachments.SOUL_GAUGE);
+            gauge += 5f;
+            if (gauge > 100f) gauge = 100f;
+            player.setData(ModAttachments.SOUL_GAUGE, gauge);
+            NecroCraft.LOGGER.info("Soul Gauge : {}", gauge);
+        }
+
+        else if(source.getEntity() instanceof AbstractMinion minion){
+            float gauge = minion.getData(ModAttachments.SOUL_GAUGE);
+            gauge += 5f;
+            if (gauge > 100f) gauge = 100f;
+            minion.setData(ModAttachments.SOUL_GAUGE, gauge);
+            NecroCraft.LOGGER.info("Soul Gauge for {} : {}", source.getEntity().getName() ,gauge);
+        }
     }
 
     @SubscribeEvent

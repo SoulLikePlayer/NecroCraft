@@ -27,6 +27,7 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.necrocraft.core.ModAttachments;
 import net.necrocraft.world.entity.ai.goal.*;
 import net.necrocraft.world.entity.ai.goal.farmer.FarmCropsGoal;
 import net.necrocraft.world.entity.ai.goal.farmer.PlantSeedsGoal;
@@ -106,8 +107,14 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * into the world, then defers to vanilla spawn finalization.
      */
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData) {
+    public @Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level,
+                                                  @NotNull DifficultyInstance difficulty,
+                                                  @NotNull EntitySpawnReason spawnReason,
+                                                  @Nullable SpawnGroupData groupData) {
         SpawnGroupData result = super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+
+        this.setData(ModAttachments.SOUL_GAUGE, 0f);
+
         fireTrigger(BonusTrigger.ON_SPAWN);
         fireSyncedTrigger(BonusTrigger.ON_SPAWN);
         return result;

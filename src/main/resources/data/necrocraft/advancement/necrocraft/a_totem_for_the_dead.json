@@ -1,0 +1,35 @@
+{
+  "parent": "necrocraft:necrocraft/root",
+  "criteria": {
+    "soul_totem": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "necrocraft:soul_totem"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.necrocraft.a_totem_for_the_dead.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "necrocraft:soul_totem"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.necrocraft.a_totem_for_the_dead.title"
+    }
+  },
+  "requirements": [
+    [
+      "soul_totem"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
