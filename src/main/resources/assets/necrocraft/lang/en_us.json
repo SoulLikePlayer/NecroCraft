@@ -45,7 +45,9 @@
 
   "block.necrocraft.soul_carving_block": "Soul Carving Table",
 
-  "itemGroup.necrocraft": "NecroCraft",
+  "itemGroup.necrocraft.materials": "NecroCraft - Materials",
+  "itemGroup.necrocraft.equipment": "NecroCraft - Equipment",
+  "itemGroup.necrocraft.bonus": "NecroCraft - Bonus Items",
 
   "item.necrocraft.soul_totem.empty": "No soul captured",
   "item.necrocraft.soul_totem.unknown": "Unknown captured creature",
