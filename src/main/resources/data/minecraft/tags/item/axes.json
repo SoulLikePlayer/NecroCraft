@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "necrocraft:bone_axe"
+    "necrocraft:bone_axe",
+    "necrocraft:netherified_bone_axe"
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "#minecraft:netherite_tool_materials",
+  "base": "necrocraft:bone_hoe",
+  "result": {
+    "id": "necrocraft:netherified_bone_hoe"
+  },
+  "template": "minecraft:netherite_upgrade_smithing_template"
+}

@@ -19,11 +19,11 @@ public class BoneEquipment extends Item {
 
         if(attacker.hasEffect(ModMobEffects.SOUL_OF_UNDEAD)){
             float gauge = attacker.getExistingData(ModAttachments.SOUL_GAUGE).orElse(0f);
-            attacker.setData(ModAttachments.SOUL_GAUGE, Math.min(100, gauge + 4));
+            attacker.setData(ModAttachments.SOUL_GAUGE, Math.min(100, gauge + getSoulAddedByTheHurt()));
         }
     }
 
-    protected float getSoulDamage(){
-        return 3.0F;
+    protected float getSoulAddedByTheHurt(){
+        return 4.0F;
     }
 }

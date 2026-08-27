@@ -16,6 +16,10 @@ import net.necrocraft.world.item.equipment.RevocationScepter;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.item.equipment.bone.classic.BoneHoe;
 import net.necrocraft.world.item.equipment.bone.classic.BoneShovel;
+import net.necrocraft.world.item.equipment.bone.netherified.NetherifiedBoneAxe;
+import net.necrocraft.world.item.equipment.bone.netherified.NetherifiedBoneEquipment;
+import net.necrocraft.world.item.equipment.bone.netherified.NetherifiedBoneHoe;
+import net.necrocraft.world.item.equipment.bone.netherified.NetherifiedBoneShovel;
 import net.necrocraft.world.level.block.ModBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -93,9 +97,41 @@ public class ModItems {
 
     public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_SWORD = ITEMS.registerItem(
             "netherified_bone_sword",
-            BoneEquipment::new,
+            NetherifiedBoneEquipment::new,
             properties -> properties
                     .sword(ModToolMaterial.NETHERIFIED_BONE, 3.0F, -2.4F)
+                    .fireResistant()
+    );
+
+    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_SHOVEL = ITEMS.registerItem(
+            "netherified_bone_shovel",
+            NetherifiedBoneShovel::new,
+            properties -> properties
+                    .shovel(ModToolMaterial.NETHERIFIED_BONE, 1.5f, -3.0f)
+                    .fireResistant()
+    );
+
+    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_PICKAXE = ITEMS.registerItem(
+            "netherified_bone_pickaxe",
+            NetherifiedBoneEquipment::new,
+            properties -> properties
+                    .pickaxe(ModToolMaterial.NETHERIFIED_BONE, 1.0f, -2.8f)
+                    .fireResistant()
+    );
+
+    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_AXE = ITEMS.registerItem(
+            "netherified_bone_axe",
+            NetherifiedBoneAxe::new,
+            properties -> properties
+                    .pickaxe(ModToolMaterial.NETHERIFIED_BONE, 7.0f, -3.2f)
+                    .fireResistant()
+    );
+
+    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_HOE = ITEMS.registerItem(
+            "netherified_bone_hoe",
+            NetherifiedBoneHoe::new,
+            properties -> properties
+                    .hoe(ModToolMaterial.NETHERIFIED_BONE, 7.0f, -3.2f)
                     .fireResistant()
     );
 
