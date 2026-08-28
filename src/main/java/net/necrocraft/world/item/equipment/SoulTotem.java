@@ -7,6 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -21,6 +22,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.necrocraft.core.ModAttachments;
+import net.necrocraft.util.AdvancementUtil;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
@@ -142,6 +144,8 @@ public class SoulTotem extends Item {
 
         spawnSummonEffects((ServerLevel) level, minion);
         ((ServerLevel) level).addFreshEntity(minion);
+
+        AdvancementUtil.grant((ServerPlayer) player, "first_servent");
 
         return InteractionResult.SUCCESS;
     }

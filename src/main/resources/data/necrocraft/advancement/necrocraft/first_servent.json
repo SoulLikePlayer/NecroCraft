@@ -1,0 +1,29 @@
+{
+  "parent": "necrocraft:necrocraft/soul_awakened",
+  "criteria": {
+    "code_trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.necrocraft.first_servent.description"
+    },
+    "frame": "task",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:zombie_head"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.necrocraft.first_servent.title"
+    }
+  },
+  "requirements": [
+    [
+      "code_trigger"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
