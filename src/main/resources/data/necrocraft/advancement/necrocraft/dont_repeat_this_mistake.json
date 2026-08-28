@@ -1,0 +1,30 @@
+{
+  "parent": "necrocraft:necrocraft/power_of_the_soulless",
+  "criteria": {
+    "code_trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.necrocraft.dont_repeat.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:golden_apple"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.necrocraft.dont_repeat.title"
+    }
+  },
+  "requirements": [
+    [
+      "code_trigger"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

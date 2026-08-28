@@ -2,6 +2,7 @@ package net.necrocraft.event;
 
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.EntityTypeTags;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.necrocraft.core.ModAttachments;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.util.AdvancementUtil;
 import net.necrocraft.world.effect.ModMobEffects;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -76,6 +78,10 @@ public class SoulOfUndeadModEvent {
         if(item.is(Items.GOLDEN_APPLE)
                 && entity.hasEffect(MobEffects.WEAKNESS)
                 && entity.hasEffect(ModMobEffects.SOUL_OF_UNDEAD)){
+
+            if(entity instanceof ServerPlayer player){
+                AdvancementUtil.grant(player, "dont_repeat_this_mistake");
+            }
 
             entity.removeEffect(ModMobEffects.SOUL_OF_UNDEAD);
             entity.removeEffect(MobEffects.WEAKNESS);
