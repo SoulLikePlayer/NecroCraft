@@ -220,6 +220,14 @@ public class ModItems {
                     .rarity(Rarity.RARE)
     );
 
+    public static DeferredItem<@NotNull AbstractBonusItem> NETHERIFIED_BONE_BONUS_ITEM = ITEMS.registerItem(
+            "netherified_bone_bonus_item",
+            NetherifiedBoneBonusItem::new,
+            properties -> properties
+                    .rarity(Rarity.UNCOMMON)
+                    .fireResistant()
+    );
+
     public static DeferredItem<@NotNull BlockItem> SOUL_CARVING_TABLE = ITEMS.registerSimpleBlockItem(
             ModBlock.SOUL_CARVING_TABLE_BLOCK
     );

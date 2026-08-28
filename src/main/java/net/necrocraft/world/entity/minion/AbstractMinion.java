@@ -837,4 +837,9 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         }
         return super.mobInteract(player, hand);
     }
+
+    @Override
+    public boolean fireImmune() {
+        return bonuses.contains(ModItems.NETHERIFIED_BONE_BONUS_ITEM.getId());
+    }
 }

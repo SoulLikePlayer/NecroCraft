@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ModItemTags {
     public static final TagKey<@NotNull Item> BONE_TOOL_MATERIALS;
+    public static final TagKey<@NotNull Item> NETHERIFIED_BONE_TOOL_MATERIALS;
 
     private static TagKey<@NotNull Item> register(String path){
         return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(NecroCraft.MODID, path));
@@ -16,5 +17,6 @@ public class ModItemTags {
 
     static {
         BONE_TOOL_MATERIALS = register("bone_tool_materials");
+        NETHERIFIED_BONE_TOOL_MATERIALS = register("netherified_bone_tool_materials");
     }
 }

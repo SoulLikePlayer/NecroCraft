@@ -1,7 +1,6 @@
 package net.necrocraft.world.item;
 
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ToolMaterial;
 import net.necrocraft.tags.ModItemTags;
 
@@ -11,6 +10,6 @@ public class ModToolMaterial {
 
     static {
         BONE = new ToolMaterial(BlockTags.INCORRECT_FOR_COPPER_TOOL, 190, 5.0F, 1.0F, 13, ModItemTags.BONE_TOOL_MATERIALS);
-        NETHERIFIED_BONE = new ToolMaterial(BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2031, 9.0F, 4.0F, 15, ItemTags.NETHERITE_TOOL_MATERIALS);
+        NETHERIFIED_BONE = new ToolMaterial(BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2031, 9.0F, 4.0F, 15, ModItemTags.NETHERIFIED_BONE_TOOL_MATERIALS);
     }
 }
