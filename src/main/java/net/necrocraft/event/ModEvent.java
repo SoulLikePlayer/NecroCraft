@@ -4,6 +4,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.EntityTypeTags;
@@ -17,6 +18,7 @@ import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.util.AdvancementUtil;
 import net.necrocraft.world.effect.ModMobEffects;
 import net.necrocraft.world.entity.minion.registry.MinionRegistry;
 import net.necrocraft.world.item.ModDataComponents;
@@ -64,6 +66,7 @@ public class ModEvent {
 
         if (offhandItem.has(ModDataComponents.SOUL_DATA.get())) return;
 
+        AdvancementUtil.grant((ServerPlayer) player,"soul_awakened");
         Identifier entityId = BuiltInRegistries.ENTITY_TYPE.getKey(killedType);
         offhandItem.set(ModDataComponents.SOUL_DATA.get(), new SoulData(entityId));
 

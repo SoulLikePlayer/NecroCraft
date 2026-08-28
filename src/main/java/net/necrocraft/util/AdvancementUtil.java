@@ -6,13 +6,14 @@ import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
+import net.necrocraft.core.NecroCraft;
 
 public class AdvancementUtil {
 
-    public static void grant(ServerPlayer player, Identifier advancementId) {
+    public static void grant(ServerPlayer player, String advancementId) {
         AdvancementHolder advancementHolder = player.level().getServer()
                 .getAdvancements()
-                .get(advancementId);
+                .get(Identifier.fromNamespaceAndPath(NecroCraft.MODID, NecroCraft.MODID.toLowerCase()+"/"+advancementId));
 
         if (advancementHolder == null) {
             return;

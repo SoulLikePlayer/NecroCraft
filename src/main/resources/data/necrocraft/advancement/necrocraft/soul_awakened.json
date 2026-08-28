@@ -1,0 +1,35 @@
+{
+  "parent": "necrocraft:necrocraft/a_totem_for_the_dead",
+  "criteria": {
+    "code_trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.necrocraft.soul_awakened.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "necrocraft:soul_totem",
+      "components": {
+        "necrocraft:soul_data": {
+          "entity_type": "minecraft:zombie",
+          "equipment": []
+        }
+      }
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.necrocraft.soul_awakened.title"
+    }
+  },
+  "requirements": [
+    [
+      "code_trigger"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
