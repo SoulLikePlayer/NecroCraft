@@ -1,0 +1,37 @@
+{
+  "parent": "necrocraft:necrocraft/power_of_the_soulless",
+  "criteria": {
+    "consume_necrotic_apple": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "necrocraft:necrotic_apple"
+          ]
+        }
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.necrocraft.true_power_of_the_soulless.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "necrocraft:necrotic_apple"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.necrocraft.true_power_of_the_soulless.title"
+    }
+  },
+  "requirements": [
+    [
+      "consume_necrotic_apple"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

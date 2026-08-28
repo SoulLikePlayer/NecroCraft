@@ -1,0 +1,46 @@
+{
+  "parent": "necrocraft:necrocraft/root",
+  "criteria": {
+    "potion_of_undead": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:potion",
+            "components": {
+              "minecraft:potion_contents": {
+                "potion": "necrocraft:potion_of_undead"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.necrocraft.power_of_the_soulless.description"
+    },
+    "frame": "task",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:potion",
+      "components": {
+        "minecraft:potion_contents": {
+          "potion": "necrocraft:potion_of_undead"
+        }
+      }
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.necrocraft.power_of_the_soulless.title"
+    }
+  },
+  "requirements": [
+    [
+      "potion_of_undead"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
