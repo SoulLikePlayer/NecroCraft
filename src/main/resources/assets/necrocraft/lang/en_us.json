@@ -5,6 +5,7 @@
 
   "item.necrocraft.necrotic_shard": "Necrotic Shard",
   "item.necrocraft.necrotic_powder": "Necrotic Powder",
+  "item.necrocraft.nemesis_shard": "Nemesis Shard",
   "item.necrocraft.soul_totem": "Soul Totem",
   "item.necrocraft.revocation_scepter": "Revocation Scepter",
   "item.necrocraft.necrotic_apple": "Necrotic Apple",
@@ -55,6 +56,7 @@
   "item.necrocraft.soul_totem.summons": "Summons: %s",
 
   "item.necrocraft.bone_equipement.gain_soul": " Gain souls with every hit",
+  "item.necrocraft.nemesis_shard.desc": "Do not use it on a minion",
 
   "item.necrocraft.soul_totem.equipment": "Equipment :",
   "item.necrocraft.soul_totem.bonuses": "Bonus :",
@@ -90,6 +92,15 @@
   "advancements.necrocraft.true_power_of_the_soulless.description": "Feel the true power by eating a Necrotic Apple",
   "advancements.necrocraft.dont_repeat.title": "Don't Repeat This Mistake",
   "advancements.necrocraft.dont_repeat.description": "Cure yourself of your own stupid mistake and don't repeat it",
+  "advancements.necrocraft.obtain_nemesis_shard.title": "A Shard You Shouldn't Have",
+  "advancements.necrocraft.obtain_nemesis_shard.description": "You've obtained a Nemesis Shard. Whatever you do, don't use it on your minion",
+  "advancements.necrocraft.ignore_the_warning.title": "You Heard Me, You Just Didn't Listen",
+  "advancements.necrocraft.ignore_the_warning.description": "You used the Nemesis Shard anyway. Now you get to live with what you've done - however long that lasts.",
+  "advancements.necrocraft.betrayed_by_your_own_creation.title": "Betrayed by Your Own Creation",
+  "advancements.necrocraft.betrayed_by_your_own_creation.description": "Killed by your own corrupted minion. It never forgave you for the shard.",
+  "advancements.necrocraft.put_it_down.title": "Had to Put It Down",
+  "advancements.necrocraft.put_it_down.description": "You killed your own frenzied minion before it could return the favor. A small mercy, for both of you.",
+
 
   "key.category.necrocraft.necrocraft": "NecroCraft",
 

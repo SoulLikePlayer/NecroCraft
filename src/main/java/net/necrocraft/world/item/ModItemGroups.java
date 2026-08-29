@@ -21,6 +21,7 @@ public class ModItemGroups {
                     .displayItems(((itemDisplayParameters, output) -> {
                         output.accept(ModItems.NECROTIC_SHARD);
                         output.accept(ModItems.NECROTIC_POWDER);
+                        output.accept(ModItems.NEMESIS_SHARD);
                         output.accept(ModItems.NECROTIC_APPLE);
 
                         output.accept(ModItems.SOUL_CARVING_TABLE);

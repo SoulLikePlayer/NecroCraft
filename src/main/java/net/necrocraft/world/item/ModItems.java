@@ -10,6 +10,7 @@ import net.necrocraft.world.item.bonus.impl.synced.ZombieNautillusShellBonusItem
 import net.necrocraft.world.item.bonus.impl.synced.MummyWrappingBonusItem;
 import net.necrocraft.world.item.bonus.impl.synced.TridentShardBonusItem;
 import net.necrocraft.world.item.component.ModConsumables;
+import net.necrocraft.world.item.equipment.NemesisShard;
 import net.necrocraft.world.item.equipment.bone.classic.BoneAxe;
 import net.necrocraft.world.item.equipment.bone.classic.BoneEquipment;
 import net.necrocraft.world.item.equipment.RevocationScepter;
@@ -38,6 +39,12 @@ public class ModItems {
     public static final DeferredItem<@NotNull Item> NECROTIC_POWDER = ITEMS.registerItem(
             "necrotic_powder",
             Item::new,
+            properties -> properties
+    );
+
+    public static final DeferredItem<@NotNull Item> NEMESIS_SHARD = ITEMS.registerItem(
+            "nemesis_shard",
+            NemesisShard::new,
             properties -> properties
     );
 

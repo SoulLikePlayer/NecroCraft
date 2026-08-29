@@ -1,0 +1,30 @@
+{
+  "parent": "necrocraft:necrocraft/obtain_nemesis_shard",
+  "criteria": {
+    "code_trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "hidden": true,
+    "description": {
+      "translate": "advancements.necrocraft.ignore_the_warning.description"
+    },
+    "frame": "task",
+    "icon": {
+      "count": 1,
+      "id": "necrocraft:nemesis_shard"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.necrocraft.ignore_the_warning.title"
+    }
+  },
+  "requirements": [
+    [
+      "code_trigger"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

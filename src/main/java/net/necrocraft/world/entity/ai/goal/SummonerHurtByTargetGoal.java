@@ -32,7 +32,7 @@ public class SummonerHurtByTargetGoal extends TargetGoal {
      */
     public boolean canUse() {
         LivingEntity owner = this.minion.getOwner();
-        if (owner == null) {
+        if (owner == null || minion.getNemesis()) {
             return false;
         } else {
             this.ownerLastHurtBy = owner.getLastHurtByMob();

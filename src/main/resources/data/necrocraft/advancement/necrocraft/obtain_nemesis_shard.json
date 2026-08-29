@@ -1,0 +1,36 @@
+{
+  "parent": "necrocraft:necrocraft/first_servent",
+  "criteria": {
+    "nemesis_shard": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "necrocraft:nemesis_shard"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "hidden": true,
+    "description": {
+      "translate": "advancements.necrocraft.obtain_nemesis_shard.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "necrocraft:nemesis_shard"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.necrocraft.obtain_nemesis_shard.title"
+    }
+  },
+  "requirements": [
+    [
+      "nemesis_shard"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

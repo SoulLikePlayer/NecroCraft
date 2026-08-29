@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "PAP",
+    "PPP"
+  ],
+  "key": {
+    "P": "necrocraft:necrotic_powder",
+    "A": "minecraft:apple"
+  },
+  "result": {
+    "count": 1,
+    "id": "necrocraft:necrotic_apple"
+  }
+}

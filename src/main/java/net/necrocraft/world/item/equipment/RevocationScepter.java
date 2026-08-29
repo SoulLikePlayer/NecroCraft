@@ -25,6 +25,10 @@ public class RevocationScepter extends Item {
     public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack itemStack, @NotNull Player player, @NotNull LivingEntity target, @NotNull InteractionHand type) {
         if(target instanceof AbstractMinion minion){
 
+            if (minion.getNemesis()) {
+                return InteractionResult.FAIL;
+            }
+
             if(!Objects.requireNonNull(minion.getOwnerReference()).matches(player)) return InteractionResult.FAIL;
 
             if (target.level() instanceof ServerLevel serverLevel) {
