@@ -12,6 +12,7 @@ import net.necrocraft.world.item.ModItemGroups;
 import net.necrocraft.world.item.ModItems;
 import net.necrocraft.world.item.alchemy.ModPotions;
 import net.necrocraft.world.level.block.ModBlock;
+import net.necrocraft.world.particle.ModParticles;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -37,6 +38,7 @@ public class NecroCraft {
         ModMobEffects.MOB_EFFECTS.register(modEventBus);
         ModLootModifier.LOOT_MODIFIERS.register(modEventBus);
         ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
+        ModParticles.PARTICLE_TYPE.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 

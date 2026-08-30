@@ -6,6 +6,7 @@ import net.minecraft.resources.Identifier;
 import net.necrocraft.client.gui.SoulGaugeOverlay;
 import net.necrocraft.client.gui.screens.inventory.CarvingScreen;
 import net.necrocraft.client.gui.screens.inventory.MinionInventoryScreen;
+import net.necrocraft.client.particles.NemesisSoulParticle;
 import net.necrocraft.client.renderer.entity.*;
 import net.necrocraft.client.renderer.entity.state.SkeletonMinionRenderState;
 import net.necrocraft.core.NecroCraft;
@@ -13,6 +14,7 @@ import net.necrocraft.world.inventory.CarvingMenu;
 import net.necrocraft.world.inventory.MinionInventoryMenu;
 import net.necrocraft.world.inventory.ModMenuTypes;
 import net.necrocraft.world.level.block.SoulCarvingTableBlock;
+import net.necrocraft.world.particle.ModParticles;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -21,6 +23,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
@@ -60,5 +63,10 @@ public class NecroCraftClient {
                     soulGauge.extractBackground(graphics, deltaTracker);
                     soulGauge.extractRenderState(graphics, deltaTracker);
                 });
+    }
+
+    @SubscribeEvent
+    public static void registerProvider(RegisterParticleProvidersEvent event){
+        event.registerSpriteSet(ModParticles.NEMESIS_SOUL.get(), NemesisSoulParticle.Provider::new);
     }
 }

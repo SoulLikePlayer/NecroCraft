@@ -13,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.necrocraft.util.AdvancementUtil;
 import net.necrocraft.world.entity.minion.AbstractMinion;
+import net.necrocraft.world.particle.ModParticles;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -41,7 +42,18 @@ public class NemesisShard extends Item {
             if (!(Objects.equals(minion.getOwner(), player.getLivingEntity()))) return InteractionResult.PASS;
 
             if (!player.level().isClientSide()) {
+
                 minion.setNemesis(true);
+
+                if (player.level() instanceof ServerLevel serverLevel) {
+                    serverLevel.sendParticles(
+                            ModParticles.NEMESIS_SOUL.get(),
+                            minion.getX(), minion.getY() + minion.getBbHeight() * 0.5, minion.getZ(),
+                            20,
+                            0.3, 0.3, 0.3,
+                            0.02
+                    );
+                }
 
                 itemStack.shrink(1);
                 AdvancementUtil.grant((ServerPlayer) player, "ignore_the_warning");
