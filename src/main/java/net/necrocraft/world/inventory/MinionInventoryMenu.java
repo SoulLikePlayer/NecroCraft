@@ -1,7 +1,9 @@
 package net.necrocraft.world.inventory;
 
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -50,6 +52,15 @@ public class MinionInventoryMenu extends AbstractContainerMenu {
         }
     }
 
+    public MinionInventoryMenu(int containerId, @NotNull Inventory playerInventory, @NotNull RegistryFriendlyByteBuf buf) {
+        this(containerId, playerInventory, resolveMinion(playerInventory, buf.readVarInt()));
+    }
+
+    private static Container resolveMinion(Inventory playerInventory, int entityId) {
+        Entity entity = playerInventory.player.level().getEntity(entityId);
+        return entity instanceof AbstractMinion minion ? minion : new SimpleContainer(MINION_SLOT_COUNT);
+    }
+
     @Override
     public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
         ItemStack result = ItemStack.EMPTY;
@@ -83,5 +94,9 @@ public class MinionInventoryMenu extends AbstractContainerMenu {
     public void removed(@NotNull Player player) {
         super.removed(player);
         this.minionContainer.stopOpen(player);
+    }
+
+    public AbstractMinion getMinion() {
+        return this.minionContainer instanceof AbstractMinion minion ? minion : null;
     }
 }

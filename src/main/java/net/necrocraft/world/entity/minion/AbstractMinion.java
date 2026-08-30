@@ -875,9 +875,9 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
                 && Objects.requireNonNull(this.getOwnerReference()).matches(player)) {
             if (!this.level().isClientSide()) {
                 player.openMenu(new SimpleMenuProvider(
-                        (containerId, playerInventory, _) -> new MinionInventoryMenu(containerId, playerInventory, this),
+                        (containerId, playerInv, _) -> new MinionInventoryMenu(containerId, playerInv, this),
                         this.getDisplayName()
-                ));
+                ), buf -> buf.writeVarInt(this.getId()));
             }
             return InteractionResult.SUCCESS;
         }

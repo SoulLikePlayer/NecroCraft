@@ -19,6 +19,6 @@ public class ModMenuTypes {
 
     public static final DeferredHolder<MenuType<?>, MenuType<MinionInventoryMenu>> MINION_INVENTORY =
             MENU_TYPES.register("minion_inventory",
-                () -> new MenuType<>(MinionInventoryMenu::new, FeatureFlags.VANILLA_SET)
-            );
+                    () -> IMenuTypeExtension.create((containerId, inventory, buffer) ->
+                            new MinionInventoryMenu(containerId, inventory, buffer)));
 }
