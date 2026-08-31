@@ -13,6 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -127,7 +128,10 @@ public class SoulOfUndeadModEvent {
             gauge += 5f;
             if (gauge > 100f) gauge = 100f;
             player.setData(ModAttachments.SOUL_GAUGE, gauge);
-            NecroCraft.LOGGER.info("Soul Gauge : {}", gauge);
+
+            FoodData foodData = player.getFoodData();
+            foodData.setFoodLevel(20);
+            foodData.setSaturation(20f);
         }
 
         else if(source.getEntity() instanceof AbstractMinion minion){
@@ -135,7 +139,6 @@ public class SoulOfUndeadModEvent {
             gauge += 5f;
             if (gauge > 100f) gauge = 100f;
             minion.setData(ModAttachments.SOUL_GAUGE, gauge);
-            NecroCraft.LOGGER.info("Soul Gauge for {} : {}", source.getEntity().getName() ,gauge);
         }
     }
 
