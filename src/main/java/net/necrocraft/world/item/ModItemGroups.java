@@ -61,6 +61,7 @@ public class ModItemGroups {
                         output.accept(ModItems.HEALTH_BONUS_ITEM);
                         output.accept(ModItems.POST_MORTEM_EXPLOSION_BONUS_ITEM);
                         output.accept(ModItems.NETHERIFIED_BONE_BONUS_ITEM);
+                        output.accept(ModItems.SOUL_GENERATOR_BONUS_ITEM);
 
                         output.accept(ModItems.STORAGE_BONUS_ITEM);
                         output.accept(ModItems.TRIAL_VAULT_BONUS_ITEM);

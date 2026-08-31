@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "P P",
+    "SPS"
+  ],
+  "key": {
+    "P": "necrocraft:necrotic_powder",
+    "S": "necrocraft:necrotic_shard"
+  },
+  "result": {
+    "count": 1,
+    "id": "necrocraft:soul_generator_bonus_item"
+  }
+}

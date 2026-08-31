@@ -576,6 +576,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         super.tick();
         if (!this.level().isClientSide()) {
             fireSyncedTrigger(BonusTrigger.ON_TICK);
+            fireTrigger(BonusTrigger.ON_TICK);
         }
     }
 

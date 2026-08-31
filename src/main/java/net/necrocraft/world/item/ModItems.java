@@ -186,7 +186,6 @@ public class ModItems {
             "post_mortem_explosion_bonus_item",
             PostMortemExplosionBonusItem::new,
             properties -> properties
-                    .rarity(Rarity.RARE)
     );
 
     public static DeferredItem<@NotNull AbstractBonusItem> STORAGE_BONUS_ITEM = ITEMS.registerItem(
@@ -233,6 +232,12 @@ public class ModItems {
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
                     .fireResistant()
+    );
+
+    public static DeferredItem<@NotNull AbstractBonusItem> SOUL_GENERATOR_BONUS_ITEM = ITEMS.registerItem(
+            "soul_generator_bonus_item",
+            SoulGenerationBonusItem::new,
+            properties -> properties
     );
 
     public static DeferredItem<@NotNull BlockItem> SOUL_CARVING_TABLE = ITEMS.registerSimpleBlockItem(
