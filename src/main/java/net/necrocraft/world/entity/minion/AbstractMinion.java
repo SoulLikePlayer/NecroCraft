@@ -102,7 +102,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     private static final float NEMESIS_SHARD_DROP_CHANCE = 0.15F;
     /** Maximum number of {@link ModItems#NEMESIS_SHARD} a corrupted ({@link #isNemesis}) minion can drop on death. */
     private static final int MAX_NEMESIS_SHARD_DROPS = 5;
-    
+
 
     /**
      * @param type  the entity type this minion is instantiated from
@@ -138,7 +138,8 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * {@link #isSedentary() sedentary}:
      * <ul>
      *     <li>Melee attack, following the owner, and combat-assist targeting
-     *     are disabled while sedentary.</li>
+     *     are disabled while sedentary. Following the owner is also disabled
+     *     while the minion is {@link #isNemesis corrupted}.</li>
      *     <li>Auto-planting and auto-tilling require the corresponding bonus
      *     (see {@link #canAutoPlant()}, {@link #canAutoTill()}).</li>
      *     <li>Crop farming and storing items in containers run unconditionally
@@ -154,7 +155,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         this.goalSelector.addGoal(3, new GatedGoal(new PlantSeedsGoal(this, 1.0D, 6), this::canAutoPlant));
         this.goalSelector.addGoal(4, new GatedGoal(new TillFarmlandGoal(this, 1.0D, 6), this::canAutoTill));
         this.goalSelector.addGoal(5, new StoreItemsInContainerGoal(this, 1.0D));
-        this.goalSelector.addGoal(7, new GatedGoal(new FollowSummonerGoal(this, 1.0F, 10.0F, 2.0F), () -> !this.isSedentary()));
+        this.goalSelector.addGoal(7, new GatedGoal(new FollowSummonerGoal(this, 1.0F, 10.0F, 2.0F), () -> !this.isSedentary() && !this.isNemesis));
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Player.class, 8.0F));
 
         this.targetSelector.addGoal(0, new NemesisHurtTargetGoal(this));
@@ -260,12 +261,14 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
     /**
-     * @return {@code true} if the minion has an owner, is not sedentary, and
-     * is at least {@link #TELEPORT_WHEN_DISTANCE_IS_SQ} (squared blocks) away from them
+     * @return {@code true} if the minion has an owner, is not sedentary, is
+     * not {@link #isNemesis corrupted}, and is at least
+     * {@link #TELEPORT_WHEN_DISTANCE_IS_SQ} (squared blocks) away from them
      */
     public boolean shouldTryTeleportToOwner() {
         LivingEntity owner = this.getOwner();
-        return owner != null && !this.isSedentary() && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
+        return owner != null && !this.isSedentary() && !this.isNemesis
+                && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
     }
 
     /**
