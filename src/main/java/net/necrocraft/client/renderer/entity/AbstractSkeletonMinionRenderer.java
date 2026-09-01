@@ -31,6 +31,7 @@ public abstract class AbstractSkeletonMinionRenderer<T extends SkeletonMinion, S
         super.extractRenderState(entity, state, partialTicks);
         state.isAggressive = entity.isAggressive();
         state.isHoldingBow = entity.getMainHandItem().is(Items.BOW);
+        state.isNemesis = entity.getNemesis();
     }
 
     protected boolean isShaking(S state) {

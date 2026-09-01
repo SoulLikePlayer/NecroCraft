@@ -15,10 +15,12 @@ import net.necrocraft.client.model.minion.zombie.DrownedMinionModel;
 import net.necrocraft.client.renderer.entity.layers.DrownedMinionDashRiptideLayer;
 import net.necrocraft.client.renderer.entity.layers.DrownedMinionOuterLayer;
 import net.necrocraft.client.renderer.entity.state.ZombieMinionRenderState;
+import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.entity.minion.impl.DrownedMinion;
 
 public class DrownedMinionRenderer extends AbstractZombieMinionRenderer<DrownedMinion, ZombieMinionRenderState, DrownedMinionModel> {
-    private static final Identifier DROWNED_LOCATION = Identifier.withDefaultNamespace("textures/entity/zombie/drowned.png");
+    private static final Identifier DROWNED_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/drowned/drowned.png");
+    private static final Identifier NEMESIS_DROWNED_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/drowned/nemesis_drowned.png");
 
     public DrownedMinionRenderer(EntityRendererProvider.Context context) {
         super(context, new DrownedMinionModel(context.bakeLayer(ModelLayers.DROWNED)), ArmorModelSet.bake(ModelLayers.DROWNED_ARMOR, context.getModelSet(), DrownedMinionModel::new));
@@ -40,7 +42,7 @@ public class DrownedMinionRenderer extends AbstractZombieMinionRenderer<DrownedM
 
     @Override
     public Identifier getTextureLocation(ZombieMinionRenderState state) {
-        return DROWNED_LOCATION;
+        return state.isNemesis ? NEMESIS_DROWNED_LOCATION : DROWNED_LOCATION;
     }
 
     @Override

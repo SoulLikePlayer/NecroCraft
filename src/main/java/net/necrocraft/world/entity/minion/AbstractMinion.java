@@ -97,10 +97,16 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      */
     private @Nullable BlockPos openedChestPos;
 
-    private boolean isNemesis;
+    /**
+     * Synced flag: whether this minion has been corrupted by a {@link net.necrocraft.world.item.equipment.NemesisShard}.
+     * Kept in {@link SynchedEntityData} (rather than a plain field) so the client
+     * picks up the change immediately, e.g. to swap render textures in real time.
+     */
+    protected static final EntityDataAccessor<Boolean> DATA_NEMESIS_ID =
+            SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.BOOLEAN);
     /** Chance for a non-corrupted minion to drop a single {@link ModItems#NEMESIS_SHARD} on death. */
     private static final float NEMESIS_SHARD_DROP_CHANCE = 0.15F;
-    /** Maximum number of {@link ModItems#NEMESIS_SHARD} a corrupted ({@link #isNemesis}) minion can drop on death. */
+    /** Maximum number of {@link ModItems#NEMESIS_SHARD} a corrupted ({@link #getNemesis()}) minion can drop on death. */
     private static final int MAX_NEMESIS_SHARD_DROPS = 5;
 
 
@@ -124,7 +130,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         SpawnGroupData result = super.finalizeSpawn(level, difficulty, spawnReason, groupData);
 
         this.setData(ModAttachments.SOUL_GAUGE, 0f);
-        this.isNemesis = false;
+        this.setNemesis(false);
 
         fireTrigger(BonusTrigger.ON_SPAWN);
         fireSyncedTrigger(BonusTrigger.ON_SPAWN);
@@ -139,7 +145,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * <ul>
      *     <li>Melee attack, following the owner, and combat-assist targeting
      *     are disabled while sedentary. Following the owner is also disabled
-     *     while the minion is {@link #isNemesis corrupted}.</li>
+     *     while the minion is {@link #getNemesis() corrupted}.</li>
      *     <li>Auto-planting and auto-tilling require the corresponding bonus
      *     (see {@link #canAutoPlant()}, {@link #canAutoTill()}).</li>
      *     <li>Crop farming and storing items in containers run unconditionally
@@ -155,7 +161,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         this.goalSelector.addGoal(3, new GatedGoal(new PlantSeedsGoal(this, 1.0D, 6), this::canAutoPlant));
         this.goalSelector.addGoal(4, new GatedGoal(new TillFarmlandGoal(this, 1.0D, 6), this::canAutoTill));
         this.goalSelector.addGoal(5, new StoreItemsInContainerGoal(this, 1.0D));
-        this.goalSelector.addGoal(7, new GatedGoal(new FollowSummonerGoal(this, 1.0F, 10.0F, 2.0F), () -> !this.isSedentary() && !this.isNemesis));
+        this.goalSelector.addGoal(7, new GatedGoal(new FollowSummonerGoal(this, 1.0F, 10.0F, 2.0F), () -> !this.isSedentary() && !this.getNemesis()));
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Player.class, 8.0F));
 
         this.targetSelector.addGoal(0, new NemesisHurtTargetGoal(this));
@@ -174,6 +180,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     protected void defineSynchedData(SynchedEntityData.@NotNull Builder entityData) {
         super.defineSynchedData(entityData);
         entityData.define(DATA_SUMMONER_UUID_ID, Optional.empty());
+        entityData.define(DATA_NEMESIS_ID, false);
     }
 
 
@@ -189,7 +196,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         EntityReference<@NotNull LivingEntity> summoner = this.getOwnerReference();
         EntityReference.store(summoner, output, "summoner");
         output.store("bonuses", Identifier.CODEC.listOf(), this.bonuses);
-        output.putBoolean("isNemesis", this.isNemesis);
+        output.putBoolean("isNemesis", this.getNemesis());
         ContainerHelper.saveAllItems(output, this.inventoryItems);
     }
 
@@ -207,7 +214,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
             this.entityData.set(DATA_SUMMONER_UUID_ID, Optional.of(owner));
         }
         this.bonuses = new ArrayList<>(input.read("bonuses", Identifier.CODEC.listOf()).orElse(List.of()));
-        this.isNemesis = input.getBooleanOr("isNemesis", false);
+        this.setNemesis(input.getBooleanOr("isNemesis", false));
         this.inventoryItems.clear();
         ContainerHelper.loadAllItems(input, this.inventoryItems);
     }
@@ -262,12 +269,12 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     /**
      * @return {@code true} if the minion has an owner, is not sedentary, is
-     * not {@link #isNemesis corrupted}, and is at least
+     * not {@link #getNemesis() corrupted}, and is at least
      * {@link #TELEPORT_WHEN_DISTANCE_IS_SQ} (squared blocks) away from them
      */
     public boolean shouldTryTeleportToOwner() {
         LivingEntity owner = this.getOwner();
-        return owner != null && !this.isSedentary() && !this.isNemesis
+        return owner != null && !this.isSedentary() && !this.getNemesis()
                 && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
     }
 
@@ -598,7 +605,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
             dropItems();
             dropNemesisShards();
 
-            if(this.isNemesis && damageSource.getEntity() instanceof ServerPlayer player && isSummonedBy(player)){
+            if(this.getNemesis() && damageSource.getEntity() instanceof ServerPlayer player && isSummonedBy(player)){
                 AdvancementUtil.grant(player, "put_it_down");
             }
         }
@@ -608,14 +615,14 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     /**
      * Drops {@link ModItems#NEMESIS_SHARD} on death.
      * <p>
-     * A minion already corrupted by Nemesis ({@link #isNemesis}) always drops
+     * A minion already corrupted by Nemesis ({@link #getNemesis()}) always drops
      * shards, in a random amount between 1 and {@link #MAX_NEMESIS_SHARD_DROPS}
      * inclusive. An uncorrupted minion instead has a
      * {@link #NEMESIS_SHARD_DROP_CHANCE} chance of dropping a single shard,
      * regardless of what killed it.
      */
     private void dropNemesisShards() {
-        if (this.isNemesis) {
+        if (this.getNemesis()) {
             int count = 1 + this.random.nextInt(MAX_NEMESIS_SHARD_DROPS);
             this.drop(new ItemStack(ModItems.NEMESIS_SHARD.get(), count), true, false);
         } else if (this.random.nextFloat() < NEMESIS_SHARD_DROP_CHANCE) {
@@ -859,7 +866,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * right-clicked with an empty main hand interaction (and not sneaking).
      * <p>
      * A minion corrupted by a {@link net.necrocraft.world.item.equipment.NemesisShard}
-     * ({@link #isNemesis}) has gone feral: it no longer recognizes its owner
+     * ({@link #getNemesis()}) has gone feral: it no longer recognizes its owner
      * for this purpose, and its inventory cannot be opened at all.
      *
      * @param player the interacting player
@@ -875,7 +882,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
                 && !player.isSecondaryUseActive()
                 && !holdingRevocationScepter
                 && !holdingNemesisShard
-                && !this.isNemesis
+                && !this.getNemesis()
                 && Objects.requireNonNull(this.getOwnerReference()).matches(player)) {
             if (!this.level().isClientSide()) {
                 player.openMenu(new SimpleMenuProvider(
@@ -899,10 +906,10 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
     public boolean getNemesis(){
-        return this.isNemesis;
+        return this.entityData.get(DATA_NEMESIS_ID);
     }
 
     public void setNemesis(boolean newNemesis){
-        this.isNemesis = newNemesis;
+        this.entityData.set(DATA_NEMESIS_ID, newNemesis);
     }
 }
