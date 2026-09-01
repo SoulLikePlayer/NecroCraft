@@ -13,11 +13,16 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.monster.zombie.Drowned;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class BoggedMinion extends SkeletonMinion{
+
+    static {
+        SYNCED_BONUS.add(ModItems.VIAL_PUTRID_VENOM_BONUS_ITEM);
+    }
 
     /**
      * @param type  the entity type this minion is instantiated from

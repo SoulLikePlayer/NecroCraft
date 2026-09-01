@@ -5,10 +5,7 @@ import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.food.ModFoods;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.impl.*;
-import net.necrocraft.world.item.bonus.impl.synced.StrayCapeBonusItem;
-import net.necrocraft.world.item.bonus.impl.synced.ZombieNautillusShellBonusItem;
-import net.necrocraft.world.item.bonus.impl.synced.MummyWrappingBonusItem;
-import net.necrocraft.world.item.bonus.impl.synced.TridentShardBonusItem;
+import net.necrocraft.world.item.bonus.impl.synced.*;
 import net.necrocraft.world.item.component.ModConsumables;
 import net.necrocraft.world.item.equipment.NemesisShard;
 import net.necrocraft.world.item.equipment.bone.classic.BoneAxe;
@@ -178,6 +175,13 @@ public class ModItems {
     public static DeferredItem<@NotNull AbstractBonusItem> STRAY_CAPE_BONUS_ITEM = ITEMS.registerItem(
             "stray_cape_bonus_item",
             StrayCapeBonusItem::new,
+            properties -> properties
+                    .rarity(Rarity.UNCOMMON)
+    );
+
+    public static DeferredItem<@NotNull AbstractBonusItem> VIAL_PUTRID_VENOM_BONUS_ITEM = ITEMS.registerItem(
+            "vial_putrid_venom_bonus_item",
+            VialPutridVenomBonusItem::new,
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
     );
