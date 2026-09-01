@@ -9,6 +9,8 @@ import net.necrocraft.world.item.bonus.BonusTrigger;
 import net.necrocraft.world.item.bonus.BonusType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class VialPutridVenomBonusItem extends AbstractBonusItem {
     public VialPutridVenomBonusItem(Properties properties) {
         super(properties);
@@ -36,7 +38,11 @@ public class VialPutridVenomBonusItem extends AbstractBonusItem {
     public void applySyncedEffect(@NotNull AbstractMinion minion) {
         LivingEntity target = minion.getLastHurtMob();
         if (target != null && target.hasEffect(MobEffects.POISON)) {
-            target.addEffect(new MobEffectInstance(MobEffects.POISON, 140, 1, true, true, true));
+            MobEffectInstance instance = Objects.requireNonNull(target.getEffect(MobEffects.POISON));
+            int actualAmplifier = instance.getAmplifier();
+            int actualDuration = instance.getDuration();
+
+            target.addEffect(new MobEffectInstance(MobEffects.POISON, actualDuration + 60, actualAmplifier + 1, true, true, true));
             minion.heal(1.0F);
         }
     }
