@@ -184,6 +184,7 @@ public class ModItems {
             VialPutridVenomBonusItem::new,
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
+                    .food(ModFoods.PUTRID_VENOM_VIAL, ModConsumables.PUTRID_VENOM_VIAL)
     );
 
     public static DeferredItem<@NotNull AbstractBonusItem> POST_MORTEM_EXPLOSION_BONUS_ITEM = ITEMS.registerItem(

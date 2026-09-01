@@ -8,13 +8,20 @@ import net.necrocraft.world.effect.ModMobEffects;
 
 import java.util.List;
 
+import static net.minecraft.world.item.component.Consumables.defaultDrink;
 import static net.minecraft.world.item.component.Consumables.defaultFood;
 
 public class ModConsumables {
     public static final Consumable NECROTIC_APPLE;
+    public static final Consumable PUTRID_VENOM_VIAL;
 
     static {
         NECROTIC_APPLE = defaultFood().onConsume(new ApplyStatusEffectsConsumeEffect(
                 List.of(new MobEffectInstance(ModMobEffects.SOUL_OF_UNDEAD, MobEffectInstance.INFINITE_DURATION)))).build();
+
+        PUTRID_VENOM_VIAL = defaultDrink().onConsume(new ApplyStatusEffectsConsumeEffect(
+                List.of(new MobEffectInstance(MobEffects.POISON, 100, 1),
+                        new MobEffectInstance(MobEffects.HUNGER, 100, 1))
+        )).build();
     }
 }
