@@ -31,7 +31,6 @@ public class MummyWrappingBonusItem extends AbstractBonusItem {
     @Override
     public void applyEffectes(@NotNull AbstractMinion minion) {
         minion.addEffect(new MobEffectInstance(MobEffects.REGENERATION, MobEffectInstance.INFINITE_DURATION, 0, true, true));
-        NecroCraft.LOGGER.info("Regeneration");
     }
 
     @Override

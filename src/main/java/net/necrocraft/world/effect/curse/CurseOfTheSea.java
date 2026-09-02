@@ -1,4 +1,4 @@
-package net.necrocraft.world.effect;
+package net.necrocraft.world.effect.curse;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
@@ -11,7 +11,7 @@ public class CurseOfTheSea extends MobEffect {
     private static final float BASE_HEAL_IN_WATER = 1.0f;
     private static final float BASE_HEAL_IN_LAND = 0.5f;
 
-    protected CurseOfTheSea(MobEffectCategory category, int color) {
+    public CurseOfTheSea(MobEffectCategory category, int color) {
         super(category, color);
     }
 
@@ -35,11 +35,6 @@ public class CurseOfTheSea extends MobEffect {
         return true;
     }
 
-    @Override
-    public boolean shouldApplyEffectTickThisTick(int tickCount, int amplifier) {
-        int period = Math.max(50 >> amplifier, 5);
-        return tickCount % period == 0;
-    }
 
     @Override
     public void onEffectAdded(@NotNull LivingEntity mob, int amplifier) {

@@ -16,7 +16,7 @@ import static net.necrocraft.world.item.bonus.BonusUtil.applyModifier;
 
 public class ZombieNautillusShellBonusItem extends AbstractBonusItem {
     private static final Identifier ARMOR_MODIFIER_ID =
-            Identifier.fromNamespaceAndPath("necrocraft", "barnacle_shell_modifier");
+            Identifier.fromNamespaceAndPath("necrocraft", "zombie_nautillus_shell_modifier");
 
     private static final double ARMOR_BONUS = 9.0D;
 
@@ -42,7 +42,6 @@ public class ZombieNautillusShellBonusItem extends AbstractBonusItem {
 
     @Override
     public void applySyncedEffect(@NotNull AbstractMinion minion) {
-        NecroCraft.LOGGER.info("Resitance Added !");
         minion.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 100, 0, true, true, true));
     }
 }

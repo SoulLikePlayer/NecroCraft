@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "SRS",
+    "SSS"
+  ],
+  "key": {
+    "S": "minecraft:sand",
+    "R": "minecraft:rotten_flesh"
+  },
+  "result": {
+    "count": 1,
+    "id": "necrocraft:dehydrated_rotten_flesh_bonus_item"
+  }
+}

@@ -187,6 +187,13 @@ public class ModItems {
                     .food(ModFoods.PUTRID_VENOM_VIAL, ModConsumables.PUTRID_VENOM_VIAL)
     );
 
+    public static DeferredItem<@NotNull AbstractBonusItem> DEHYDRATED_ROTTEN_FLESH_BONUS_ITEM = ITEMS.registerItem(
+            "dehydrated_rotten_flesh_bonus_item",
+            DehydratedRottenFleshBonusItem::new,
+            properties -> properties
+                    .rarity(Rarity.UNCOMMON)
+    );
+
     public static DeferredItem<@NotNull AbstractBonusItem> POST_MORTEM_EXPLOSION_BONUS_ITEM = ITEMS.registerItem(
             "post_mortem_explosion_bonus_item",
             PostMortemExplosionBonusItem::new,

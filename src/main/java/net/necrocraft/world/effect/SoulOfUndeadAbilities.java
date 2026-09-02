@@ -40,7 +40,7 @@ public final class SoulOfUndeadAbilities {
         if (onCooldown(player, LAST_HEAL_TICK, HEAL_COOLDOWN_TICKS)) {
             return;
         }
-        if (!trySpendSoulGauge(player, HEAL_SOUL_COST)) {
+        if (trySpendSoulGauge(player, HEAL_SOUL_COST)) {
             return;
         }
 
@@ -73,7 +73,7 @@ public final class SoulOfUndeadAbilities {
         if (minions.isEmpty()) {
             return;
         }
-        if (!trySpendSoulGauge(player, EMPOWER_SOUL_COST)) {
+        if (trySpendSoulGauge(player, EMPOWER_SOUL_COST)) {
             return;
         }
 
@@ -103,9 +103,9 @@ public final class SoulOfUndeadAbilities {
         if (gauge < cost) {
             NecroCraft.LOGGER.debug("{} tried to use an ability but only had {} Soul Gauge (needs {})",
                     player.getGameProfile().name(), gauge, cost);
-            return false;
+            return true;
         }
         player.setData(ModAttachments.SOUL_GAUGE, gauge - cost);
-        return true;
+        return false;
     }
 }
