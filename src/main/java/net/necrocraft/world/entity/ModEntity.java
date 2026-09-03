@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  * registered lazily once the underlying registry is available, as required
  * by NeoForge's mod loading lifecycle.
  */
-public class ModEntity {
+public class  ModEntity {
 
     /** Deferred register holding all entity types contributed by this mod. */
     public static final DeferredRegister.Entities ENTITY_TYPES =

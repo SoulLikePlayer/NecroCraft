@@ -86,6 +86,7 @@
   "carving.necrocraft.page.bonus": "Bonus",
   "carving.necrocraft.page.equipment.tooltip": "Switch to the equipment page",
   "carving.necrocraft.page.bonus.tooltip": "Switch to the bonus slots page",
+  "carving.necrocraft.page.evolution.tooltip": "Switch to the evolution page",
 
   "effect.necrocraft.curse_of_the_sea": "Curse Of The Sea",
   "effect.necrocraft.soul_of_undead": "Soul Of Undead",
@@ -117,5 +118,9 @@
   "key.category.necrocraft.necrocraft": "NecroCraft",
 
   "key.necrocraft.soul_heal" : "Healing Ability",
-  "key.necrocraft.soul_empower": "Minion Empowered"
+  "key.necrocraft.soul_empower": "Minion Empowered",
+  "carving.necrocraft.slot.evolution_ingredient": "Ingredient",
+  "carving.necrocraft.evolution.none": "New Soul Totem",
+  "carving.necrocraft.slot.evolution_result": "New Soul Totem",
+  "carving.necrocraft.page.evolution": "Evolution"
 }

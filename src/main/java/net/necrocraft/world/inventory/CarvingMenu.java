@@ -5,14 +5,18 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.Equippable;
+import net.necrocraft.world.entity.minion.registry.MinionEvolution;
+import net.necrocraft.world.entity.minion.registry.MinionEvolutions;
 import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.BonusType;
@@ -21,9 +25,12 @@ import net.necrocraft.world.item.component.SoulData;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.level.block.ModBlock;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CarvingMenu extends AbstractContainerMenu {
 
@@ -74,7 +81,15 @@ public class CarvingMenu extends AbstractContainerMenu {
             {80, 113}
     };
 
-    private static final int CONTAINER_SIZE = BONUS_SLOT_END;
+    public static final int EVOLUTION_INGREDIENT_SLOT = BONUS_SLOT_END;
+    public static final int EVOLUTION_INGREDIENT_SLOT_X = 26;
+    public static final int EVOLUTION_INGREDIENT_SLOT_Y = 63;
+
+    public static final int EVOLUTION_RESULT_SLOT = EVOLUTION_INGREDIENT_SLOT + 1;
+    public static final int EVOLUTION_RESULT_SLOT_X = 134;
+    public static final int EVOLUTION_RESULT_SLOT_Y = 63;
+
+    private static final int CONTAINER_SIZE = EVOLUTION_RESULT_SLOT + 1;
 
     private static final int INV_SLOT_START = CONTAINER_SIZE;
     private static final int INV_SLOT_END = INV_SLOT_START + 27;
@@ -93,6 +108,8 @@ public class CarvingMenu extends AbstractContainerMenu {
 
     private final ContainerLevelAccess access;
     private final Container container;
+
+    private final DataSlot selectedEvolutionIndex = DataSlot.standalone();
 
     public CarvingMenu(int containerId, Inventory inventory) {
         this(containerId, inventory, new SimpleContainer(CONTAINER_SIZE), ContainerLevelAccess.NULL);
@@ -121,6 +138,13 @@ public class CarvingMenu extends AbstractContainerMenu {
             int[] pos = BONUS_SLOT_POSITIONS[i];
             this.addSlot(new BonusSlot(container, BONUS_SLOT_START + i, pos[0], pos[1]));
         }
+
+        this.addSlot(new EvolutionIngredientSlot(container, EVOLUTION_INGREDIENT_SLOT,
+                EVOLUTION_INGREDIENT_SLOT_X, EVOLUTION_INGREDIENT_SLOT_Y));
+        this.addSlot(new EvolutionResultSlot(container, EVOLUTION_RESULT_SLOT,
+                EVOLUTION_RESULT_SLOT_X, EVOLUTION_RESULT_SLOT_Y));
+
+        this.addDataSlot(this.selectedEvolutionIndex);
 
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
@@ -173,6 +197,7 @@ public class CarvingMenu extends AbstractContainerMenu {
                     }
                 }
             }
+            CarvingMenu.this.updateEvolutionResult();
         }
 
         @Override
@@ -211,6 +236,7 @@ public class CarvingMenu extends AbstractContainerMenu {
                     CarvingMenu.this.container.setItem(EQUIPMENT_SLOT_START + i, ItemStack.EMPTY);
                 }
             }
+            CarvingMenu.this.updateEvolutionResult();
             super.onTake(player, stack);
         }
     }
@@ -282,6 +308,122 @@ public class CarvingMenu extends AbstractContainerMenu {
             super.setChanged();
             CarvingMenu.this.updateSoulData();
         }
+    }
+
+    private class EvolutionIngredientSlot extends Slot {
+        public EvolutionIngredientSlot(Container container, int index, int x, int y) {
+            super(container, index, x, y);
+        }
+
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            CarvingMenu.this.updateEvolutionResult();
+        }
+    }
+
+    private class EvolutionResultSlot extends Slot {
+        public EvolutionResultSlot(Container container, int index, int x, int y) {
+            super(container, index, x, y);
+        }
+
+        @Override
+        public boolean mayPlace(@NotNull ItemStack stack) {
+            return false;
+        }
+
+        @Override
+        public void onTake(@NotNull Player player, @NotNull ItemStack stack) {
+            CarvingMenu.this.consumeEvolution();
+            super.onTake(player, stack);
+        }
+    }
+
+    public List<MinionEvolution> getAvailableEvolutions() {
+        ItemStack totemStack = this.container.getItem(TOTEM_SLOT);
+        if (totemStack.isEmpty()) {
+            return List.of();
+        }
+        SoulData soulData = totemStack.get(ModDataComponents.SOUL_DATA.get());
+        if (soulData == null) {
+            return List.of();
+        }
+        Optional<EntityType<?>> resolved = BuiltInRegistries.ENTITY_TYPE.getOptional(soulData.entityType());
+        if (resolved.isEmpty()) {
+            return List.of();
+        }
+        List<MinionEvolution> evolutions = MinionEvolutions.getEvolutions(resolved.get());
+        return evolutions;
+    }
+
+    public int getSelectedEvolutionIndex() {
+        return this.selectedEvolutionIndex.get();
+    }
+
+    @Override
+    public boolean clickMenuButton(@NotNull Player player, int id) {
+        List<MinionEvolution> evolutions = this.getAvailableEvolutions();
+        if (id < 0 || id >= evolutions.size()) {
+            return false;
+        }
+        this.selectedEvolutionIndex.set(id);
+        this.updateEvolutionResult();
+        return true;
+    }
+
+    private void updateEvolutionResult() {
+        List<MinionEvolution> evolutions = this.getAvailableEvolutions();
+        if (evolutions.isEmpty()) {
+            this.selectedEvolutionIndex.set(0);
+            this.container.setItem(EVOLUTION_RESULT_SLOT, ItemStack.EMPTY);
+            return;
+        }
+
+        int index = Math.min(Math.max(this.selectedEvolutionIndex.get(), 0), evolutions.size() - 1);
+        this.selectedEvolutionIndex.set(index);
+        MinionEvolution chosen = evolutions.get(index);
+
+        ItemStack totemStack = this.container.getItem(TOTEM_SLOT);
+        ItemStack ingredientStack = this.container.getItem(EVOLUTION_INGREDIENT_SLOT);
+
+        if (totemStack.isEmpty() || !chosen.acceptsIngredient(ingredientStack)) {
+            this.container.setItem(EVOLUTION_RESULT_SLOT, ItemStack.EMPTY);
+            return;
+        }
+
+        this.container.setItem(EVOLUTION_RESULT_SLOT, this.buildEvolvedTotem(totemStack, chosen));
+    }
+
+    private ItemStack buildEvolvedTotem(ItemStack totemStack, MinionEvolution evolution) {
+        ItemStack evolved = totemStack.copyWithCount(1);
+        SoulData soulData = evolved.get(ModDataComponents.SOUL_DATA.get());
+        if (soulData != null) {
+            Identifier resultId = BuiltInRegistries.ENTITY_TYPE.getKey(evolution.result());
+            evolved.set(ModDataComponents.SOUL_DATA.get(), soulData.withEntityType(resultId));
+        }
+        return evolved;
+    }
+
+    private void consumeEvolution() {
+        List<MinionEvolution> evolutions = this.getAvailableEvolutions();
+        int index = this.selectedEvolutionIndex.get();
+        if (index < 0 || index >= evolutions.size()) {
+            return;
+        }
+        MinionEvolution chosen = evolutions.get(index);
+
+        ItemStack ingredientStack = this.container.getItem(EVOLUTION_INGREDIENT_SLOT);
+        if (!chosen.acceptsIngredient(ingredientStack)) {
+            return;
+        }
+
+        ingredientStack.shrink(chosen.ingredientCount());
+        if (ingredientStack.isEmpty()) {
+            this.container.setItem(EVOLUTION_INGREDIENT_SLOT, ItemStack.EMPTY);
+        }
+
+        this.container.setItem(TOTEM_SLOT, ItemStack.EMPTY);
+        this.selectedEvolutionIndex.set(0);
     }
 
     @Override

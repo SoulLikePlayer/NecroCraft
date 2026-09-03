@@ -6,6 +6,7 @@ import net.necrocraft.command.NecroCraftCommands;
 import net.necrocraft.core.loot.ModLootModifier;
 import net.necrocraft.world.effect.ModMobEffects;
 import net.necrocraft.world.entity.ModEntity;
+import net.necrocraft.world.entity.minion.registry.MinionEvolutionBootstrap;
 import net.necrocraft.world.inventory.ModMenuTypes;
 import net.necrocraft.world.item.ModDataComponents;
 import net.necrocraft.world.item.ModItemGroups;
@@ -18,6 +19,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
@@ -43,6 +45,12 @@ public class NecroCraft {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         NeoForge.EVENT_BUS.addListener(this::onRegisterCommands);
+
+        modEventBus.addListener(this::commonSetup);
+    }
+
+    private void commonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(MinionEvolutionBootstrap::register);
     }
 
     private void onRegisterCommands(RegisterCommandsEvent event) {

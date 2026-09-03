@@ -8,7 +8,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.necrocraft.world.entity.ModEntity;
 import net.necrocraft.world.entity.minion.AbstractMinion;
+import net.necrocraft.world.entity.minion.registry.MinionEvolution;
+import net.necrocraft.world.entity.minion.registry.MinionEvolutions;
+import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,6 +20,14 @@ import org.jetbrains.annotations.NotNull;
  * zombie's ambient, hurt, death and step sounds.
  */
 public class ZombieMinion extends AbstractMinion {
+
+    static {
+        MinionEvolutions.register(ModEntity.ZOMBIE_MINION.get(),
+                new MinionEvolution(ModEntity.DROWNED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 20));
+
+        MinionEvolutions.register(ModEntity.ZOMBIE_MINION.get(),
+                new MinionEvolution(ModEntity.HUSK_MINION.get(), ModItems.NECROTIC_POWDER.get(), 20));
+    }
 
     /**
      * @param type  the entity type this minion is instantiated from

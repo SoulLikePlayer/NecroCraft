@@ -55,4 +55,8 @@ public record SoulData(Identifier entityType, List<ItemStack> equipment, List<Id
     public SoulData withBonuses(List<Identifier> newBonuses) {
         return new SoulData(this.entityType, this.equipment, List.copyOf(newBonuses));
     }
+
+    public SoulData withEntityType(Identifier newEntityType) {
+        return new SoulData(newEntityType, this.equipment, this.bonuses);
+    }
 }
