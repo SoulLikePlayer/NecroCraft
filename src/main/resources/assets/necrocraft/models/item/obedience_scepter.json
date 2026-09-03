@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "necrocraft:item/revocation_scepter"
+    "layer0": "necrocraft:item/obedience_scepter"
   }
 }

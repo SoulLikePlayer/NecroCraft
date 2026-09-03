@@ -1,10 +1,7 @@
 package net.necrocraft.world.item.equipment;
 
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,7 +20,7 @@ import java.util.Objects;
  * corrupts it: the minion goes feral, attacking anything nearby (including
  * its former owner, see {@link net.necrocraft.world.entity.ai.goal.NemesisHurtTargetGoal}),
  * refuses to open its inventory, and can no longer be revoked with a
- * {@link RevocationScepter}. There is no known way back — corrupting a minion
+ * {@link ObedienceScepter}. There is no known way back — corrupting a minion
  * is a deliberate, irreversible choice.
  */
 public class NemesisShard extends Item {

@@ -7,6 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public record SoulData(Identifier entityType, List<ItemStack> equipment, List<Id
             Identifier.CODEC.listOf(0, MAX_BONUSES).optionalFieldOf("bonuses", List.of()).forGetter(SoulData::bonuses)
     ).apply(instance, SoulData::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, SoulData> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<@NotNull RegistryFriendlyByteBuf, @NotNull SoulData> STREAM_CODEC = StreamCodec.composite(
             Identifier.STREAM_CODEC, SoulData::entityType,
             ItemStack.OPTIONAL_STREAM_CODEC.apply(ByteBufCodecs.list()), SoulData::equipment,
             Identifier.STREAM_CODEC.apply(ByteBufCodecs.list()), SoulData::bonuses,
@@ -53,31 +54,5 @@ public record SoulData(Identifier entityType, List<ItemStack> equipment, List<Id
 
     public SoulData withBonuses(List<Identifier> newBonuses) {
         return new SoulData(this.entityType, this.equipment, List.copyOf(newBonuses));
-    }
-
-    public SoulData withAddedBonus(Identifier bonusId) {
-        if (this.bonuses.contains(bonusId) || this.bonuses.size() >= MAX_BONUSES) {
-            return this;
-        }
-        List<Identifier> updated = new ArrayList<>(this.bonuses);
-        updated.add(bonusId);
-        return new SoulData(this.entityType, this.equipment, List.copyOf(updated));
-    }
-
-    public SoulData withRemovedBonus(Identifier bonusId) {
-        if (!this.bonuses.contains(bonusId)) {
-            return this;
-        }
-        List<Identifier> updated = new ArrayList<>(this.bonuses);
-        updated.remove(bonusId);
-        return new SoulData(this.entityType, this.equipment, List.copyOf(updated));
-    }
-
-    public boolean hasBonus(Identifier bonusId) {
-        return this.bonuses.contains(bonusId);
-    }
-
-    public boolean isBonusFull() {
-        return this.bonuses.size() >= MAX_BONUSES;
     }
 }

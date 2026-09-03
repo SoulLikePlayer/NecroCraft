@@ -7,7 +7,7 @@
   "item.necrocraft.necrotic_powder": "Necrotic Powder",
   "item.necrocraft.nemesis_shard": "Nemesis Shard",
   "item.necrocraft.soul_totem": "Soul Totem",
-  "item.necrocraft.revocation_scepter": "Revocation Scepter",
+  "item.necrocraft.obedience_scepter": "Obedience Scepter",
   "item.necrocraft.necrotic_apple": "Necrotic Apple",
   "item.necrocraft.bone_sword": "Bone Sword",
   "item.necrocraft.bone_axe": "Bone Axe",
@@ -24,6 +24,13 @@
   "item.minecraft.splash_potion.effect.potion_of_undead": "Splash Potion Of Undead",
   "item.minecraft.lingering_potion.effect.potion_of_undead": "Lingering Potion Of Undead",
   "item.minecraft.tipped_arrow.effect.potion_of_undead": "Arrow Of Undead",
+
+
+  "item.necrocraft.obedience_scepter.desc": "Control your minions by commanding them to stay put, wander, or vanish.",
+  "item.necrocraft.obedience_scepter.current_action": "Actual Order : %s",
+  "item.necrocraft.obedience_scepter.action.revocation": "Revocation",
+  "item.necrocraft.obedience_scepter.action.sedentary": "Sedentary",
+  "item.necrocraft.obedience_scepter.action.wandering": "Wandering",
 
   "item.necrocraft.solid_skin_bonus_item": "Solid Skin",
   "item.necrocraft.health_bonus_item": "Second Heart",

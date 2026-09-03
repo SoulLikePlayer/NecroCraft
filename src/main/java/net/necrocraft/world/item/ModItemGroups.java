@@ -35,7 +35,7 @@ public class ModItemGroups {
                     .title(Component.translatable("itemGroup.necrocraft.equipment"))
                     .displayItems(((itemDisplayParameters, output) -> {
                         output.accept(ModItems.SOUL_TOTEM);
-                        output.accept(ModItems.REVOCATION_SCEPTER);
+                        output.accept(ModItems.OBEDIENCE_SCEPTER);
 
                         output.accept(ModItems.BONE_SWORD);
                         output.accept(ModItems.BONE_SHOVEL);

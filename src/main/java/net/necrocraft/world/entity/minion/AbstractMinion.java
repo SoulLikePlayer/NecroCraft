@@ -13,6 +13,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -92,6 +93,15 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * Identifiers of the bonus items currently equipped on this minion, driving its optional behaviors.
      */
     private List<Identifier> bonuses = new ArrayList<>();
+    private boolean isSedentary;
+    /**
+     * Whether this minion has been ordered to wander freely: like
+     * {@link #isSedentary()}, it will neither follow nor teleport back to
+     * its owner, but unlike sedentary mode it keeps fighting, hunting and
+     * moving on its own. Mutually exclusive with {@link #isSedentary}
+     * (setting one clears the other).
+     */
+    private boolean isWandering;
     /**
      * Position of the container currently visually opened by this minion, if any (see {@link StoreItemsInContainerGoal}).
      */
@@ -131,6 +141,8 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
         this.setData(ModAttachments.SOUL_GAUGE, 0f);
         this.setNemesis(false);
+        this.setSedentary(false);
+        this.setWandering(false);
 
         fireTrigger(BonusTrigger.ON_SPAWN);
         fireSyncedTrigger(BonusTrigger.ON_SPAWN);
@@ -145,7 +157,11 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * <ul>
      *     <li>Melee attack, following the owner, and combat-assist targeting
      *     are disabled while sedentary. Following the owner is also disabled
-     *     while the minion is {@link #getNemesis() corrupted}.</li>
+     *     while the minion is {@link #getNemesis() corrupted} or while it is
+     *     {@link #getWandering() wandering} — wandering only cuts the leash
+     *     to the owner (no following, no teleporting back) and adds a
+     *     villager-like random stroll; combat, hunting and farming continue
+     *     as normal.</li>
      *     <li>Auto-planting and auto-tilling require the corresponding bonus
      *     (see {@link #canAutoPlant()}, {@link #canAutoTill()}).</li>
      *     <li>Crop farming and storing items in containers run unconditionally
@@ -161,7 +177,8 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         this.goalSelector.addGoal(3, new GatedGoal(new PlantSeedsGoal(this, 1.0D, 6), this::canAutoPlant));
         this.goalSelector.addGoal(4, new GatedGoal(new TillFarmlandGoal(this, 1.0D, 6), this::canAutoTill));
         this.goalSelector.addGoal(5, new StoreItemsInContainerGoal(this, 1.0D));
-        this.goalSelector.addGoal(7, new GatedGoal(new FollowSummonerGoal(this, 1.0F, 10.0F, 2.0F), () -> !this.isSedentary() && !this.getNemesis()));
+        this.goalSelector.addGoal(7, new GatedGoal(new FollowSummonerGoal(this, 1.0F, 10.0F, 2.0F), () -> !this.isSedentary() && !this.getNemesis() && !this.getWandering()));
+        this.goalSelector.addGoal(8, new GatedGoal(new WaterAvoidingRandomStrollGoal(this, 0.6D), this::getWandering));
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Player.class, 8.0F));
 
         this.targetSelector.addGoal(0, new NemesisHurtTargetGoal(this));
@@ -197,7 +214,41 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         EntityReference.store(summoner, output, "summoner");
         output.store("bonuses", Identifier.CODEC.listOf(), this.bonuses);
         output.putBoolean("isNemesis", this.getNemesis());
+        output.putBoolean("isSedentary", this.getSedentary());
+        output.putBoolean("isWandering", this.getWandering());
         ContainerHelper.saveAllItems(output, this.inventoryItems);
+    }
+
+    public boolean getSedentary() {
+        return this.isSedentary;
+    }
+
+    /**
+     * @param newSedentary the new sedentary state; setting it to {@code true}
+     *                      clears {@link #isWandering} since the two states
+     *                      are mutually exclusive
+     */
+    public void setSedentary(boolean newSedentary){
+        this.isSedentary = newSedentary;
+        if (newSedentary) {
+            this.isWandering = false;
+        }
+    }
+
+    public boolean getWandering() {
+        return this.isWandering;
+    }
+
+    /**
+     * @param newWandering the new wandering state; setting it to {@code true}
+     *                      clears {@link #isSedentary} since the two states
+     *                      are mutually exclusive
+     */
+    public void setWandering(boolean newWandering){
+        this.isWandering = newWandering;
+        if (newWandering) {
+            this.isSedentary = false;
+        }
     }
 
     /**
@@ -215,6 +266,8 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         }
         this.bonuses = new ArrayList<>(input.read("bonuses", Identifier.CODEC.listOf()).orElse(List.of()));
         this.setNemesis(input.getBooleanOr("isNemesis", false));
+        this.setSedentary(input.getBooleanOr("isSedentary", false));
+        this.setWandering(input.getBooleanOr("isWandering", false));
         this.inventoryItems.clear();
         ContainerHelper.loadAllItems(input, this.inventoryItems);
     }
@@ -269,12 +322,13 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     /**
      * @return {@code true} if the minion has an owner, is not sedentary, is
-     * not {@link #getNemesis() corrupted}, and is at least
-     * {@link #TELEPORT_WHEN_DISTANCE_IS_SQ} (squared blocks) away from them
+     * not {@link #getNemesis() corrupted}, is not {@link #getWandering()
+     * wandering}, and is at least {@link #TELEPORT_WHEN_DISTANCE_IS_SQ}
+     * (squared blocks) away from them
      */
     public boolean shouldTryTeleportToOwner() {
         LivingEntity owner = this.getOwner();
-        return owner != null && !this.isSedentary() && !this.getNemesis()
+        return owner != null && !this.isSedentary() && !this.getNemesis() && !this.getWandering()
                 && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
     }
 
@@ -467,7 +521,8 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
                 return true;
             }
         }
-        return false;
+
+        return getSedentary();
     }
 
     /**
@@ -551,7 +606,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+    public boolean hurtServer(@NotNull ServerLevel level, @NotNull DamageSource source, float damage) {
         this.lastCombatTick = this.tickCount;
         fireTrigger(BonusTrigger.ON_HIT);
         fireSyncedTrigger(BonusTrigger.ON_HIT);
@@ -662,7 +717,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * @param entity the item entity being picked up
      */
     @Override
-    protected void pickUpItem(ServerLevel level, ItemEntity entity) {
+    protected void pickUpItem(@NotNull ServerLevel level, @NotNull ItemEntity entity) {
         if (!this.canPickUpLoot()) {
             return;
         }
@@ -875,12 +930,12 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      */
     @Override
     protected @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
-        boolean holdingRevocationScepter = player.getItemInHand(hand).is(ModItems.REVOCATION_SCEPTER);
+        boolean holdingObedienceScepter = player.getItemInHand(hand).is(ModItems.OBEDIENCE_SCEPTER);
         boolean holdingNemesisShard = player.getItemInHand(hand).is(ModItems.NEMESIS_SHARD);
 
         if (hand == InteractionHand.MAIN_HAND
                 && !player.isSecondaryUseActive()
-                && !holdingRevocationScepter
+                && !holdingObedienceScepter
                 && !holdingNemesisShard
                 && !this.getNemesis()
                 && Objects.requireNonNull(this.getOwnerReference()).matches(player)) {

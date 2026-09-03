@@ -10,7 +10,7 @@ import net.necrocraft.world.item.component.ModConsumables;
 import net.necrocraft.world.item.equipment.NemesisShard;
 import net.necrocraft.world.item.equipment.bone.classic.BoneAxe;
 import net.necrocraft.world.item.equipment.bone.classic.BoneEquipment;
-import net.necrocraft.world.item.equipment.RevocationScepter;
+import net.necrocraft.world.item.equipment.ObedienceScepter;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.item.equipment.bone.classic.BoneHoe;
 import net.necrocraft.world.item.equipment.bone.classic.BoneShovel;
@@ -51,9 +51,9 @@ public class ModItems {
             properties -> properties
     );
 
-    public static DeferredItem<@NotNull Item> REVOCATION_SCEPTER =ITEMS.registerItem(
-            "revocation_scepter",
-            RevocationScepter::new,
+    public static DeferredItem<@NotNull Item> OBEDIENCE_SCEPTER =ITEMS.registerItem(
+            "obedience_scepter",
+            ObedienceScepter::new,
             properties -> properties
     );
 
