@@ -56,5 +56,6 @@ public class ModAttributeSupplierEvent {
         );
 
         event.put(STRAY_MINION.get(), Stray.createAttributes().build());
+        event.put(FROSTY_MINION.get(), Stray.createAttributes().build());
     }
 }

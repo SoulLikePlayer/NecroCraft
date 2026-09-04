@@ -89,6 +89,7 @@
   "carving.necrocraft.page.evolution.tooltip": "Switch to the evolution page",
 
   "effect.necrocraft.curse_of_the_sea": "Curse Of The Sea",
+  "effect.necrocraft.curse_of_the_frost": "Curse Of The Frost",
   "effect.necrocraft.soul_of_undead": "Soul Of Undead",
 
   "advancements.necrocraft.root.title": "Necrocraft",
@@ -122,5 +123,7 @@
   "carving.necrocraft.slot.evolution_ingredient": "Ingredient",
   "carving.necrocraft.evolution.none": "New Soul Totem",
   "carving.necrocraft.slot.evolution_result": "New Soul Totem",
-  "carving.necrocraft.page.evolution": "Evolution"
+  "carving.necrocraft.page.evolution": "Evolution",
+
+  "entity.necrocraft.frosty_minions": "Frosty"
 }

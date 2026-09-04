@@ -4,6 +4,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.necrocraft.world.entity.ModEntity;
 import net.necrocraft.world.item.ModItems;
+import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,5 +32,8 @@ public final class MinionEvolutionBootstrap {
                 new MinionEvolution(EntityTypes.BOGGED, ModItems.NECROTIC_POWDER.get(), 20));
         MinionEvolutions.register(EntityTypes.SKELETON,
                 new MinionEvolution(EntityTypes.PARCHED, ModItems.NECROTIC_POWDER.get(), 20));
+
+        MinionEvolutions.register(EntityTypes.STRAY,
+                new MinionEvolution(ModEntity.FROSTY_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45));
     }
 }

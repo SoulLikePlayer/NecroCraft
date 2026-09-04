@@ -4,6 +4,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.entity.minion.impl.*;
+import net.necrocraft.world.entity.minion.impl.stray.FrostyMinion;
+import net.necrocraft.world.entity.minion.impl.stray.StrayMinion;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,6 +70,12 @@ public class  ModEntity {
     public static final Supplier<EntityType<@NotNull StrayMinion>> STRAY_MINION = ENTITY_TYPES.registerEntityType(
             "stray_minions",
             StrayMinion::new,
+            MobCategory.MISC
+    );
+
+    public static final Supplier<EntityType<@NotNull FrostyMinion>> FROSTY_MINION = ENTITY_TYPES.registerEntityType(
+            "frosty_minions",
+            FrostyMinion::new,
             MobCategory.MISC
     );
 }

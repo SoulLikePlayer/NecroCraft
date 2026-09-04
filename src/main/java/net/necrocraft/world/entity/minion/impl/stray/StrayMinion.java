@@ -1,4 +1,4 @@
-package net.necrocraft.world.entity.minion.impl;
+package net.necrocraft.world.entity.minion.impl.stray;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -12,12 +12,13 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.necrocraft.world.entity.minion.impl.SkeletonMinion;
 import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class StrayMinion extends SkeletonMinion{
+public class StrayMinion extends SkeletonMinion {
 
     static {
         SYNCED_BONUS.add(ModItems.STRAY_CAPE_BONUS_ITEM);
@@ -73,9 +74,12 @@ public class StrayMinion extends SkeletonMinion{
      */
     @Override
     public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
+        applyHurtEffect(target);
+        return super.doHurtTarget(level, target);
+    }
+
+    protected void applyHurtEffect(@NotNull Entity target) {
         Objects.requireNonNull(target.asLivingEntity())
                 .addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 200, 0, true, true, true));
-
-        return super.doHurtTarget(level, target);
     }
 }
