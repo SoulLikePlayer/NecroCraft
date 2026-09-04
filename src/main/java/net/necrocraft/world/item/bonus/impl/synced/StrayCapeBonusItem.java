@@ -15,7 +15,7 @@ public class StrayCapeBonusItem extends AbstractBonusItem {
     private static final Identifier SPEED_MODIFIER_ID =
             Identifier.fromNamespaceAndPath("necrocraft", "speed_modifier_id");
 
-    private static final double SPEED_BONUS = 3.0D;
+    private static final double SPEED_BONUS = 1.5D;
     private static final int COMBAT_COOLDOWN_TICKS = 24;
 
     public StrayCapeBonusItem(Properties properties) {
