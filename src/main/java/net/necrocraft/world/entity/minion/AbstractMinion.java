@@ -616,10 +616,13 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     @Override
     public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
         this.lastCombatTick = this.tickCount;
+        applyHurtEffect(target);
         fireTrigger(BonusTrigger.ON_DAMAGE);
         fireSyncedTrigger(BonusTrigger.ON_DAMAGE);
         return super.doHurtTarget(level, target);
     }
+
+    protected void applyHurtEffect(@NotNull Entity target) {}
 
     /**
      * Fires {@link BonusTrigger#ON_KILL} whenever this minion lands the

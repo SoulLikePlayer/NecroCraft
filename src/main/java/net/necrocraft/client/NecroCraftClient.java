@@ -44,6 +44,7 @@ public class NecroCraftClient {
         event.registerEntityRenderer(STRAY_MINION.get(), StrayMinionRenderer::new);
         event.registerEntityRenderer(PARCHED_MINION.get(), ParchedMinionRenderer::new);
         event.registerEntityRenderer(BOGGED_MINION.get(), BoggedMinionRenderer::new);
+        event.registerEntityRenderer(BLIGHTED_MINION.get(), BlightedMinionRenderer::new);
         event.registerEntityRenderer(HUSK_MINION.get(), HuskMinionRenderer::new);
         event.registerEntityRenderer(FROSTY_MINION.get(), FrostyMinionRenderer::new);
     }

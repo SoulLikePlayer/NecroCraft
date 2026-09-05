@@ -71,5 +71,6 @@ public class MinionRegistry {
         register(EntityTypes.PARCHED, ModEntity.PARCHED_MINION);
         register(EntityTypes.STRAY, ModEntity.STRAY_MINION);
         register(ModEntity.FROSTY_MINION.get(), ModEntity.FROSTY_MINION);
+        register(ModEntity.BLIGHTED_MINION.get(), ModEntity.BLIGHTED_MINION);
     }
 }

@@ -10,17 +10,17 @@ import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.entity.minion.impl.bogged.BoggedMinion;
 import org.jetbrains.annotations.NotNull;
 
-public class BoggedMinionRenderer  extends AbstractSkeletonMinionRenderer<BoggedMinion, SkeletonMinionRenderState> {
-    private static final Identifier BOGGED_SKELETON_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/bogged/bogged.png");
-    private static final Identifier BOGGED_OUTER_LAYER_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/bogged/bogged_overlay.png");
+public class BlightedMinionRenderer extends AbstractSkeletonMinionRenderer<BoggedMinion, SkeletonMinionRenderState> {
+    private static final Identifier BLIGHTED_SKELETON_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/blighted/blighted.png");
+    private static final Identifier BLIGHTED_OUTER_LAYER_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/blighted/blighted_overlay.png");
 
-    public BoggedMinionRenderer(EntityRendererProvider.Context context) {
+    public BlightedMinionRenderer(EntityRendererProvider.Context context) {
         super(context, ModelLayers.BOGGED_ARMOR, new BoggedMinionModel(context.bakeLayer(ModelLayers.BOGGED)));
-        this.addLayer(new SkeletonMinionClothingLayer<>(this, context.getModelSet(), ModelLayers.BOGGED_OUTER_LAYER, BOGGED_OUTER_LAYER_LOCATION));
+        this.addLayer(new SkeletonMinionClothingLayer<>(this, context.getModelSet(), ModelLayers.BOGGED_OUTER_LAYER, BLIGHTED_OUTER_LAYER_LOCATION));
     }
 
     public @NotNull Identifier getTextureLocation(SkeletonMinionRenderState state) {
-        return BOGGED_SKELETON_LOCATION;
+        return BLIGHTED_SKELETON_LOCATION;
     }
 
     public SkeletonMinionRenderState createRenderState() {

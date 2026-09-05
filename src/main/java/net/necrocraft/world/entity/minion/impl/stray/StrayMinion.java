@@ -74,7 +74,6 @@ public class StrayMinion extends SkeletonMinion {
      */
     @Override
     public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
-        applyHurtEffect(target);
         return super.doHurtTarget(level, target);
     }
 

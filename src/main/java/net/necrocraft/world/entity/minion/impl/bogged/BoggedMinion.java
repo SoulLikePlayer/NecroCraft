@@ -1,4 +1,4 @@
-package net.necrocraft.world.entity.minion.impl;
+package net.necrocraft.world.entity.minion.impl.bogged;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -10,15 +10,15 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.monster.zombie.Drowned;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.necrocraft.world.entity.minion.impl.SkeletonMinion;
 import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class BoggedMinion extends SkeletonMinion{
+public class BoggedMinion extends SkeletonMinion {
 
     static {
         SYNCED_BONUS.add(ModItems.VIAL_PUTRID_VENOM_BONUS_ITEM);
@@ -74,9 +74,11 @@ public class BoggedMinion extends SkeletonMinion{
      */
     @Override
     public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
+        return super.doHurtTarget(level, target);
+    }
+
+    protected void applyHurtEffect(@NotNull Entity target) {
         Objects.requireNonNull(target.asLivingEntity())
                 .addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0, true, true, true));
-
-        return super.doHurtTarget(level, target);
     }
 }

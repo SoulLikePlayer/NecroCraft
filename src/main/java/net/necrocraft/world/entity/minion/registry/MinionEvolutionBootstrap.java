@@ -35,5 +35,8 @@ public final class MinionEvolutionBootstrap {
 
         MinionEvolutions.register(EntityTypes.STRAY,
                 new MinionEvolution(ModEntity.FROSTY_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45));
+
+        MinionEvolutions.register(EntityTypes.BOGGED,
+                new MinionEvolution(ModEntity.BLIGHTED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45));
     }
 }

@@ -40,6 +40,7 @@ public class ModAttributeSupplierEvent {
         event.put(SKELETON_MINION.get(), Skeleton.createAttributes().build());
 
         event.put(BOGGED_MINION.get(), Bogged.createAttributes().build());
+        event.put(BLIGHTED_MINION.get(), Bogged.createAttributes().build());
 
         event.put(DROWNED_MINION.get(),
                 Drowned.createAttributes()
