@@ -11,8 +11,8 @@ import net.necrocraft.world.entity.minion.impl.bogged.BoggedMinion;
 import org.jetbrains.annotations.NotNull;
 
 public class BlightedMinionRenderer extends AbstractSkeletonMinionRenderer<BoggedMinion, SkeletonMinionRenderState> {
-    private static final Identifier BLIGHTED_SKELETON_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/blighted/blighted.png");
-    private static final Identifier BLIGHTED_OUTER_LAYER_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/blighted/blighted_overlay.png");
+    private static final Identifier BLIGHTED_SKELETON_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/bogged/blighted/blighted.png");
+    private static final Identifier BLIGHTED_OUTER_LAYER_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/bogged/blighted/blighted_overlay.png");
 
     public BlightedMinionRenderer(EntityRendererProvider.Context context) {
         super(context, ModelLayers.BOGGED_ARMOR, new BoggedMinionModel(context.bakeLayer(ModelLayers.BOGGED)));

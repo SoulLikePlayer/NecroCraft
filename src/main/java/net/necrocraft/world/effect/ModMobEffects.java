@@ -5,6 +5,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.world.effect.curse.CurseOfTheDrought;
 import net.necrocraft.world.effect.curse.CurseOfTheFrost;
 import net.necrocraft.world.effect.curse.CurseOfTheSea;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -14,18 +15,23 @@ public class ModMobEffects {
     public static final DeferredRegister<@NotNull MobEffect> MOB_EFFECTS =
             DeferredRegister.create(Registries.MOB_EFFECT, NecroCraft.MODID);
 
-    public static final Holder<@NotNull MobEffect> CURSE_OF_THE_SEA = MOB_EFFECTS.register("curse_of_the_sea", () -> new CurseOfTheSea(
-            MobEffectCategory.BENEFICIAL,
+    public static final Holder<@NotNull MobEffect> SOUL_OF_UNDEAD = MOB_EFFECTS.register("soul_of_undead", () -> new SoulOfUndead(
+            MobEffectCategory.NEUTRAL,
             0xADD8E6
     ));
 
-    public static final Holder<@NotNull MobEffect> SOUL_OF_UNDEAD = MOB_EFFECTS.register("soul_of_undead", () -> new SoulOfUndead(
-            MobEffectCategory.NEUTRAL,
+    public static final Holder<@NotNull MobEffect> CURSE_OF_THE_SEA = MOB_EFFECTS.register("curse_of_the_sea", () -> new CurseOfTheSea(
+            MobEffectCategory.BENEFICIAL,
             0xADD8E6
     ));
 
     public static final Holder<@NotNull MobEffect> CURSE_OF_THE_FROST = MOB_EFFECTS.register("curse_of_the_frost", () -> new CurseOfTheFrost(
             MobEffectCategory.HARMFUL,
             0x99E6FF
+    ));
+
+    public static final Holder<@NotNull MobEffect> CURSE_OF_THE_DROUGHT = MOB_EFFECTS.register("curse_of_the_drought", () -> new CurseOfTheDrought(
+            MobEffectCategory.HARMFUL,
+            0x5D5543
     ));
 }

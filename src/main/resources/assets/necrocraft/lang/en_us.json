@@ -90,6 +90,7 @@
 
   "effect.necrocraft.curse_of_the_sea": "Curse Of The Sea",
   "effect.necrocraft.curse_of_the_frost": "Curse Of The Frost",
+  "effect.necrocraft.curse_of_the_drought": "Curse Of The Drought",
   "effect.necrocraft.soul_of_undead": "Soul Of Undead",
 
   "advancements.necrocraft.root.title": "Necrocraft",
@@ -125,5 +126,7 @@
   "carving.necrocraft.slot.evolution_result": "New Soul Totem",
   "carving.necrocraft.page.evolution": "Evolution",
 
-  "entity.necrocraft.frosty_minions": "Frosty"
+  "entity.necrocraft.frosty_minions": "Frosty",
+  "entity.necrocraft.brighted_minions": "Brigthed",
+  "entity.necrocraft.arid_minions": "Arid"
 }

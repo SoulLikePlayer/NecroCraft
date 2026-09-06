@@ -1,4 +1,4 @@
-package net.necrocraft.world.entity.minion.impl;
+package net.necrocraft.world.entity.minion.impl.husk;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -12,11 +12,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.necrocraft.world.entity.minion.impl.ZombieMinion;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class HuskMinion extends ZombieMinion{
+public class HuskMinion extends ZombieMinion {
 
     /**
      * @param type  the entity type this minion is instantiated from
@@ -59,18 +60,9 @@ public class HuskMinion extends ZombieMinion{
         this.playSound(this.getStepSound(), 0.15F, 1.0F);
     }
 
-    /**
-     * Minion's logic at what happen when he hurt
-     *
-     * @param level the level the minion is created in
-     * @param target the entity the minion hurt
-     * @return if everithing works
-     */
     @Override
-    public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
+    protected void applyHurtEffect(@NotNull Entity target) {
         Objects.requireNonNull(target.asLivingEntity())
                 .addEffect(new MobEffectInstance(MobEffects.HUNGER, 200, 0, true, true, true));
-
-        return super.doHurtTarget(level, target);
     }
 }

@@ -6,6 +6,8 @@ import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.entity.minion.impl.*;
 import net.necrocraft.world.entity.minion.impl.bogged.BlightedMinion;
 import net.necrocraft.world.entity.minion.impl.bogged.BoggedMinion;
+import net.necrocraft.world.entity.minion.impl.husk.AridifiedMinion;
+import net.necrocraft.world.entity.minion.impl.husk.HuskMinion;
 import net.necrocraft.world.entity.minion.impl.stray.FrostyMinion;
 import net.necrocraft.world.entity.minion.impl.stray.StrayMinion;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -64,6 +66,12 @@ public class  ModEntity {
     public static final Supplier<EntityType<@NotNull HuskMinion>> HUSK_MINION = ENTITY_TYPES.registerEntityType(
             "husk_minions",
             HuskMinion::new,
+            MobCategory.MISC
+    );
+
+    public static final Supplier<EntityType<@NotNull AridifiedMinion>> ARIDIFIED_MINION = ENTITY_TYPES.registerEntityType(
+            "aridified_minions",
+            AridifiedMinion::new,
             MobCategory.MISC
     );
 

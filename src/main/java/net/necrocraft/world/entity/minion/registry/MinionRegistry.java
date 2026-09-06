@@ -68,6 +68,7 @@ public class MinionRegistry {
         register(EntityTypes.BOGGED, ModEntity.BOGGED_MINION);
         register(EntityTypes.DROWNED, ModEntity.DROWNED_MINION);
         register(EntityTypes.HUSK, ModEntity.HUSK_MINION);
+        register(ModEntity.ARIDIFIED_MINION.get(), ModEntity.ARIDIFIED_MINION);
         register(EntityTypes.PARCHED, ModEntity.PARCHED_MINION);
         register(EntityTypes.STRAY, ModEntity.STRAY_MINION);
         register(ModEntity.FROSTY_MINION.get(), ModEntity.FROSTY_MINION);

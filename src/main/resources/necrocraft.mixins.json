@@ -5,6 +5,7 @@
   "refmap": "necrocraft.refmap.json",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "CurseOfTheDroughtHealMixin",
     "SoulOfUndeadHalveFoodMixin",
     "SoulOfUndeadHealHarmMixin",
     "SoulOfUndeadImmunityMixin",
