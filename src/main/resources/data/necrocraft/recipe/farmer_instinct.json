@@ -7,7 +7,7 @@
     " n "
   ],
   "key": {
-    "s": "minecraft:wooden_hoe",
+    "h": "minecraft:wooden_hoe",
     "n": "necrocraft:necrotic_powder"
   },
   "result": "necrocraft:farmer_bonus_item"

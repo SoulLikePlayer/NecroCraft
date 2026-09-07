@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " n ",
+    "nhn",
+    " f "
+  ],
+  "key": {
+    "h": "minecraft:wooden_hoe",
+    "f": "minecraft:rotten_flesh",
+    "n": "necrocraft:necrotic_powder"
+  },
+  "result": "necrocraft:auto_tiller_bonus_item"
+}
