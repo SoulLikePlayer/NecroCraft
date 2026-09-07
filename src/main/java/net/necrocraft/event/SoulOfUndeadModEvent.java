@@ -52,6 +52,7 @@ public class SoulOfUndeadModEvent {
         if (!(newTarget instanceof Player player)) return;
         if (attacker.getType().builtInRegistryHolder().is(EntityTypeTags.UNDEAD)) {
             if (attacker instanceof WitherBoss) return;
+            if (attacker instanceof AbstractMinion) return;
             if (player.hasEffect(ModMobEffects.SOUL_OF_UNDEAD)) {
                 event.setCanceled(true);
             }

@@ -24,8 +24,6 @@ import java.util.Objects;
 
 public class ParchedMinion extends SkeletonMinion {
 
-    private @Nullable Entity currentHurtTarget;
-
     static{
         SYNCED_BONUS.add(ModItems.MUMMY_WRAPPING_BONUS_ITEM);
     }
@@ -83,7 +81,6 @@ public class ParchedMinion extends SkeletonMinion {
         Objects.requireNonNull(target.asLivingEntity())
                 .addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 0, true, true, true));
 
-        this.currentHurtTarget = target;
         return super.doHurtTarget(level, target);
     }
 }

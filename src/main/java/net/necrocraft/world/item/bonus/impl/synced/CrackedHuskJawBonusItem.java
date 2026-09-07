@@ -10,8 +10,8 @@ import net.necrocraft.world.item.bonus.BonusTrigger;
 import net.necrocraft.world.item.bonus.BonusType;
 import org.jetbrains.annotations.NotNull;
 
-public class DehydratedRottenFleshBonusItem extends AbstractBonusItem {
-    public DehydratedRottenFleshBonusItem(Properties properties) {
+public class CrackedHuskJawBonusItem extends AbstractBonusItem {
+    public CrackedHuskJawBonusItem(Properties properties) {
         super(properties);
     }
 
@@ -29,7 +29,7 @@ public class DehydratedRottenFleshBonusItem extends AbstractBonusItem {
     public void applyEffectes(@NotNull AbstractMinion minion) {
         LivingEntity target = minion.getTarget();
         if(target != null){
-            target.addEffect(new MobEffectInstance(MobEffects.HUNGER, 60, 0, true, true, true));
+            target.addEffect(new MobEffectInstance(MobEffects.MINING_FATIGUE, 60, 0, true, true, true));
         }
     }
 

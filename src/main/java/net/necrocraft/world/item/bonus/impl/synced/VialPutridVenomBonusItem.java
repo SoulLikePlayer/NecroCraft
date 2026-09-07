@@ -28,7 +28,7 @@ public class VialPutridVenomBonusItem extends AbstractBonusItem {
 
     @Override
     public void applyEffectes(@NotNull AbstractMinion minion) {
-        LivingEntity target = minion.getLastHurtMob();
+        LivingEntity target = minion.getTarget();
         if(target != null){
             target.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 0, true, true, true));
         }
@@ -36,7 +36,7 @@ public class VialPutridVenomBonusItem extends AbstractBonusItem {
 
     @Override
     public void applySyncedEffect(@NotNull AbstractMinion minion) {
-        LivingEntity target = minion.getLastHurtMob();
+        LivingEntity target = minion.getTarget();
         if (target != null && target.hasEffect(MobEffects.POISON)) {
             MobEffectInstance instance = Objects.requireNonNull(target.getEffect(MobEffects.POISON));
             int actualAmplifier = instance.getAmplifier();

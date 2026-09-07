@@ -194,6 +194,13 @@ public class ModItems {
                     .rarity(Rarity.UNCOMMON)
     );
 
+    public static DeferredItem<@NotNull AbstractBonusItem> CRACKED_HUSK_JAW_BONUS_ITEM = ITEMS.registerItem(
+            "cracked_husk_jaw_bonus_item",
+            CrackedHuskJawBonusItem::new,
+            properties -> properties
+                    .rarity(Rarity.UNCOMMON)
+    );
+
     public static DeferredItem<@NotNull AbstractBonusItem> POST_MORTEM_EXPLOSION_BONUS_ITEM = ITEMS.registerItem(
             "post_mortem_explosion_bonus_item",
             PostMortemExplosionBonusItem::new,

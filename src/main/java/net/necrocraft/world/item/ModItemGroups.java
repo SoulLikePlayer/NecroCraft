@@ -74,6 +74,7 @@ public class ModItemGroups {
                         output.accept(ModItems.MUMMY_WRAPPING_BONUS_ITEM);
 
                         output.accept(ModItems.DEHYDRATED_ROTTEN_FLESH_BONUS_ITEM);
+                        output.accept(ModItems.CRACKED_HUSK_JAW_BONUS_ITEM);
 
                         output.accept(ModItems.TRIDENT_SHARD_BONUS_ITEM);
                         output.accept(ModItems.ZOMBIE_NAUTILUS_SHELL_BONUS_ITEM);

@@ -13,11 +13,18 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.necrocraft.world.entity.minion.impl.ZombieMinion;
+import net.necrocraft.world.item.ModItems;
+import net.neoforged.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class HuskMinion extends ZombieMinion {
+
+    static {
+        SYNCED_BONUS.add(ModItems.DEHYDRATED_ROTTEN_FLESH_BONUS_ITEM);
+        SYNCED_BONUS.add(ModItems.CRACKED_HUSK_JAW_BONUS_ITEM);
+    }
 
     /**
      * @param type  the entity type this minion is instantiated from
