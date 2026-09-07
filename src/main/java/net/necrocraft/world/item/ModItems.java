@@ -192,6 +192,7 @@ public class ModItems {
             DehydratedRottenFleshBonusItem::new,
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
+                    .food(ModFoods.DEHYDRATED_ROTTEN_FLESH, ModConsumables.DEHYDRATED_ROTTEN_FLESH)
     );
 
     public static DeferredItem<@NotNull AbstractBonusItem> CRACKED_HUSK_JAW_BONUS_ITEM = ITEMS.registerItem(

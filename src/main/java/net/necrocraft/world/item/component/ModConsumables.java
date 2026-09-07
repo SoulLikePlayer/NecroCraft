@@ -14,6 +14,7 @@ import static net.minecraft.world.item.component.Consumables.defaultFood;
 public class ModConsumables {
     public static final Consumable NECROTIC_APPLE;
     public static final Consumable PUTRID_VENOM_VIAL;
+    public static final Consumable DEHYDRATED_ROTTEN_FLESH;
 
     static {
         NECROTIC_APPLE = defaultFood().onConsume(new ApplyStatusEffectsConsumeEffect(
@@ -21,7 +22,11 @@ public class ModConsumables {
 
         PUTRID_VENOM_VIAL = defaultDrink().onConsume(new ApplyStatusEffectsConsumeEffect(
                 List.of(new MobEffectInstance(MobEffects.POISON, 100, 1),
-                        new MobEffectInstance(MobEffects.HUNGER, 100, 1))
-        )).build();
+                        new MobEffectInstance(MobEffects.HUNGER, 100, 1)))).build();
+
+        DEHYDRATED_ROTTEN_FLESH = defaultFood().onConsume(new ApplyStatusEffectsConsumeEffect(
+                List.of(new MobEffectInstance(MobEffects.HUNGER, 600, 1),
+                        new MobEffectInstance(MobEffects.NAUSEA, 200, 0)))).build();
+
     }
 }
