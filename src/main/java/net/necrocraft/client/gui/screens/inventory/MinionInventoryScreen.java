@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
-import net.necrocraft.client.NecroCraftClient;
 import net.necrocraft.core.ModAttachments;
 import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.entity.minion.AbstractMinion;
@@ -18,23 +17,17 @@ public class MinionInventoryScreen extends AbstractContainerScreen<@NotNull Mini
 
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(NecroCraft.MODID, "textures/gui/container/minion_inventory.png");
 
-    /**
-     * Layout for the health and soul gauge bars drawn in the header of the
-     * container screen, above the inventory grid. Positions are relative to
-     * the top-left corner of the background texture ({@link #leftPos}/{@link #topPos})
-     * and are placeholders — adjust the offsets to match the actual texture.
-     */
+    private static final Identifier HEALTH_BAR_BG_SPRITE = Identifier.fromNamespaceAndPath(NecroCraft.MODID, "container/minion_health_background");
+    private static final Identifier HEALTH_BAR_PROGRESS_SPRITE = Identifier.fromNamespaceAndPath(NecroCraft.MODID, "container/minion_health_progress");
+    private static final Identifier SOUL_BAR_BG_SPRITE = Identifier.fromNamespaceAndPath(NecroCraft.MODID, "container/minion_soul_background");
+    private static final Identifier SOUL_BAR_PROGRESS_SPRITE = Identifier.fromNamespaceAndPath(NecroCraft.MODID, "container/minion_soul_progress");
+
     private static final int GAUGE_BAR_WIDTH = 60;
     private static final int GAUGE_BAR_HEIGHT = 5;
     private static final int GAUGE_BAR_X_OFFSET = 8;
     private static final int GAUGE_BAR_SPACING = 3;
     private static final int SOUL_BAR_Y_OFFSET = -GAUGE_BAR_HEIGHT - GAUGE_BAR_SPACING;
     private static final int HEALTH_BAR_Y_OFFSET = SOUL_BAR_Y_OFFSET - GAUGE_BAR_HEIGHT - GAUGE_BAR_SPACING;
-
-    private static final int HEALTH_BAR_BG_COLOR = 0xFF4B0000;
-    private static final int HEALTH_BAR_FG_COLOR = 0xFFB40000;
-    private static final int SOUL_BAR_BG_COLOR = 0xFF15122A;
-    private static final int SOUL_BAR_FG_COLOR = 0xFF6E3FBF;
 
     public MinionInventoryScreen(MinionInventoryMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title, 176, 166);
@@ -56,15 +49,6 @@ public class MinionInventoryScreen extends AbstractContainerScreen<@NotNull Mini
         extractMinionGauges(graphics, xo, yo);
     }
 
-    /**
-     * Draws the owning minion's health and soul gauge as two small bars in
-     * the header of the container, so the player can check on both without
-     * closing the screen.
-     * <p>
-     * NOTE: assumes {@link MinionInventoryMenu} exposes the underlying
-     * {@link AbstractMinion} via {@code getMinion()} — adjust the accessor
-     * name below if yours differs.
-     */
     private void extractMinionGauges(@NotNull GuiGraphicsExtractor graphics, int xo, int yo) {
         AbstractMinion minion = this.menu.getMinion();
         if (minion == null || !minion.isAlive()) return;
@@ -74,15 +58,21 @@ public class MinionInventoryScreen extends AbstractContainerScreen<@NotNull Mini
         float soulRatio = Mth.clamp(minion.getData(ModAttachments.SOUL_GAUGE) / 100.0F, 0.0F, 1.0F);
 
         int barX = xo + GAUGE_BAR_X_OFFSET;
-        drawGaugeBar(graphics, barX, yo + HEALTH_BAR_Y_OFFSET, healthRatio, HEALTH_BAR_BG_COLOR, HEALTH_BAR_FG_COLOR);
-        drawGaugeBar(graphics, barX, yo + SOUL_BAR_Y_OFFSET, soulRatio, SOUL_BAR_BG_COLOR, SOUL_BAR_FG_COLOR);
+        drawHorizontalGaugeSprite(graphics, barX, yo + HEALTH_BAR_Y_OFFSET, healthRatio, HEALTH_BAR_BG_SPRITE, HEALTH_BAR_PROGRESS_SPRITE);
+        drawHorizontalGaugeSprite(graphics, barX, yo + SOUL_BAR_Y_OFFSET, soulRatio, SOUL_BAR_BG_SPRITE, SOUL_BAR_PROGRESS_SPRITE);
     }
 
-    private void drawGaugeBar(@NotNull GuiGraphicsExtractor graphics, int x, int y, float ratio, int bgColor, int fgColor) {
-        graphics.fill(x, y, x + GAUGE_BAR_WIDTH, y + GAUGE_BAR_HEIGHT, bgColor);
+    private void drawHorizontalGaugeSprite(@NotNull GuiGraphicsExtractor graphics, int x, int y, float ratio,
+                                           @NotNull Identifier bgSprite, @NotNull Identifier progressSprite) {
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, bgSprite, x, y, GAUGE_BAR_WIDTH, GAUGE_BAR_HEIGHT);
+
         int filledWidth = (int) (GAUGE_BAR_WIDTH * ratio);
         if (filledWidth > 0) {
-            graphics.fill(x, y, x + filledWidth, y + GAUGE_BAR_HEIGHT, fgColor);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, progressSprite,
+                    GAUGE_BAR_WIDTH, GAUGE_BAR_HEIGHT,
+                    0, 0,
+                    x, y,
+                    filledWidth, GAUGE_BAR_HEIGHT);
         }
     }
 
