@@ -40,7 +40,10 @@ public class ModAttributeSupplierEvent {
         event.put(SKELETON_MINION.get(), Skeleton.createAttributes().build());
 
         event.put(BOGGED_MINION.get(), Bogged.createAttributes().build());
-        event.put(BLIGHTED_MINION.get(), Bogged.createAttributes().build());
+        event.put(BLIGHTED_MINION.get(),
+                Bogged.createAttributes()
+                        .add(Attributes.ATTACK_DAMAGE, 2.5F)
+                        .build());
 
         event.put(DROWNED_MINION.get(),
                 Drowned.createAttributes()
@@ -49,7 +52,13 @@ public class ModAttributeSupplierEvent {
         );
 
         event.put(HUSK_MINION.get(), Husk.createAttributes().build());
-        event.put(ARIDIFIED_MINION.get(), Husk.createAttributes().build());
+        event.put(ARIDIFIED_MINION.get(),
+                Husk.createAttributes()
+                        .add(Attributes.MAX_HEALTH, 10.0F)
+                        .add(Attributes.ATTACK_DAMAGE, 2.5F)
+                        .add(Attributes.MOVEMENT_SPEED, 0.02F)
+                        .build()
+        );
 
         event.put(PARCHED_MINION.get(),
                 Parched.createAttributes()
@@ -58,6 +67,9 @@ public class ModAttributeSupplierEvent {
         );
 
         event.put(STRAY_MINION.get(), Stray.createAttributes().build());
-        event.put(FROSTY_MINION.get(), Stray.createAttributes().build());
-    }
+        event.put(FROSTY_MINION.get(),
+                Stray.createAttributes()
+                        .add(Attributes.MOVEMENT_SPEED, 0.05F)
+                        .build()
+        );    }
 }

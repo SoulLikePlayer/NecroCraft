@@ -23,83 +23,90 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+
 public class ModItems {
+
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(NecroCraft.MODID);
 
-    public static final DeferredItem<@NotNull Item> NECROTIC_SHARD = ITEMS.registerItem(
-            "necrotic_shard",
-            Item::new,
-            properties -> properties
-    );
+    private static DeferredItem<@NotNull Item> register(String name, Function<Item.Properties, Item> factory) {
+        return ITEMS.registerItem(name, factory, UnaryOperator.identity());
+    }
 
-    public static final DeferredItem<@NotNull Item> NECROTIC_POWDER = ITEMS.registerItem(
-            "necrotic_powder",
-            Item::new,
-            properties -> properties
-    );
+    private static DeferredItem<@NotNull Item> register(
+            String name, Function<Item.Properties, Item> factory, UnaryOperator<Item.Properties> props) {
+        return ITEMS.registerItem(name, factory, props);
+    }
 
-    public static final DeferredItem<@NotNull Item> NEMESIS_SHARD = ITEMS.registerItem(
-            "nemesis_shard",
-            NemesisShard::new,
-            properties -> properties
-    );
+    private static <T extends AbstractBonusItem> DeferredItem<@NotNull T> registerBonus(
+            String name, Function<Item.Properties, T> factory) {
+        return ITEMS.registerItem(name, factory, UnaryOperator.identity());
+    }
 
-    public static DeferredItem<@NotNull Item> SOUL_TOTEM = ITEMS.registerItem(
-            "soul_totem",
-            SoulTotem::new,
-            properties -> properties
-    );
+    private static <T extends AbstractBonusItem> DeferredItem<@NotNull T> registerBonus(
+            String name, Function<Item.Properties, T> factory, Rarity rarity) {
+        return ITEMS.registerItem(name, factory, p -> p.rarity(rarity));
+    }
 
-    public static DeferredItem<@NotNull Item> OBEDIENCE_SCEPTER =ITEMS.registerItem(
-            "obedience_scepter",
-            ObedienceScepter::new,
-            properties -> properties
-    );
+    private static <T extends AbstractBonusItem> DeferredItem<@NotNull T> registerBonus(
+            String name, Function<Item.Properties, T> factory, UnaryOperator<Item.Properties> props) {
+        return ITEMS.registerItem(name, factory, props);
+    }
 
-    public static DeferredItem<@NotNull Item> NECROTIC_APPLE = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull Item> NECROTIC_SHARD =
+            register("necrotic_shard", Item::new);
+
+    public static final DeferredItem<@NotNull Item> NECROTIC_POWDER =
+            register("necrotic_powder", Item::new);
+
+    public static final DeferredItem<@NotNull Item> NEMESIS_SHARD =
+            register("nemesis_shard", NemesisShard::new);
+
+    public static final DeferredItem<@NotNull Item> SOUL_TOTEM =
+            register("soul_totem", SoulTotem::new);
+
+    public static final DeferredItem<@NotNull Item> OBEDIENCE_SCEPTER =
+            register("obedience_scepter", ObedienceScepter::new);
+
+    public static final DeferredItem<@NotNull Item> NECROTIC_APPLE = register(
             "necrotic_apple",
             Item::new,
-            properties -> properties
-                    .food(ModFoods.NECROTIC_APPLE, ModConsumables.NECROTIC_APPLE)
+            properties -> properties.food(ModFoods.NECROTIC_APPLE, ModConsumables.NECROTIC_APPLE)
     );
 
-    public static DeferredItem<@NotNull Item> BONE_SWORD = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull Item> BONE_SWORD = register(
             "bone_sword",
             BoneEquipment::new,
-            properties -> properties
-                    .sword(ModToolMaterial.BONE, 3.0F, -2.4F)
+            properties -> properties.sword(ModToolMaterial.BONE, 3.0F, -2.4F)
     );
 
-    public static DeferredItem<@NotNull Item> BONE_SHOVEL = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull Item> BONE_SHOVEL = register(
             "bone_shovel",
             BoneShovel::new,
-            properties -> properties
-                    .shovel(ModToolMaterial.BONE, 1.5f, -3.0f)
+            properties -> properties.shovel(ModToolMaterial.BONE, 1.5f, -3.0f)
     );
 
-    public static DeferredItem<@NotNull Item> BONE_PICKAXE = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull Item> BONE_PICKAXE = register(
             "bone_pickaxe",
             BoneEquipment::new,
-            properties -> properties
-                    .pickaxe(ModToolMaterial.BONE, 1.0f, -2.8f)
+            properties -> properties.pickaxe(ModToolMaterial.BONE, 1.0f, -2.8f)
     );
 
-    public static DeferredItem<@NotNull Item> BONE_AXE = ITEMS.registerItem(
+       public static final DeferredItem<@NotNull Item> BONE_AXE = register(
             "bone_axe",
             BoneAxe::new,
-            properties -> properties
-                    .pickaxe(ModToolMaterial.BONE, 7.0f, -3.2f)
+            properties -> properties.axe(ModToolMaterial.BONE, 7.0f, -3.2f)
     );
 
-    public static DeferredItem<@NotNull Item> BONE_HOE = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull Item> BONE_HOE = register(
             "bone_hoe",
             BoneHoe::new,
-            properties -> properties
-                    .hoe(ModToolMaterial.BONE, 7.0f, -3.2f)
+            properties -> properties.hoe(ModToolMaterial.BONE, 7.0f, -3.2f)
     );
 
-    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_SWORD = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull Item> NETHERIFIED_BONE_SWORD = register(
             "netherified_bone_sword",
             NetherifiedBoneEquipment::new,
             properties -> properties
@@ -107,7 +114,7 @@ public class ModItems {
                     .fireResistant()
     );
 
-    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_SHOVEL = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull Item> NETHERIFIED_BONE_SHOVEL = register(
             "netherified_bone_shovel",
             NetherifiedBoneShovel::new,
             properties -> properties
@@ -115,7 +122,7 @@ public class ModItems {
                     .fireResistant()
     );
 
-    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_PICKAXE = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull Item> NETHERIFIED_BONE_PICKAXE = register(
             "netherified_bone_pickaxe",
             NetherifiedBoneEquipment::new,
             properties -> properties
@@ -123,15 +130,16 @@ public class ModItems {
                     .fireResistant()
     );
 
-    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_AXE = ITEMS.registerItem(
+    // NOTE: same .pickaxe(...) -> .axe(...) fix as BONE_AXE above, for consistency.
+    public static final DeferredItem<@NotNull Item> NETHERIFIED_BONE_AXE = register(
             "netherified_bone_axe",
             NetherifiedBoneAxe::new,
             properties -> properties
-                    .pickaxe(ModToolMaterial.NETHERIFIED_BONE, 7.0f, -3.2f)
+                    .axe(ModToolMaterial.NETHERIFIED_BONE, 7.0f, -3.2f)
                     .fireResistant()
     );
 
-    public static DeferredItem<@NotNull Item> NETHERIFIED_BONE_HOE = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull Item> NETHERIFIED_BONE_HOE = register(
             "netherified_bone_hoe",
             NetherifiedBoneHoe::new,
             properties -> properties
@@ -139,47 +147,49 @@ public class ModItems {
                     .fireResistant()
     );
 
-    public static DeferredItem<@NotNull AbstractBonusItem> SOLID_SKIN_BONUS_ITEM = ITEMS.registerItem(
-            "solid_skin_bonus_item",
-            SolidSkinBonusItem::new,
-            properties -> properties
-    );
+    public static final DeferredItem<@NotNull AbstractBonusItem> SOLID_SKIN_BONUS_ITEM =
+            registerBonus("solid_skin_bonus_item", SolidSkinBonusItem::new);
 
-    public static DeferredItem<@NotNull AbstractBonusItem> HEALTH_BONUS_ITEM = ITEMS.registerItem(
-            "health_bonus_item",
-            HealthBonusItem::new,
-            properties -> properties
-    );
+    public static final DeferredItem<@NotNull AbstractBonusItem> HEALTH_BONUS_ITEM =
+            registerBonus("health_bonus_item", HealthBonusItem::new);
 
-    public static DeferredItem<@NotNull AbstractBonusItem> MUMMY_WRAPPING_BONUS_ITEM = ITEMS.registerItem(
-            "mummy_wrapping_bonus_item",
-            MummyWrappingBonusItem::new,
-            properties -> properties
-                    .rarity(Rarity.UNCOMMON)
-    );
+    public static final DeferredItem<@NotNull AbstractBonusItem> POST_MORTEM_EXPLOSION_BONUS_ITEM =
+            registerBonus("post_mortem_explosion_bonus_item", PostMortemExplosionBonusItem::new);
 
-    public static DeferredItem<@NotNull AbstractBonusItem> TRIDENT_SHARD_BONUS_ITEM = ITEMS.registerItem(
-            "trident_shard_bonus_item",
-            TridentShardBonusItem::new,
-            properties -> properties
-                    .rarity(Rarity.UNCOMMON)
-    );
+    public static final DeferredItem<@NotNull AbstractBonusItem> STORAGE_BONUS_ITEM =
+            registerBonus("storage_bonus_item", StorageBonusItem::new);
 
-    public static DeferredItem<@NotNull AbstractBonusItem> ZOMBIE_NAUTILUS_SHELL_BONUS_ITEM = ITEMS.registerItem(
-            "zombie_nautilus_shell",
-            ZombieNautillusShellBonusItem::new,
-            properties -> properties
-                    .rarity(Rarity.UNCOMMON)
-    );
+    public static final DeferredItem<@NotNull AbstractBonusItem> HUNTER_BONUS_ITEM =
+            registerBonus("hunter_bonus_item", HunterBonusItem::new);
 
-    public static DeferredItem<@NotNull AbstractBonusItem> STRAY_CAPE_BONUS_ITEM = ITEMS.registerItem(
-            "stray_cape_bonus_item",
-            StrayCapeBonusItem::new,
-            properties -> properties
-                    .rarity(Rarity.UNCOMMON)
-    );
+    public static final DeferredItem<@NotNull AbstractBonusItem> FARMER_BONUS_ITEM =
+            registerBonus("farmer_bonus_item", FarmerBonusItem::new);
 
-    public static DeferredItem<@NotNull AbstractBonusItem> VIAL_PUTRID_VENOM_BONUS_ITEM = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull AbstractBonusItem> AUTO_PLANTER_BONUS_ITEM =
+            registerBonus("auto_planter_bonus_item", AutoPlanterBonusItem::new);
+
+    public static final DeferredItem<@NotNull AbstractBonusItem> AUTO_TILLER_BONUS_ITEM =
+            registerBonus("auto_tiller_bonus_item", AutoTillerBonusItem::new);
+
+    public static final DeferredItem<@NotNull AbstractBonusItem> SOUL_GENERATOR_BONUS_ITEM =
+            registerBonus("soul_generator_bonus_item", SoulGenerationBonusItem::new);
+
+    public static final DeferredItem<@NotNull AbstractBonusItem> MUMMY_WRAPPING_BONUS_ITEM =
+            registerBonus("mummy_wrapping_bonus_item", MummyWrappingBonusItem::new, Rarity.UNCOMMON);
+
+    public static final DeferredItem<@NotNull AbstractBonusItem> TRIDENT_SHARD_BONUS_ITEM =
+            registerBonus("trident_shard_bonus_item", TridentShardBonusItem::new, Rarity.UNCOMMON);
+
+    public static final DeferredItem<@NotNull AbstractBonusItem> ZOMBIE_NAUTILUS_SHELL_BONUS_ITEM =
+            registerBonus("zombie_nautilus_shell", ZombieNautillusShellBonusItem::new, Rarity.UNCOMMON);
+
+    public static final DeferredItem<@NotNull AbstractBonusItem> STRAY_CAPE_BONUS_ITEM =
+            registerBonus("stray_cape_bonus_item", StrayCapeBonusItem::new, Rarity.UNCOMMON);
+
+    public static final DeferredItem<@NotNull AbstractBonusItem> CRACKED_HUSK_JAW_BONUS_ITEM =
+            registerBonus("cracked_husk_jaw_bonus_item", CrackedHuskJawBonusItem::new, Rarity.UNCOMMON);
+
+    public static final DeferredItem<@NotNull AbstractBonusItem> VIAL_PUTRID_VENOM_BONUS_ITEM = registerBonus(
             "vial_putrid_venom_bonus_item",
             VialPutridVenomBonusItem::new,
             properties -> properties
@@ -187,7 +197,7 @@ public class ModItems {
                     .food(ModFoods.PUTRID_VENOM_VIAL, ModConsumables.PUTRID_VENOM_VIAL)
     );
 
-    public static DeferredItem<@NotNull AbstractBonusItem> DEHYDRATED_ROTTEN_FLESH_BONUS_ITEM = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull AbstractBonusItem> DEHYDRATED_ROTTEN_FLESH_BONUS_ITEM = registerBonus(
             "dehydrated_rotten_flesh_bonus_item",
             DehydratedRottenFleshBonusItem::new,
             properties -> properties
@@ -195,58 +205,7 @@ public class ModItems {
                     .food(ModFoods.DEHYDRATED_ROTTEN_FLESH, ModConsumables.DEHYDRATED_ROTTEN_FLESH)
     );
 
-    public static DeferredItem<@NotNull AbstractBonusItem> CRACKED_HUSK_JAW_BONUS_ITEM = ITEMS.registerItem(
-            "cracked_husk_jaw_bonus_item",
-            CrackedHuskJawBonusItem::new,
-            properties -> properties
-                    .rarity(Rarity.UNCOMMON)
-    );
-
-    public static DeferredItem<@NotNull AbstractBonusItem> POST_MORTEM_EXPLOSION_BONUS_ITEM = ITEMS.registerItem(
-            "post_mortem_explosion_bonus_item",
-            PostMortemExplosionBonusItem::new,
-            properties -> properties
-    );
-
-    public static DeferredItem<@NotNull AbstractBonusItem> STORAGE_BONUS_ITEM = ITEMS.registerItem(
-            "storage_bonus_item",
-            StorageBonusItem::new,
-            properties -> properties
-    );
-
-
-    public static DeferredItem<@NotNull AbstractBonusItem> HUNTER_BONUS_ITEM = ITEMS.registerItem(
-            "hunter_bonus_item",
-            HunterBonusItem::new,
-            properties -> properties
-    );
-
-    public static DeferredItem<@NotNull AbstractBonusItem> FARMER_BONUS_ITEM = ITEMS.registerItem(
-            "farmer_bonus_item",
-            FarmerBonusItem::new,
-            properties -> properties
-    );
-
-    public static DeferredItem<@NotNull AbstractBonusItem> AUTO_PLANTER_BONUS_ITEM = ITEMS.registerItem(
-            "auto_planter_bonus_item",
-            AutoPlanterBonusItem::new,
-            properties -> properties
-    );
-
-    public static DeferredItem<@NotNull AbstractBonusItem> AUTO_TILLER_BONUS_ITEM = ITEMS.registerItem(
-            "auto_tiller_bonus_item",
-            AutoTillerBonusItem::new,
-            properties -> properties
-    );
-
-    public static DeferredItem<@NotNull AbstractBonusItem> TRIAL_VAULT_BONUS_ITEM = ITEMS.registerItem(
-            "trial_vault_bonus_item",
-            TrialVaultBonusItem::new,
-            properties -> properties
-                    .rarity(Rarity.RARE)
-    );
-
-    public static DeferredItem<@NotNull AbstractBonusItem> NETHERIFIED_BONE_BONUS_ITEM = ITEMS.registerItem(
+    public static final DeferredItem<@NotNull AbstractBonusItem> NETHERIFIED_BONE_BONUS_ITEM = registerBonus(
             "netherified_bone_bonus_item",
             NetherifiedBoneBonusItem::new,
             properties -> properties
@@ -254,13 +213,9 @@ public class ModItems {
                     .fireResistant()
     );
 
-    public static DeferredItem<@NotNull AbstractBonusItem> SOUL_GENERATOR_BONUS_ITEM = ITEMS.registerItem(
-            "soul_generator_bonus_item",
-            SoulGenerationBonusItem::new,
-            properties -> properties
-    );
+    public static final DeferredItem<@NotNull AbstractBonusItem> TRIAL_VAULT_BONUS_ITEM =
+            registerBonus("trial_vault_bonus_item", TrialVaultBonusItem::new, Rarity.RARE);
 
-    public static DeferredItem<@NotNull BlockItem> SOUL_CARVING_TABLE = ITEMS.registerSimpleBlockItem(
-            ModBlock.SOUL_CARVING_TABLE_BLOCK
-    );
+    public static final DeferredItem<@NotNull BlockItem> SOUL_CARVING_TABLE =
+            ITEMS.registerSimpleBlockItem(ModBlock.SOUL_CARVING_TABLE_BLOCK);
 }

@@ -8,6 +8,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.necrocraft.core.ModAttachments;
 import net.necrocraft.world.entity.ModEntity;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import net.necrocraft.world.entity.minion.registry.MinionEvolution;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
  * skeleton's ambient, hurt, death and step sounds.
  */
 public class SkeletonMinion extends AbstractMinion {
+    private static final float SOUL_GAUGE_MAX = 100f;
 
     static {
         MinionEvolutions.register(ModEntity.SKELETON_MINION.get(),
@@ -72,4 +74,19 @@ public class SkeletonMinion extends AbstractMinion {
     protected void playStepSound(@NotNull BlockPos pos, @NotNull BlockState blockState) {
         this.playSound(this.getStepSound(), 0.15F, 1.0F);
     }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (!this.level().isClientSide()) {
+            float gauge = this.getData(ModAttachments.SOUL_GAUGE);
+            if (gauge >= SOUL_GAUGE_MAX) {
+                onSoulGaugeFull();
+                this.setData(ModAttachments.SOUL_GAUGE, 0f);
+            }
+        }
+    }
+
+    protected void onSoulGaugeFull(){}
 }
