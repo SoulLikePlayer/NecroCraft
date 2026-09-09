@@ -21,18 +21,6 @@ import org.jetbrains.annotations.NotNull;
  * skeleton's ambient, hurt, death and step sounds.
  */
 public class SkeletonMinion extends AbstractMinion {
-    private static final float SOUL_GAUGE_MAX = 100f;
-
-    static {
-        MinionEvolutions.register(ModEntity.SKELETON_MINION.get(),
-                new MinionEvolution(ModEntity.STRAY_MINION.get(), ModItems.NECROTIC_POWDER.get(), 20));
-
-        MinionEvolutions.register(ModEntity.SKELETON_MINION.get(),
-                new MinionEvolution(ModEntity.BOGGED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 20));
-
-        MinionEvolutions.register(ModEntity.SKELETON_MINION.get(),
-                new MinionEvolution(ModEntity.PARCHED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 20));
-    }
 
     /**
      * @param type  the entity type this minion is instantiated from
@@ -74,19 +62,4 @@ public class SkeletonMinion extends AbstractMinion {
     protected void playStepSound(@NotNull BlockPos pos, @NotNull BlockState blockState) {
         this.playSound(this.getStepSound(), 0.15F, 1.0F);
     }
-
-    @Override
-    public void tick() {
-        super.tick();
-
-        if (!this.level().isClientSide()) {
-            float gauge = this.getData(ModAttachments.SOUL_GAUGE);
-            if (gauge >= SOUL_GAUGE_MAX) {
-                onSoulGaugeFull();
-                this.setData(ModAttachments.SOUL_GAUGE, 0f);
-            }
-        }
-    }
-
-    protected void onSoulGaugeFull(){}
 }

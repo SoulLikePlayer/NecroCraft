@@ -9,6 +9,7 @@ import net.minecraft.world.entity.monster.zombie.Drowned;
 import net.minecraft.world.entity.monster.zombie.Husk;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.world.entity.monster.skeleton.Echoing;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -35,6 +36,8 @@ public class ModAttributeSupplierEvent {
      */
     @SubscribeEvent
     public static void createDefaultAttributes(EntityAttributeCreationEvent event){
+        event.put(ECHOING.get(), Echoing.createAttributes().build());
+
         event.put(ZOMBIE_MINION.get(), Zombie.createAttributes().build());
 
         event.put(SKELETON_MINION.get(), Skeleton.createAttributes().build());

@@ -22,24 +22,24 @@ public final class MinionEvolutionBootstrap {
         registered = true;
 
         MinionEvolutions.register(EntityTypes.ZOMBIE,
-                new MinionEvolution(EntityTypes.DROWNED, ModItems.NECROTIC_POWDER.get(), 20));
+                new MinionEvolution(EntityTypes.DROWNED, ModItems.NECROTIC_POWDER.get(), 20, 5));
         MinionEvolutions.register(EntityTypes.ZOMBIE,
-                new MinionEvolution(EntityTypes.HUSK, ModItems.NECROTIC_POWDER.get(), 20));
+                new MinionEvolution(EntityTypes.HUSK, ModItems.NECROTIC_POWDER.get(), 20, 5));
 
         MinionEvolutions.register(EntityTypes.SKELETON,
-                new MinionEvolution(EntityTypes.STRAY, ModItems.NECROTIC_POWDER.get(), 20));
+                new MinionEvolution(EntityTypes.STRAY, ModItems.NECROTIC_POWDER.get(), 20, 5));
         MinionEvolutions.register(EntityTypes.SKELETON,
-                new MinionEvolution(EntityTypes.BOGGED, ModItems.NECROTIC_POWDER.get(), 20));
+                new MinionEvolution(EntityTypes.BOGGED, ModItems.NECROTIC_POWDER.get(), 20, 5));
         MinionEvolutions.register(EntityTypes.SKELETON,
-                new MinionEvolution(EntityTypes.PARCHED, ModItems.NECROTIC_POWDER.get(), 20));
+                new MinionEvolution(EntityTypes.PARCHED, ModItems.NECROTIC_POWDER.get(), 20, 5));
 
         MinionEvolutions.register(EntityTypes.STRAY,
-                new MinionEvolution(ModEntity.FROSTY_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45));
+                new MinionEvolution(ModEntity.FROSTY_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45, 15));
 
         MinionEvolutions.register(EntityTypes.BOGGED,
-                new MinionEvolution(ModEntity.BLIGHTED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45));
+                new MinionEvolution(ModEntity.BLIGHTED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45, 15));
 
         MinionEvolutions.register(EntityTypes.HUSK,
-                new MinionEvolution(ModEntity.ARIDIFIED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45));
+                new MinionEvolution(ModEntity.ARIDIFIED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45, 15));
     }
 }

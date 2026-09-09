@@ -48,6 +48,8 @@ public class NecroCraftClient {
         event.registerEntityRenderer(HUSK_MINION.get(), HuskMinionRenderer::new);
         event.registerEntityRenderer(ARIDIFIED_MINION.get(), AridifiedMinionRenderer::new);
         event.registerEntityRenderer(FROSTY_MINION.get(), FrostyMinionRenderer::new);
+
+        event.registerEntityRenderer(ECHOING.get(), EchoingRenderer::new);
     }
 
     @SubscribeEvent

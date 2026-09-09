@@ -21,14 +21,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ZombieMinion extends AbstractMinion {
 
-    static {
-        MinionEvolutions.register(ModEntity.ZOMBIE_MINION.get(),
-                new MinionEvolution(ModEntity.DROWNED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 20));
-
-        MinionEvolutions.register(ModEntity.ZOMBIE_MINION.get(),
-                new MinionEvolution(ModEntity.HUSK_MINION.get(), ModItems.NECROTIC_POWDER.get(), 20));
-    }
-
     /**
      * @param type  the entity type this minion is instantiated from
      * @param level the level the minion is created in

@@ -10,6 +10,7 @@ import net.necrocraft.world.entity.minion.impl.husk.AridifiedMinion;
 import net.necrocraft.world.entity.minion.impl.husk.HuskMinion;
 import net.necrocraft.world.entity.minion.impl.stray.FrostyMinion;
 import net.necrocraft.world.entity.minion.impl.stray.StrayMinion;
+import net.necrocraft.world.entity.monster.skeleton.Echoing;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 
@@ -93,5 +94,11 @@ public class  ModEntity {
             "frosty_minions",
             FrostyMinion::new,
             MobCategory.MISC
+    );
+
+    public static final Supplier<EntityType<@NotNull Echoing>> ECHOING = ENTITY_TYPES.registerEntityType(
+            "echoing",
+            Echoing::new,
+            MobCategory.MONSTER
     );
 }

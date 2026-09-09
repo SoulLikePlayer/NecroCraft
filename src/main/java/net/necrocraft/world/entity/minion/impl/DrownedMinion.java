@@ -1,6 +1,5 @@
 package net.necrocraft.world.entity.minion.impl;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -22,7 +21,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.AmphibiousPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.monster.skeleton.Parched;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
@@ -30,14 +29,13 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import net.necrocraft.world.effect.ModMobEffects;
 import net.necrocraft.world.item.ModItems;
-import net.neoforged.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 public class DrownedMinion extends ZombieMinion {
     private boolean searchingForLand;

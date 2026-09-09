@@ -129,5 +129,7 @@
 
   "entity.necrocraft.frosty_minions": "Frosty",
   "entity.necrocraft.brighted_minions": "Brigthed",
-  "entity.necrocraft.arid_minions": "Arid"
+  "entity.necrocraft.arid_minions": "Arid",
+
+  "entity.necrocraft.echoing": "Echoing"
 }
