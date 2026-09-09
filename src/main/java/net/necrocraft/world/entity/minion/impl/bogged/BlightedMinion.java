@@ -14,6 +14,8 @@ import java.util.Objects;
 public class BlightedMinion extends BoggedMinion{
 
     static {
+        SYNCED_BONUS.add(ModItems.VIAL_WITHERING_VENOM_BONUS_ITEM);
+
         SYNCED_BONUS.remove(ModItems.VIAL_PUTRID_VENOM_BONUS_ITEM);
     }
 

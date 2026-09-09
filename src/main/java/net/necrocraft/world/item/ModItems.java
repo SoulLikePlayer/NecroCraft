@@ -204,6 +204,14 @@ public class ModItems {
                     .food(ModFoods.PUTRID_VENOM_VIAL, ModConsumables.PUTRID_VENOM_VIAL)
     );
 
+    public static final DeferredItem<@NotNull AbstractBonusItem> VIAL_WITHERING_VENOM_BONUS_ITEM = registerBonus(
+            "vial_withering_venom_bonus_item",
+            VialWitheringVenomBonusItem::new,
+            properties -> properties
+                    .rarity(Rarity.UNCOMMON)
+                    .food(ModFoods.PUTRID_VENOM_VIAL, ModConsumables.PUTRID_VENOM_VIAL)
+    );
+
     public static final DeferredItem<@NotNull AbstractBonusItem> DEHYDRATED_ROTTEN_FLESH_BONUS_ITEM = registerBonus(
             "dehydrated_rotten_flesh_bonus_item",
             DehydratedRottenFleshBonusItem::new,

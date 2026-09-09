@@ -82,6 +82,7 @@ public class ModItemGroups {
                         output.accept(ModItems.STRAY_CAPE_BONUS_ITEM);
 
                         output.accept(ModItems.VIAL_PUTRID_VENOM_BONUS_ITEM);
+                        output.accept(ModItems.VIAL_WITHERING_VENOM_BONUS_ITEM);
                     }))
                     .build()
     );

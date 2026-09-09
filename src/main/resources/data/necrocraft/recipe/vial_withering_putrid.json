@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "necrocraft:vial_putrid_venom_bonus_item",
+    "minecraft:wither_rose"
+  ],
+  "result": {
+    "id": "necrocraft:vial_withering_venom_bonus_item",
+    "count": 1
+  }
+}
