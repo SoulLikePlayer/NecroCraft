@@ -23,6 +23,6 @@ public class EchoingMinion extends SkeletonMinion {
     @Override
     protected void applyHurtEffect(@NotNull Entity target) {
         Objects.requireNonNull(target.asLivingEntity())
-                .addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 0, true, true, true));
+                .addEffect(new MobEffectInstance(MobEffects.DARKNESS, 200, 0, true, true, true));
     }
 }
