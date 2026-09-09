@@ -32,6 +32,8 @@ public final class MinionEvolutionBootstrap {
                 new MinionEvolution(EntityTypes.BOGGED, ModItems.NECROTIC_POWDER.get(), 20, 5));
         MinionEvolutions.register(EntityTypes.SKELETON,
                 new MinionEvolution(EntityTypes.PARCHED, ModItems.NECROTIC_POWDER.get(), 20, 5));
+        MinionEvolutions.register(EntityTypes.SKELETON,
+                new MinionEvolution(ModEntity.ECHOING_MINION.get(), ModItems.NECROTIC_POWDER.get(), 20, 5));
 
         MinionEvolutions.register(EntityTypes.STRAY,
                 new MinionEvolution(ModEntity.FROSTY_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45, 15));

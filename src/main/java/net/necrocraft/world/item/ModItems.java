@@ -2,6 +2,7 @@ package net.necrocraft.world.item;
 
 import net.minecraft.world.item.*;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.world.entity.ModEntity;
 import net.necrocraft.world.food.ModFoods;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.impl.*;
@@ -130,7 +131,6 @@ public class ModItems {
                     .fireResistant()
     );
 
-    // NOTE: same .pickaxe(...) -> .axe(...) fix as BONE_AXE above, for consistency.
     public static final DeferredItem<@NotNull Item> NETHERIFIED_BONE_AXE = register(
             "netherified_bone_axe",
             NetherifiedBoneAxe::new,
@@ -145,6 +145,13 @@ public class ModItems {
             properties -> properties
                     .hoe(ModToolMaterial.NETHERIFIED_BONE, 7.0f, -3.2f)
                     .fireResistant()
+    );
+
+    public static final DeferredItem<@NotNull Item> ECHOING_SPAWN_EGG = register(
+            "echoing_spawn_egg",
+            SpawnEggItem::new,
+            properties -> properties
+                    .spawnEgg(ModEntity.ECHOING.get())
     );
 
     public static final DeferredItem<@NotNull AbstractBonusItem> SOLID_SKIN_BONUS_ITEM =

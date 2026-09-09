@@ -96,6 +96,12 @@ public class  ModEntity {
             MobCategory.MISC
     );
 
+    public static final Supplier<EntityType<@NotNull EchoingMinion>> ECHOING_MINION = ENTITY_TYPES.registerEntityType(
+            "echoing_minions",
+            EchoingMinion::new,
+            MobCategory.MISC
+    );
+
     public static final Supplier<EntityType<@NotNull Echoing>> ECHOING = ENTITY_TYPES.registerEntityType(
             "echoing",
             Echoing::new,

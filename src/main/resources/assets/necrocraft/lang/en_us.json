@@ -19,6 +19,7 @@
   "item.necrocraft.netherified_bone_hoe": "Netherified Bone Hoe",
   "item.necrocraft.netherified_bone_pickaxe": "Netherified Bone Pickaxe",
   "item.necrocraft.netherified_bone_shovel": "Netherified Bone Shovel",
+  "item.necrocraft.echoing_spawn_egg": "Echoing Spawn Egg",
 
   "item.minecraft.potion.effect.potion_of_undead": "Potion Of Undead",
   "item.minecraft.splash_potion.effect.potion_of_undead": "Splash Potion Of Undead",
@@ -63,6 +64,7 @@
   "itemGroup.necrocraft.materials": "NecroCraft - Materials",
   "itemGroup.necrocraft.equipment": "NecroCraft - Equipment",
   "itemGroup.necrocraft.bonus": "NecroCraft - Bonus Items",
+  "itemGroup.necrocraft.spawn_egg": "NecroCraft - Spawn Egg",
 
   "item.necrocraft.soul_totem.empty": "No soul captured",
   "item.necrocraft.soul_totem.unknown": "Unknown captured creature",

@@ -69,18 +69,10 @@ public class ParchedMinion extends SkeletonMinion {
         this.playSound(this.getStepSound(), 0.15F, 1.0F);
     }
 
-    /**
-     * Minion's logic at what happen when he hurt
-     *
-     * @param level the level the minion is created in
-     * @param target the entity the minion hurt
-     * @return if everithing works
-     */
+
     @Override
-    public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
+    protected void applyHurtEffect(@NotNull Entity target) {
         Objects.requireNonNull(target.asLivingEntity())
                 .addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 0, true, true, true));
-
-        return super.doHurtTarget(level, target);
     }
 }

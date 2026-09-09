@@ -85,4 +85,14 @@ public class ModItemGroups {
                     }))
                     .build()
     );
+
+    public static final Supplier<CreativeModeTab> NECROCRAFT_SPAWN_EGG = CREATIVE_MODE_TABS.register("necrocraft_spawn_egg",
+            () -> CreativeModeTab.builder()
+                    .icon(() -> new ItemStack(ModItems.ECHOING_SPAWN_EGG.get()))
+                    .title(Component.translatable("itemGroup.necrocraft.spawn_egg"))
+                    .displayItems(((itemDisplayParameters, output) -> {
+                        output.accept(ModItems.ECHOING_SPAWN_EGG);
+                    }))
+                    .build()
+    );
 }
