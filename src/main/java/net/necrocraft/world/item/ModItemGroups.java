@@ -65,6 +65,7 @@ public class ModItemGroups {
 
                         output.accept(ModItems.STORAGE_BONUS_ITEM);
                         output.accept(ModItems.TRIAL_VAULT_BONUS_ITEM);
+                        output.accept(ModItems.CYCLE_OF_NEMESIS_BONUS_ITEM);
 
                         output.accept(ModItems.HUNTER_BONUS_ITEM);
                         output.accept(ModItems.FARMER_BONUS_ITEM);

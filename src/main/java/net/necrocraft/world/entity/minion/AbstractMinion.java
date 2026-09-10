@@ -561,7 +561,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * @param trigger the trigger being fired
      */
     private void fireTrigger(@NotNull BonusTrigger trigger) {
-        for (Identifier bonusId : this.bonuses) {
+        for (Identifier bonusId : List.copyOf(this.bonuses)) {
             BonusUtil.resolve(bonusId).ifPresent(bonus -> {
                 if (bonus.getBonusTrigger() == trigger) {
                     bonus.applyEffectes(this);
@@ -581,7 +581,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
      * @param trigger the trigger being fired
      */
     private void fireSyncedTrigger(@NotNull BonusTrigger trigger) {
-        for (Identifier bonusId : this.bonuses) {
+        for (Identifier bonusId : List.copyOf(this.bonuses)) {
             boolean isSynced = false;
             for (DeferredItem<@NotNull AbstractBonusItem> synced : this.getSyncedBonusItem()) {
                 if (synced.getId().equals(bonusId)) {
@@ -658,8 +658,14 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     @Override
     public void die(@NotNull DamageSource damageSource) {
         if (this.level() instanceof ServerLevel) {
+
             fireTrigger(BonusTrigger.ON_DEATH);
             fireSyncedTrigger(BonusTrigger.ON_DEATH);
+
+            if (this.getHealth() > 0.0F) {
+                return;
+            }
+
             dropItems();
             dropNemesisShards();
 
@@ -969,5 +975,9 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
 
     public void setNemesis(boolean newNemesis){
         this.entityData.set(DATA_NEMESIS_ID, newNemesis);
+    }
+
+    public void removeBonus(@NotNull Identifier bonusId) {
+        this.bonuses.remove(bonusId);
     }
 }

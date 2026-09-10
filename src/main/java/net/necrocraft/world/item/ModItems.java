@@ -181,6 +181,9 @@ public class ModItems {
     public static final DeferredItem<@NotNull AbstractBonusItem> SOUL_GENERATOR_BONUS_ITEM =
             registerBonus("soul_generator_bonus_item", SoulGenerationBonusItem::new);
 
+    public static final DeferredItem<@NotNull AbstractBonusItem> CYCLE_OF_NEMESIS_BONUS_ITEM =
+            registerBonus("cycle_nemesis_bonus_item", CycleOfNemesisBonusItem::new, Rarity.RARE);
+
     public static final DeferredItem<@NotNull AbstractBonusItem> MUMMY_WRAPPING_BONUS_ITEM =
             registerBonus("mummy_wrapping_bonus_item", MummyWrappingBonusItem::new, Rarity.UNCOMMON);
 
