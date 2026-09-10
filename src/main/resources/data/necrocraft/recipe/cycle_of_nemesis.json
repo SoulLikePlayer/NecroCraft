@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "S S",
+    " S "
+  ],
+  "key": {
+    "S":  "necrocraft:nemesis_shard"
+  },
+  "result": "necrocraft:cycle_nemesis_bonus_item"
+}
