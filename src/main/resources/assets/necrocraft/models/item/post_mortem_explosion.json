@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "necrocraft:item/explosion_heart"
+    "layer0": "necrocraft:item/explosion_flesh"
   }
 }

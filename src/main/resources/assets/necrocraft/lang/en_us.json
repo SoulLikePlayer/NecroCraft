@@ -33,8 +33,7 @@
   "item.necrocraft.obedience_scepter.action.sedentary": "Sedentary",
   "item.necrocraft.obedience_scepter.action.wandering": "Wandering",
 
-  "item.necrocraft.solid_skin_bonus_item": "Solid Skin",
-  "item.necrocraft.health_bonus_item": "Second Heart",
+  "item.necrocraft.solid_skin_bonus_item": "Solid Flesh",
   "item.necrocraft.storage_bonus_item": "Storage Dead Finger",
   "item.necrocraft.auto_planter_bonus_item": "Green Thumb",
   "item.necrocraft.auto_tiller_bonus_item": "Farmer Brain",
@@ -56,7 +55,7 @@
   "item.necrocraft.dehydrated_rotten_flesh_bonus_item": "Dehydrated Rotten Flesh",
   "item.necrocraft.cracked_husk_jaw_bonus_item": "Cracked Husk Jaw",
 
-  "item.necrocraft.post_mortem_explosion_bonus_item": "Explosion Heart",
+  "item.necrocraft.post_mortem_explosion_bonus_item": "Explosif Flesh",
 
   "item.necrocraft.hunter_bonus_item": "Hunter Instinct",
   "item.necrocraft.farmer_bonus_item": "Farmer Instinct",
