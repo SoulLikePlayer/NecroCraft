@@ -157,9 +157,6 @@ public class ModItems {
     public static final DeferredItem<@NotNull AbstractBonusItem> SOLID_SKIN_BONUS_ITEM =
             registerBonus("solid_skin_bonus_item", SolidSkinBonusItem::new);
 
-    public static final DeferredItem<@NotNull AbstractBonusItem> HEALTH_BONUS_ITEM =
-            registerBonus("health_bonus_item", HealthBonusItem::new);
-
     public static final DeferredItem<@NotNull AbstractBonusItem> POST_MORTEM_EXPLOSION_BONUS_ITEM =
             registerBonus("post_mortem_explosion_bonus_item", PostMortemExplosionBonusItem::new);
 

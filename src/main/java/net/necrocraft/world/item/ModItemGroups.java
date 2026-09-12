@@ -58,7 +58,6 @@ public class ModItemGroups {
                     .title(Component.translatable("itemGroup.necrocraft.bonus"))
                     .displayItems(((itemDisplayParameters, output) -> {
                         output.accept(ModItems.SOLID_SKIN_BONUS_ITEM);
-                        output.accept(ModItems.HEALTH_BONUS_ITEM);
                         output.accept(ModItems.POST_MORTEM_EXPLOSION_BONUS_ITEM);
                         output.accept(ModItems.NETHERIFIED_BONE_BONUS_ITEM);
                         output.accept(ModItems.SOUL_GENERATOR_BONUS_ITEM);
