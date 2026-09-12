@@ -1,6 +1,8 @@
 package net.necrocraft.world.item.equipment;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,6 +23,8 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.Mth;
 import net.necrocraft.core.ModAttachments;
 import net.necrocraft.util.AdvancementUtil;
 import net.necrocraft.world.entity.minion.AbstractMinion;
@@ -138,7 +142,8 @@ public class SoulTotem extends Item {
         }
 
         minion.setOwner(player);
-        minion.snapTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), 0.0F);
+        Vec3 spawnPos = getSpawnPositionInFront(player);
+        minion.snapTo(spawnPos.x, spawnPos.y, spawnPos.z, player.getYRot(), 0.0F);
         equipMinion(minion, soulData);
         applyBonuses(minion, soulData);
 
@@ -148,6 +153,44 @@ public class SoulTotem extends Item {
         AdvancementUtil.grant((ServerPlayer) player, "first_servent");
 
         return InteractionResult.SUCCESS;
+    }
+
+    /** Horizontal distance, in blocks, in front of the player where the minion is summoned. */
+    private static final double SUMMON_DISTANCE = 2.0;
+
+    /**
+     * Computes the point on the ground in front of the player where the
+     * minion should appear, instead of directly on top of the player.
+     * Casts straight down from a spot {@link #SUMMON_DISTANCE} blocks ahead
+     * of the player (based on their look direction) to land on the nearest
+     * surface, falling back to the player's own Y level if no ground is
+     * found within a few blocks.
+     *
+     * @param player the summoning player
+     * @return the world-space position to spawn the minion at
+     */
+    private static Vec3 getSpawnPositionInFront(Player player) {
+        double yawRad = Math.toRadians(player.getYRot());
+        double dx = -Math.sin(yawRad);
+        double dz = Math.cos(yawRad);
+
+        double targetX = player.getX() + dx * SUMMON_DISTANCE;
+        double targetZ = player.getZ() + dz * SUMMON_DISTANCE;
+
+        Level level = player.level();
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos(
+                Mth.floor(targetX),
+                Mth.floor(player.getY()) + 2,
+                Mth.floor(targetZ));
+
+        for (int i = 0; i < 6; i++) {
+            if (!level.getBlockState(cursor).isAir() && level.getBlockState(cursor.above()).isAir()) {
+                return new Vec3(targetX, cursor.getY() + 1.0, targetZ);
+            }
+            cursor.move(Direction.DOWN);
+        }
+
+        return new Vec3(targetX, player.getY(), targetZ);
     }
 
     /**
@@ -257,14 +300,30 @@ public class SoulTotem extends Item {
         double x = minion.getX();
         double y = minion.getY() + minion.getBbHeight() / 2.0;
         double z = minion.getZ();
+        double baseY = minion.getY() + 0.1;
 
+        // Ring of soul fire around the minion's feet, giving a "summoning circle" read
+        // instead of a random puff.
+        int ringPoints = 16;
+        double radius = Math.max(minion.getBbWidth() / 2.0 + 0.3, 0.6);
+        for (int i = 0; i < ringPoints; i++) {
+            double angle = (2 * Math.PI * i) / ringPoints;
+            double px = x + radius * Math.cos(angle);
+            double pz = z + radius * Math.sin(angle);
+            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
+                    px, baseY, pz, 1,
+                    0.0, 0.02, 0.0, 0.01);
+        }
+
+        // Soul particles rising from the ring toward the minion's body.
         level.sendParticles(ParticleTypes.SOUL,
                 x, y, z, 30,
                 0.4, 0.5, 0.4, 0.05);
 
-        level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
-                x, minion.getY() + 0.1, z, 15,
-                0.5, 0.02, 0.5, 0.01);
+        // A denser burst centered on the torso for the "moment of arrival".
+        level.sendParticles(ParticleTypes.SOUL,
+                x, minion.getY() + minion.getBbHeight() * 0.75, z, 12,
+                0.15, 0.15, 0.15, 0.02);
 
         level.playSound(null, minion.blockPosition(),
                 SoundEvents.SOUL_ESCAPE.value(), SoundSource.PLAYERS, 1.0F, 1.0F);
