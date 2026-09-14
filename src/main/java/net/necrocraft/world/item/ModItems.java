@@ -193,23 +193,24 @@ public class ModItems {
     public static final DeferredItem<@NotNull AbstractBonusItem> STRAY_CAPE_BONUS_ITEM =
             registerBonus("stray_cape_bonus_item", StrayCapeBonusItem::new, Rarity.UNCOMMON);
 
+    public static final DeferredItem<@NotNull AbstractBonusItem> FROSTY_BONE_BONUS_ITEM =
+            registerBonus("frosty_bone_bonus_item", FrostyBoneBonusItem::new, Rarity.UNCOMMON);
+
     public static final DeferredItem<@NotNull AbstractBonusItem> CRACKED_HUSK_JAW_BONUS_ITEM =
             registerBonus("cracked_husk_jaw_bonus_item", CrackedHuskJawBonusItem::new, Rarity.UNCOMMON);
 
-    public static final DeferredItem<@NotNull AbstractBonusItem> VIAL_PUTRID_VENOM_BONUS_ITEM = registerBonus(
-            "vial_putrid_venom_bonus_item",
-            VialPutridVenomBonusItem::new,
+    public static final DeferredItem<@NotNull AbstractBonusItem> POISONED_BONE_BONUS_ITEM = registerBonus(
+            "poisoned_bone_bonus_item",
+            PoisonedBoneBonusItem::new,
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
-                    .food(ModFoods.PUTRID_VENOM_VIAL, ModConsumables.PUTRID_VENOM_VIAL)
     );
 
-    public static final DeferredItem<@NotNull AbstractBonusItem> VIAL_WITHERING_VENOM_BONUS_ITEM = registerBonus(
-            "vial_withering_venom_bonus_item",
-            VialWitheringVenomBonusItem::new,
+    public static final DeferredItem<@NotNull AbstractBonusItem> WITHERED_BONE_BONUS_ITEM = registerBonus(
+            "withered_bone_bonus_item",
+            WitheredBoneBonusItem::new,
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
-                    .food(ModFoods.PUTRID_VENOM_VIAL, ModConsumables.PUTRID_VENOM_VIAL)
     );
 
     public static final DeferredItem<@NotNull AbstractBonusItem> DEHYDRATED_ROTTEN_FLESH_BONUS_ITEM = registerBonus(

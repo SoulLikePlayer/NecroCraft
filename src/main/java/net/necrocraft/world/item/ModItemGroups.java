@@ -80,9 +80,10 @@ public class ModItemGroups {
                         output.accept(ModItems.ZOMBIE_NAUTILUS_SHELL_BONUS_ITEM);
 
                         output.accept(ModItems.STRAY_CAPE_BONUS_ITEM);
+                        output.accept(ModItems.FROSTY_BONE_BONUS_ITEM);
 
-                        output.accept(ModItems.VIAL_PUTRID_VENOM_BONUS_ITEM);
-                        output.accept(ModItems.VIAL_WITHERING_VENOM_BONUS_ITEM);
+                        output.accept(ModItems.POISONED_BONE_BONUS_ITEM);
+                        output.accept(ModItems.WITHERED_BONE_BONUS_ITEM);
                     }))
                     .build()
     );

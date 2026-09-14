@@ -21,7 +21,7 @@ import java.util.Objects;
 public class BoggedMinion extends SkeletonMinion {
 
     static {
-        SYNCED_BONUS.add(ModItems.VIAL_PUTRID_VENOM_BONUS_ITEM);
+        SYNCED_BONUS.add(ModItems.POISONED_BONE_BONUS_ITEM);
     }
 
     /**

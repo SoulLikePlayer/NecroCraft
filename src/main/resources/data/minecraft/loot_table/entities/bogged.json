@@ -52,7 +52,7 @@
               "function": "minecraft:enchanted_count_increase"
             }
           ],
-          "name": "necrocraft:frosty_bone_bonus_item"
+          "name": "necrocraft:poisoned_bone_bonus_item"
         }
       ],
       "rolls": 1.0
@@ -87,32 +87,14 @@
             },
             {
               "function": "minecraft:set_potion",
-              "id": "minecraft:slowness"
+              "id": "minecraft:poison"
             }
           ],
           "name": "minecraft:tipped_arrow"
         }
       ],
       "rolls": 1.0
-    },
-    {
-      "conditions": [
-        {
-          "condition": "minecraft:killed_by_player"
-        },
-        {
-          "condition": "minecraft:random_chance",
-          "chance": 0.05
-        }
-      ],
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "name": "necrocraft:stray_cape_bonus_item"
-        }
-      ],
-      "rolls": 1.0
     }
   ],
-  "random_sequence": "minecraft:entities/stray"
+  "random_sequence": "minecraft:entities/bogged"
 }

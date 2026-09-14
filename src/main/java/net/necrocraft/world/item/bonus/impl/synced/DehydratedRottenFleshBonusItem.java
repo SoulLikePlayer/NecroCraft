@@ -1,10 +1,14 @@
 package net.necrocraft.world.item.bonus.impl.synced;
 
+import net.minecraft.core.Holder;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.necrocraft.world.effect.ModMobEffects;
 import net.necrocraft.world.entity.minion.AbstractMinion;
+import net.necrocraft.world.entity.minion.impl.husk.AridifiedMinion;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.BonusTrigger;
 import net.necrocraft.world.item.bonus.BonusType;
@@ -37,7 +41,13 @@ public class DehydratedRottenFleshBonusItem extends AbstractBonusItem {
     public void applySyncedEffect(@NotNull AbstractMinion minion) {
         LivingEntity target = minion.getTarget();
         assert target != null;
-        MobEffectInstance existingHunger = target.getEffect(MobEffects.HUNGER);
+
+        Holder<@NotNull MobEffect> mobEffect = switch (minion){
+            case AridifiedMinion _ -> ModMobEffects.CURSE_OF_THE_DROUGHT;
+            default -> MobEffects.HUNGER;
+        };
+
+        MobEffectInstance existingHunger = target.getEffect(mobEffect);
         int amplifier = existingHunger != null ? existingHunger.getAmplifier() : 0;
 
         double classicDamage = minion.getAttributeValue(Attributes.ATTACK_DAMAGE);
