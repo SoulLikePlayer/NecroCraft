@@ -6,11 +6,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
+import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class EchoingMinion extends SkeletonMinion {
+
+    static {
+        SYNCED_BONUS.add(ModItems.ECHOING_BONE_BONUS_ITEM);
+    }
 
     /**
      * @param type  the entity type this minion is instantiated from

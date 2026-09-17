@@ -206,6 +206,13 @@ public class ModItems {
                     .rarity(Rarity.UNCOMMON)
     );
 
+    public static final DeferredItem<@NotNull AbstractBonusItem> ECHOING_BONE_BONUS_ITEM = registerBonus(
+            "echoing_bone_bonus_item",
+            EchoingBoneBonusItem::new,
+            properties -> properties
+                    .rarity(Rarity.UNCOMMON)
+    );
+
     public static final DeferredItem<@NotNull AbstractBonusItem> WITHERED_BONE_BONUS_ITEM = registerBonus(
             "withered_bone_bonus_item",
             WitheredBoneBonusItem::new,
