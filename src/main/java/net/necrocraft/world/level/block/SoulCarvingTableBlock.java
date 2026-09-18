@@ -31,13 +31,13 @@ public class SoulCarvingTableBlock extends Block {
 
     protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult) {
         if (!level.isClientSide()) {
-            player.openMenu(state.getMenuProvider(level, pos));
+            player.openMenu(new SimpleMenuProvider(
+                    (containerId, inventory, _) ->
+                            new CarvingMenu(containerId, inventory),
+                    CONTAINER_TITLE)
+            );
         }
 
         return InteractionResult.SUCCESS;
-    }
-
-    protected MenuProvider getMenuProvider(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos) {
-        return new SimpleMenuProvider((containerId, inventory, _) -> new CarvingMenu(containerId, inventory), CONTAINER_TITLE);
     }
 }

@@ -26,7 +26,7 @@ public class CarvingScreen extends AbstractContainerScreen<@NotNull CarvingMenu>
     private static final Identifier CARVING_TABLE_LOCATION_EQUIPMENT = Identifier.fromNamespaceAndPath("necrocraft", "textures/gui/container/soul_carving_table/equipment.png");
     private static final Identifier CARVING_TABLE_LOCATION_BONUS = Identifier.fromNamespaceAndPath("necrocraft", "textures/gui/container/soul_carving_table/bonus.png");
     private static final Identifier CARVING_TABLE_LOCATION_EVOLUTION = Identifier.fromNamespaceAndPath("necrocraft", "textures/gui/container/soul_carving_table/evolution.png");
-
+    private Component dynamicTitle;
     private static final Component TOTEM_TOOLTIP = Component.translatable("carving.necrocraft.slot.totem");
 
     private static final Component[] EQUIPMENT_TOOLTIPS = new Component[] {

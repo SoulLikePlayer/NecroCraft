@@ -7,18 +7,18 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.necrocraft.core.NecroCraft;
+import org.jetbrains.annotations.NotNull;
 
 public class ModMenuTypes {
-    public static final DeferredRegister<MenuType<?>> MENU_TYPES =
+    public static final DeferredRegister<@NotNull MenuType<?>> MENU_TYPES =
             DeferredRegister.create(BuiltInRegistries.MENU, NecroCraft.MODID);
 
-    public static final DeferredHolder<MenuType<?>, MenuType<CarvingMenu>> CARVING_MENU =
+    public static final DeferredHolder<@NotNull MenuType<?>, @NotNull MenuType<CarvingMenu>> CARVING_MENU =
             MENU_TYPES.register("soul_carving_table",
                     () -> IMenuTypeExtension.create((containerId, inventory, buffer) ->
                             new CarvingMenu(containerId, inventory)));
 
-    public static final DeferredHolder<MenuType<?>, MenuType<MinionInventoryMenu>> MINION_INVENTORY =
+    public static final DeferredHolder<@NotNull MenuType<?>, @NotNull MenuType<@NotNull MinionInventoryMenu>> MINION_INVENTORY =
             MENU_TYPES.register("minion_inventory",
-                    () -> IMenuTypeExtension.create((containerId, inventory, buffer) ->
-                            new MinionInventoryMenu(containerId, inventory, buffer)));
+                    () -> IMenuTypeExtension.create(MinionInventoryMenu::new));
 }

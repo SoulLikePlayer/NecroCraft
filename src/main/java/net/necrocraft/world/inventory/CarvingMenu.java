@@ -15,6 +15,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.Equippable;
+import net.necrocraft.core.ModAttachments;
 import net.necrocraft.world.entity.minion.registry.MinionEvolution;
 import net.necrocraft.world.entity.minion.registry.MinionEvolutions;
 import net.necrocraft.world.item.ModDataComponents;
@@ -24,6 +25,7 @@ import net.necrocraft.world.item.bonus.BonusUtil;
 import net.necrocraft.world.item.component.SoulData;
 import net.necrocraft.world.item.equipment.SoulTotem;
 import net.necrocraft.world.level.block.ModBlock;
+import net.neoforged.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,8 +112,9 @@ public class CarvingMenu extends AbstractContainerMenu {
     private final Container container;
 
     private final DataSlot selectedEvolutionIndex = DataSlot.standalone();
+    private final Player playerInteract;
 
-    public CarvingMenu(int containerId, Inventory inventory) {
+    public CarvingMenu(int containerId, Inventory inventory){
         this(containerId, inventory, new SimpleContainer(CONTAINER_SIZE), ContainerLevelAccess.NULL);
     }
 
@@ -122,6 +125,7 @@ public class CarvingMenu extends AbstractContainerMenu {
 
         this.access = access;
         this.container = container;
+        this.playerInteract = inventory.player;
 
         this.addSlot(new TotemSlot(container, TOTEM_SLOT, TOTEM_SLOT_X, TOTEM_SLOT_Y));
 
@@ -416,8 +420,15 @@ public class CarvingMenu extends AbstractContainerMenu {
         if (!chosen.acceptsIngredient(ingredientStack)) {
             return;
         }
-
         ingredientStack.shrink(chosen.ingredientCount());
+
+        if (!chosen.acceptsAmount(playerInteract)){
+            return;
+        }
+        playerInteract.setData(ModAttachments.SOUL_GAUGE, Math.max(0,
+                playerInteract.getData(ModAttachments.SOUL_GAUGE) - chosen.soulAmount())
+        );
+
         if (ingredientStack.isEmpty()) {
             this.container.setItem(EVOLUTION_INGREDIENT_SLOT, ItemStack.EMPTY);
         }
