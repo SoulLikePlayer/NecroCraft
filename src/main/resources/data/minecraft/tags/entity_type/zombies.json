@@ -3,6 +3,9 @@
   "values": [
     "necrocraft:zombie_minions",
     "necrocraft:drowned_minions",
-    "necrocraft:husk_minions"
+    "necrocraft:husk_minions",
+    "necrocraft:aridified_minions",
+    "necrocraft:ignited_minions",
+    "necrocraft:abyssal_drowned_minions"
   ]
 }

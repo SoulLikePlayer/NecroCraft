@@ -6,8 +6,11 @@ import net.necrocraft.core.NecroCraft;
 import net.necrocraft.world.entity.minion.impl.*;
 import net.necrocraft.world.entity.minion.impl.bogged.BlightedMinion;
 import net.necrocraft.world.entity.minion.impl.bogged.BoggedMinion;
+import net.necrocraft.world.entity.minion.impl.drowned.AbyssalDrownedMinion;
+import net.necrocraft.world.entity.minion.impl.drowned.DrownedMinion;
 import net.necrocraft.world.entity.minion.impl.husk.AridifiedMinion;
 import net.necrocraft.world.entity.minion.impl.husk.HuskMinion;
+import net.necrocraft.world.entity.minion.impl.husk.IgnitedMinion;
 import net.necrocraft.world.entity.minion.impl.stray.FrostyMinion;
 import net.necrocraft.world.entity.minion.impl.stray.StrayMinion;
 import net.necrocraft.world.entity.monster.skeleton.Echoing;
@@ -63,6 +66,12 @@ public class  ModEntity {
             MobCategory.MISC
     );
 
+    public static final Supplier<EntityType<@NotNull AbyssalDrownedMinion>> ABYSSAL_DROWNED_MINION = ENTITY_TYPES.registerEntityType(
+            "abyssal_drowned_minions",
+            AbyssalDrownedMinion::new,
+            MobCategory.MISC
+    );
+
     /** The {@link EntityType} for {@link HuskMinion}, classified under {@link MobCategory#MISC}. */
     public static final Supplier<EntityType<@NotNull HuskMinion>> HUSK_MINION = ENTITY_TYPES.registerEntityType(
             "husk_minions",
@@ -73,6 +82,12 @@ public class  ModEntity {
     public static final Supplier<EntityType<@NotNull AridifiedMinion>> ARIDIFIED_MINION = ENTITY_TYPES.registerEntityType(
             "aridified_minions",
             AridifiedMinion::new,
+            MobCategory.MISC
+    );
+
+    public static final Supplier<EntityType<@NotNull IgnitedMinion>> IGNITED_MINION = ENTITY_TYPES.registerEntityType(
+            "ignited_minions",
+            IgnitedMinion::new,
             MobCategory.MISC
     );
 

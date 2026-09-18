@@ -11,13 +11,13 @@ import org.jetbrains.annotations.NotNull;
 
 public class AridifiedMinionRenderer extends ZombieMinionRenderer {
     private static final Identifier ARIDIFIED_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/husk/aridified/aridified.png");
-    private static final Identifier NEMESIS_HUSK_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/husk/aridified/nemesis_aridified.png");
+    private static final Identifier NEMESIS_ARIFIED_LOCATION = Identifier.fromNamespaceAndPath(NecroCraft.MODID,"textures/entity/husk/aridified/nemesis_aridified.png");
 
     public AridifiedMinionRenderer(EntityRendererProvider.Context context) {
         super(context, ModelLayers.HUSK, ModelLayers.HUSK_ARMOR);
     }
 
     public @NotNull Identifier getTextureLocation(ZombieMinionRenderState state) {
-        return state.isNemesis ? NEMESIS_HUSK_LOCATION : ARIDIFIED_LOCATION;
+        return state.isNemesis ? NEMESIS_ARIFIED_LOCATION : ARIDIFIED_LOCATION;
     }
 }

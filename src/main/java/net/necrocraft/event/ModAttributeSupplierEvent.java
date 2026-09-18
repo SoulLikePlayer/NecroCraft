@@ -50,11 +50,8 @@ public class ModAttributeSupplierEvent {
                         .add(Attributes.ATTACK_DAMAGE, 2.5F)
                         .build());
 
-        event.put(DROWNED_MINION.get(),
-                Drowned.createAttributes()
-                        .add(Attributes.STEP_HEIGHT, 1.0F)
-                        .build()
-        );
+        event.put(DROWNED_MINION.get(), Drowned.createAttributes().build());
+        event.put(ABYSSAL_DROWNED_MINION.get(), Drowned.createAttributes().build());
 
         event.put(HUSK_MINION.get(), Husk.createAttributes().build());
         event.put(ARIDIFIED_MINION.get(),
@@ -62,6 +59,10 @@ public class ModAttributeSupplierEvent {
                         .add(Attributes.MAX_HEALTH, 10.0F)
                         .add(Attributes.ATTACK_DAMAGE, 2.5F)
                         .add(Attributes.MOVEMENT_SPEED, 0.02F)
+                        .build()
+        );
+        event.put(IGNITED_MINION.get(),
+                Husk.createAttributes()
                         .build()
         );
 

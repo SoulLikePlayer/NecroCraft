@@ -6,7 +6,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import net.necrocraft.client.renderer.entity.state.ZombieMinionRenderState;
-import net.necrocraft.world.entity.minion.impl.DrownedMinion;
+import net.necrocraft.world.entity.minion.impl.drowned.DrownedMinion;
 
 public class DrownedMinionModel extends ZombieMinionModel<ZombieMinionRenderState> {
     private static final float PRE_DASH_TICKS = 12f;

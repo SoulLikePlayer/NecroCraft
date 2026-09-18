@@ -1,4 +1,4 @@
-package net.necrocraft.world.entity.minion.impl;
+package net.necrocraft.world.entity.minion.impl.drowned;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -21,13 +21,13 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.AmphibiousPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
-import net.minecraft.world.entity.monster.skeleton.Parched;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import net.necrocraft.world.effect.ModMobEffects;
+import net.necrocraft.world.entity.minion.impl.ZombieMinion;
 import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
 
@@ -88,9 +88,7 @@ public class DrownedMinion extends ZombieMinion {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-
+    protected void applyTickEffect() {
         LivingEntity owner = getOwner();
         if (owner == null) {
             return;

@@ -10,6 +10,7 @@ import net.necrocraft.client.particles.NemesisSoulParticle;
 import net.necrocraft.client.renderer.entity.*;
 import net.necrocraft.client.renderer.entity.state.SkeletonMinionRenderState;
 import net.necrocraft.core.NecroCraft;
+import net.necrocraft.world.entity.monster.skeleton.Echoing;
 import net.necrocraft.world.inventory.CarvingMenu;
 import net.necrocraft.world.inventory.MinionInventoryMenu;
 import net.necrocraft.world.inventory.ModMenuTypes;
@@ -39,15 +40,24 @@ public class NecroCraftClient {
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event){
         event.registerEntityRenderer(ZOMBIE_MINION.get(), ZombieMinionRenderer::new);
-        event.registerEntityRenderer(SKELETON_MINION.get(), SkeletonMinionRenderer::new);
+
         event.registerEntityRenderer(DROWNED_MINION.get(), DrownedMinionRenderer::new);
+        event.registerEntityRenderer(ABYSSAL_DROWNED_MINION.get(), AbyssalDrownedRenderer::new);
+
         event.registerEntityRenderer(STRAY_MINION.get(), StrayMinionRenderer::new);
+        event.registerEntityRenderer(FROSTY_MINION.get(), FrostyMinionRenderer::new);
+
         event.registerEntityRenderer(PARCHED_MINION.get(), ParchedMinionRenderer::new);
+
         event.registerEntityRenderer(BOGGED_MINION.get(), BoggedMinionRenderer::new);
         event.registerEntityRenderer(BLIGHTED_MINION.get(), BlightedMinionRenderer::new);
+
         event.registerEntityRenderer(HUSK_MINION.get(), HuskMinionRenderer::new);
         event.registerEntityRenderer(ARIDIFIED_MINION.get(), AridifiedMinionRenderer::new);
-        event.registerEntityRenderer(FROSTY_MINION.get(), FrostyMinionRenderer::new);
+        event.registerEntityRenderer(IGNITED_MINION.get(), IgnitedMinionRenderer::new);
+
+        event.registerEntityRenderer(SKELETON_MINION.get(), SkeletonMinionRenderer::new);
+
         event.registerEntityRenderer(ECHOING_MINION.get(), EchoingMinionRenderer::new);
 
         event.registerEntityRenderer(ECHOING.get(), EchoingRenderer::new);

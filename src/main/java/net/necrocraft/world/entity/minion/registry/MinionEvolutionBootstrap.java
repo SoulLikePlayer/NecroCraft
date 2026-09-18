@@ -26,6 +26,14 @@ public final class MinionEvolutionBootstrap {
         MinionEvolutions.register(EntityTypes.ZOMBIE,
                 new MinionEvolution(EntityTypes.HUSK, ModItems.NECROTIC_POWDER.get(), 20, 5));
 
+        MinionEvolutions.register(EntityTypes.HUSK,
+                new MinionEvolution(ModEntity.ARIDIFIED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45, 15));
+        MinionEvolutions.register(EntityTypes.HUSK,
+                new MinionEvolution(ModEntity.IGNITED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45, 15));
+
+        MinionEvolutions.register(EntityTypes.DROWNED,
+                new MinionEvolution(ModEntity.ABYSSAL_DROWNED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45, 5));
+
         MinionEvolutions.register(EntityTypes.SKELETON,
                 new MinionEvolution(EntityTypes.STRAY, ModItems.NECROTIC_POWDER.get(), 20, 5));
         MinionEvolutions.register(EntityTypes.SKELETON,
@@ -40,8 +48,5 @@ public final class MinionEvolutionBootstrap {
 
         MinionEvolutions.register(EntityTypes.BOGGED,
                 new MinionEvolution(ModEntity.BLIGHTED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45, 15));
-
-        MinionEvolutions.register(EntityTypes.HUSK,
-                new MinionEvolution(ModEntity.ARIDIFIED_MINION.get(), ModItems.NECROTIC_POWDER.get(), 45, 15));
     }
 }

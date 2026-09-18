@@ -623,6 +623,7 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     }
 
     protected void applyHurtEffect(@NotNull Entity target) {}
+    protected void applyTickEffect(){}
 
     /**
      * Fires {@link BonusTrigger#ON_KILL} whenever this minion lands the
@@ -645,6 +646,8 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         if (!this.level().isClientSide()) {
             fireSyncedTrigger(BonusTrigger.ON_TICK);
             fireTrigger(BonusTrigger.ON_TICK);
+
+            applyTickEffect();
         }
     }
 

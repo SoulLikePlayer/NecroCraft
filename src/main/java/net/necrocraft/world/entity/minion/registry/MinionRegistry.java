@@ -5,6 +5,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.necrocraft.world.entity.ModEntity;
 import net.necrocraft.world.entity.minion.AbstractMinion;
+import net.neoforged.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -74,5 +75,7 @@ public class MinionRegistry {
         register(ModEntity.FROSTY_MINION.get(), ModEntity.FROSTY_MINION);
         register(ModEntity.BLIGHTED_MINION.get(), ModEntity.BLIGHTED_MINION);
         register(ModEntity.ECHOING.get(), ModEntity.ECHOING_MINION);
+        register(ModEntity.IGNITED_MINION.get(), ModEntity.IGNITED_MINION);
+        register(ModEntity.ABYSSAL_DROWNED_MINION.get(), ModEntity.ABYSSAL_DROWNED_MINION);
     }
 }

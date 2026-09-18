@@ -12,7 +12,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.necrocraft.client.model.minion.zombie.DrownedMinionModel;
 import net.necrocraft.client.renderer.entity.state.ZombieMinionRenderState;
-import net.necrocraft.world.entity.minion.impl.DrownedMinion;
+import net.necrocraft.world.entity.minion.impl.drowned.DrownedMinion;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 
