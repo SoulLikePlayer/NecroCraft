@@ -20,6 +20,7 @@
   "item.necrocraft.netherified_bone_pickaxe": "Netherified Bone Pickaxe",
   "item.necrocraft.netherified_bone_shovel": "Netherified Bone Shovel",
   "item.necrocraft.echoing_spawn_egg": "Echoing Spawn Egg",
+  "item.necrocraft.necronomicon_volume_1": "Necronomicon – Volume I",
 
   "item.minecraft.potion.effect.potion_of_undead": "Potion Of Undead",
   "item.minecraft.splash_potion.effect.potion_of_undead": "Splash Potion Of Undead",
@@ -137,5 +138,6 @@
   "entity.necrocraft.aridified_minions": "Aridified",
   "entity.necrocraft.ignited_minions": "Ignited",
 
-  "entity.necrocraft.echoing": "Echoing"
+  "entity.necrocraft.echoing": "Echoing",
+  "itemGroup.necrocraft.necronomicon": "NecroCraft - Necronomicon"
 }

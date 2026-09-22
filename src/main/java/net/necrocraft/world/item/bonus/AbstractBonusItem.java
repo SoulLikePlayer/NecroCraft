@@ -5,7 +5,6 @@ import net.minecraft.world.item.Item;
 import net.necrocraft.world.entity.minion.AbstractMinion;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
 

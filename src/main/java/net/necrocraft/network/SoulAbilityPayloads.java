@@ -16,14 +16,14 @@ public final class SoulAbilityPayloads {
      * Request to trigger the "self heal" Soul of Undead ability.
      */
     public record RequestSoulHeal() implements CustomPacketPayload {
-        public static final Type<RequestSoulHeal> TYPE =
+        public static final Type<@NotNull RequestSoulHeal> TYPE =
                 new Type<>(Identifier.fromNamespaceAndPath(NecroCraft.MODID, "request_soul_heal"));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, RequestSoulHeal> STREAM_CODEC =
+        public static final StreamCodec<@NotNull RegistryFriendlyByteBuf, @NotNull RequestSoulHeal> STREAM_CODEC =
                 StreamCodec.unit(new RequestSoulHeal());
 
         @Override
-        public Type<? extends CustomPacketPayload> type() {
+        public @NotNull Type<? extends @NotNull CustomPacketPayload> type() {
             return TYPE;
         }
     }
@@ -39,7 +39,7 @@ public final class SoulAbilityPayloads {
                 StreamCodec.unit(new RequestSoulEmpower());
 
         @Override
-        public Type<@NotNull ? extends CustomPacketPayload> type() {
+        public @NotNull Type<? extends @NotNull CustomPacketPayload> type() {
             return TYPE;
         }
     }

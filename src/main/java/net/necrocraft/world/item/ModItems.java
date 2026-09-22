@@ -7,6 +7,8 @@ import net.necrocraft.world.food.ModFoods;
 import net.necrocraft.world.item.bonus.AbstractBonusItem;
 import net.necrocraft.world.item.bonus.impl.*;
 import net.necrocraft.world.item.bonus.impl.synced.*;
+import net.necrocraft.world.item.book.NecronomiconItem;
+import net.necrocraft.world.item.book.NecronomiconVolume;
 import net.necrocraft.world.item.component.ModConsumables;
 import net.necrocraft.world.item.equipment.NemesisShard;
 import net.necrocraft.world.item.equipment.bone.classic.BoneAxe;
@@ -234,6 +236,11 @@ public class ModItems {
             properties -> properties
                     .rarity(Rarity.UNCOMMON)
                     .fireResistant()
+    );
+
+    public static final DeferredItem<@NotNull Item> NECRONOMICON_1 = register(
+            "necronomicon_volume_1",
+            props -> new NecronomiconItem(NecronomiconVolume.VOLUME_1, props.stacksTo(1))
     );
 
     public static final DeferredItem<@NotNull AbstractBonusItem> TRIAL_VAULT_BONUS_ITEM =

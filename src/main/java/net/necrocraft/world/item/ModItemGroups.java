@@ -3,11 +3,15 @@ package net.necrocraft.world.item;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.necrocraft.core.NecroCraft;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class ModItemGroups {
@@ -84,6 +88,7 @@ public class ModItemGroups {
 
                         output.accept(ModItems.POISONED_BONE_BONUS_ITEM);
                         output.accept(ModItems.WITHERED_BONE_BONUS_ITEM);
+                        output.accept(ModItems.ECHOING_BONE_BONUS_ITEM);
                     }))
                     .build()
     );
@@ -92,9 +97,28 @@ public class ModItemGroups {
             () -> CreativeModeTab.builder()
                     .icon(() -> new ItemStack(ModItems.ECHOING_SPAWN_EGG.get()))
                     .title(Component.translatable("itemGroup.necrocraft.spawn_egg"))
-                    .displayItems(((itemDisplayParameters, output) -> {
+                    .displayItems(((_, output) -> {
                         output.accept(ModItems.ECHOING_SPAWN_EGG);
                     }))
                     .build()
     );
+
+    public static final Supplier<CreativeModeTab> NECROCRAFT_NECRONOMICON = register("necrocraft_necronomicon", ModItems.NECRONOMICON_1, Component.translatable("itemGroup.necrocraft.necronomicon"), new ArrayList<>(List.of(ModItems.NECRONOMICON_1)));
+
+
+    //
+
+
+    private static Supplier<CreativeModeTab> register(String name, DeferredItem<@NotNull Item> icon, Component title, ArrayList<DeferredItem<@NotNull Item>> item){
+        return CREATIVE_MODE_TABS.register(name,
+                () -> CreativeModeTab.builder()
+                        .icon(() -> new ItemStack(icon.get()))
+                        .title(title)
+                        .displayItems(((_, output) -> {
+                            for (DeferredItem<Item> itemOutput : item){
+                                output.accept(itemOutput);
+                            }
+                        }))
+                        .build());
+    }
 }
