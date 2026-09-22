@@ -10,7 +10,6 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -18,104 +17,104 @@ public class ModItemGroups {
     public static DeferredRegister<@NotNull CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, NecroCraft.MODID);
 
-    public static final Supplier<CreativeModeTab> NECROCRAFT_MATERIALS = CREATIVE_MODE_TABS.register("necrocraft_materials",
-            () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModItems.NECROTIC_SHARD.get()))
-                    .title(Component.translatable("itemGroup.necrocraft.materials"))
-                    .displayItems(((itemDisplayParameters, output) -> {
-                        output.accept(ModItems.NECROTIC_SHARD);
-                        output.accept(ModItems.NECROTIC_POWDER);
-                        output.accept(ModItems.NEMESIS_SHARD);
-                        output.accept(ModItems.NECROTIC_APPLE);
+    public static final Supplier<CreativeModeTab> NECROCRAFT_MATERIALS = register(
+            "necrocraft_materials",
+            ModItems.NECROTIC_SHARD,
+            Component.translatable("itemGroup.necrocraft.materials"),
+            List.of(
+                    ModItems.NECROTIC_SHARD,
+                    ModItems.NECROTIC_POWDER,
+                    ModItems.NEMESIS_SHARD,
+                    ModItems.NECROTIC_APPLE,
 
-                        output.accept(ModItems.SOUL_CARVING_TABLE);
-                    }))
-                    .build()
+                    ModItems.SOUL_CARVING_TABLE
+            )
     );
 
-    public static final Supplier<CreativeModeTab> NECROCRAFT_EQUIPMENT = CREATIVE_MODE_TABS.register("necrocraft_equipment",
-            () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModItems.SOUL_TOTEM.get()))
-                    .title(Component.translatable("itemGroup.necrocraft.equipment"))
-                    .displayItems(((itemDisplayParameters, output) -> {
-                        output.accept(ModItems.SOUL_TOTEM);
-                        output.accept(ModItems.OBEDIENCE_SCEPTER);
+    public static final Supplier<CreativeModeTab> NECROCRAFT_EQUIPMENT = register(
+            "necrocraft_equipment",
+            ModItems.SOUL_TOTEM,
+            Component.translatable("itemGroup.necrocraft.equipment"),
+            List.of(
+                    ModItems.SOUL_TOTEM,
+                    ModItems.OBEDIENCE_SCEPTER,
 
-                        output.accept(ModItems.BONE_SWORD);
-                        output.accept(ModItems.BONE_SHOVEL);
-                        output.accept(ModItems.BONE_PICKAXE);
-                        output.accept(ModItems.BONE_AXE);
-                        output.accept(ModItems.BONE_HOE);
+                    ModItems.BONE_SWORD,
+                    ModItems.BONE_SHOVEL,
+                    ModItems.BONE_PICKAXE,
+                    ModItems.BONE_AXE,
+                    ModItems.BONE_HOE,
 
-                        output.accept(ModItems.NETHERIFIED_BONE_SWORD);
-                        output.accept(ModItems.NETHERIFIED_BONE_SHOVEL);
-                        output.accept(ModItems.NETHERIFIED_BONE_PICKAXE);
-                        output.accept(ModItems.NETHERIFIED_BONE_AXE);
-                        output.accept(ModItems.NETHERIFIED_BONE_HOE);
-                    }))
-                    .build()
+                    ModItems.NETHERIFIED_BONE_SWORD,
+                    ModItems.NETHERIFIED_BONE_SHOVEL,
+                    ModItems.NETHERIFIED_BONE_PICKAXE,
+                    ModItems.NETHERIFIED_BONE_AXE,
+                    ModItems.NETHERIFIED_BONE_HOE
+            )
     );
 
-   public static final Supplier<CreativeModeTab> NECROCRAFT_BONUS = CREATIVE_MODE_TABS.register("necrocraft_bonus",
-            () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModItems.SOLID_SKIN_BONUS_ITEM.get()))
-                    .title(Component.translatable("itemGroup.necrocraft.bonus"))
-                    .displayItems(((itemDisplayParameters, output) -> {
-                        output.accept(ModItems.SOLID_SKIN_BONUS_ITEM);
-                        output.accept(ModItems.POST_MORTEM_EXPLOSION_BONUS_ITEM);
-                        output.accept(ModItems.NETHERIFIED_BONE_BONUS_ITEM);
-                        output.accept(ModItems.SOUL_GENERATOR_BONUS_ITEM);
+    public static final Supplier<CreativeModeTab> NECROCRAFT_BONUS = register(
+            "necrocraft_bonus",
+            ModItems.SOLID_SKIN_BONUS_ITEM,
+            Component.translatable("itemGroup.necrocraft.bonus"),
+            List.of(
+                    ModItems.SOLID_SKIN_BONUS_ITEM,
+                    ModItems.POST_MORTEM_EXPLOSION_BONUS_ITEM,
+                    ModItems.NETHERIFIED_BONE_BONUS_ITEM,
+                    ModItems.SOUL_GENERATOR_BONUS_ITEM,
 
-                        output.accept(ModItems.STORAGE_BONUS_ITEM);
-                        output.accept(ModItems.TRIAL_VAULT_BONUS_ITEM);
-                        output.accept(ModItems.CYCLE_OF_NEMESIS_BONUS_ITEM);
+                    ModItems.STORAGE_BONUS_ITEM,
+                    ModItems.TRIAL_VAULT_BONUS_ITEM,
+                    ModItems.CYCLE_OF_NEMESIS_BONUS_ITEM,
 
-                        output.accept(ModItems.HUNTER_BONUS_ITEM);
-                        output.accept(ModItems.FARMER_BONUS_ITEM);
-                        output.accept(ModItems.AUTO_PLANTER_BONUS_ITEM);
-                        output.accept(ModItems.AUTO_TILLER_BONUS_ITEM);
+                    ModItems.HUNTER_BONUS_ITEM,
+                    ModItems.FARMER_BONUS_ITEM,
+                    ModItems.AUTO_PLANTER_BONUS_ITEM,
+                    ModItems.AUTO_TILLER_BONUS_ITEM,
 
-                        output.accept(ModItems.MUMMY_WRAPPING_BONUS_ITEM);
+                    ModItems.MUMMY_WRAPPING_BONUS_ITEM,
 
-                        output.accept(ModItems.DEHYDRATED_ROTTEN_FLESH_BONUS_ITEM);
-                        output.accept(ModItems.CRACKED_HUSK_JAW_BONUS_ITEM);
+                    ModItems.DEHYDRATED_ROTTEN_FLESH_BONUS_ITEM,
+                    ModItems.CRACKED_HUSK_JAW_BONUS_ITEM,
 
-                        output.accept(ModItems.TRIDENT_SHARD_BONUS_ITEM);
-                        output.accept(ModItems.ZOMBIE_NAUTILUS_SHELL_BONUS_ITEM);
+                    ModItems.TRIDENT_SHARD_BONUS_ITEM,
+                    ModItems.ZOMBIE_NAUTILUS_SHELL_BONUS_ITEM,
 
-                        output.accept(ModItems.STRAY_CAPE_BONUS_ITEM);
-                        output.accept(ModItems.FROSTY_BONE_BONUS_ITEM);
+                    ModItems.STRAY_CAPE_BONUS_ITEM,
+                    ModItems.FROSTY_BONE_BONUS_ITEM,
 
-                        output.accept(ModItems.POISONED_BONE_BONUS_ITEM);
-                        output.accept(ModItems.WITHERED_BONE_BONUS_ITEM);
-                        output.accept(ModItems.ECHOING_BONE_BONUS_ITEM);
-                    }))
-                    .build()
+                    ModItems.POISONED_BONE_BONUS_ITEM,
+                    ModItems.WITHERED_BONE_BONUS_ITEM,
+                    ModItems.ECHOING_BONE_BONUS_ITEM
+            )
     );
 
-    public static final Supplier<CreativeModeTab> NECROCRAFT_SPAWN_EGG = CREATIVE_MODE_TABS.register("necrocraft_spawn_egg",
-            () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModItems.ECHOING_SPAWN_EGG.get()))
-                    .title(Component.translatable("itemGroup.necrocraft.spawn_egg"))
-                    .displayItems(((_, output) -> {
-                        output.accept(ModItems.ECHOING_SPAWN_EGG);
-                    }))
-                    .build()
+    public static final Supplier<CreativeModeTab> NECROCRAFT_SPAWN_EGG = register(
+            "necrocraft_spawn_egg",
+            ModItems.ECHOING_SPAWN_EGG,
+            Component.translatable("itemGroup.necrocraft.spawn_egg"),
+            List.of(
+                    ModItems.ECHOING_SPAWN_EGG
+            )
     );
 
-    public static final Supplier<CreativeModeTab> NECROCRAFT_NECRONOMICON = register("necrocraft_necronomicon", ModItems.NECRONOMICON_1, Component.translatable("itemGroup.necrocraft.necronomicon"), new ArrayList<>(List.of(ModItems.NECRONOMICON_1)));
+    public static final Supplier<CreativeModeTab> NECROCRAFT_NECRONOMICON = register(
+            "necrocraft_necronomicon",
+            ModItems.NECRONOMICON_1,
+            Component.translatable("itemGroup.necrocraft.necronomicon"),
+            List.of(
+                    ModItems.NECRONOMICON_1
+            )
+    );
 
 
-    //
-
-
-    private static Supplier<CreativeModeTab> register(String name, DeferredItem<@NotNull Item> icon, Component title, ArrayList<DeferredItem<@NotNull Item>> item){
+    private static Supplier<CreativeModeTab> register(String name, DeferredItem<? extends @NotNull Item> icon, Component title, List<DeferredItem<? extends @NotNull Item>> items) {
         return CREATIVE_MODE_TABS.register(name,
                 () -> CreativeModeTab.builder()
                         .icon(() -> new ItemStack(icon.get()))
                         .title(title)
                         .displayItems(((_, output) -> {
-                            for (DeferredItem<Item> itemOutput : item){
+                            for (DeferredItem<? extends @NotNull Item> itemOutput : items) {
                                 output.accept(itemOutput);
                             }
                         }))
