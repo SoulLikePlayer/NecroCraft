@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.necrocraft.client.NecronomiconClientHooks;
+import org.jetbrains.annotations.NotNull;
 
 public class NecronomiconItem extends Item {
     private final NecronomiconVolume volume;
@@ -21,7 +22,7 @@ public class NecronomiconItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public @NotNull InteractionResult use(Level level, @NotNull Player player, @NotNull InteractionHand hand) {
         if (level.isClientSide()) {
             NecronomiconClientHooks.openBook(this.volume);
         }

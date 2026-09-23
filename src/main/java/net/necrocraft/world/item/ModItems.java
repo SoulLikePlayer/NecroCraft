@@ -29,8 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public class ModItems {
-
+public class ModItems{
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(NecroCraft.MODID);
 

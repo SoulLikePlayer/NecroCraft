@@ -56,13 +56,6 @@
         }
       ],
       "rolls": 1.0
-    },
-    {
-      "conditions": [
-        {
-          "condition": "minecraft:killed_by_player"
-        }
-      ]
     }
   ],
   "random_sequence": "necrocraft:entities/echoing"
