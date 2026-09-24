@@ -1,9 +1,11 @@
 package net.necrocraft.world.entity.minion.impl;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
@@ -14,6 +16,7 @@ import net.necrocraft.world.entity.minion.registry.MinionEvolution;
 import net.necrocraft.world.entity.minion.registry.MinionEvolutions;
 import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A tamed minion variant of the vanilla {@code Zombie}, reusing the
@@ -27,6 +30,11 @@ public class ZombieMinion extends AbstractMinion {
      */
     public ZombieMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
         super(type, level);
+    }
+
+    @Override
+    public @Nullable Holder<@NotNull MobEffect> getMinionEffect() {
+        return null;
     }
 
     /** @return the ambient sound played while the minion is idle */

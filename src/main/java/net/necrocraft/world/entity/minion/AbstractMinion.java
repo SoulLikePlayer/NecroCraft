@@ -1,6 +1,7 @@
 package net.necrocraft.world.entity.minion;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -8,14 +9,21 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.*;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -30,7 +38,6 @@ import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.necrocraft.core.ModAttachments;
-import net.necrocraft.core.NecroCraft;
 import net.necrocraft.util.AdvancementUtil;
 import net.necrocraft.world.entity.ai.goal.*;
 import net.necrocraft.world.entity.ai.goal.farmer.FarmCropsGoal;
@@ -48,6 +55,8 @@ import net.necrocraft.world.item.bonus.BonusUtil;
 import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.Items;
 
 import java.util.*;
 
@@ -68,21 +77,16 @@ import java.util.*;
  * {@link Container} implementation backing the minion's inventory, and
  * finally player interaction.
  */
-public class AbstractMinion extends PathfinderMob implements OwnableEntity, Container, ContainerUser {
+public abstract class AbstractMinion extends PathfinderMob implements OwnableEntity, Container, ContainerUser, RangedAttackMob {
+
     public static final ArrayList<DeferredItem<@NotNull AbstractBonusItem>> SYNCED_BONUS = new ArrayList<>();
 
-    /**
-     * Squared distance to the owner beyond which the minion attempts to teleport to them.
-     */
-    public static final int TELEPORT_WHEN_DISTANCE_IS_SQ = 144;
     /**
      * Synced reference to the living entity that owns/summoned this minion, if any.
      */
     protected static final EntityDataAccessor<@NotNull Optional<EntityReference<@NotNull LivingEntity>>> DATA_SUMMONER_UUID_ID =
             SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
-    private static final int MIN_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 2;
-    private static final int MAX_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 3;
-    private static final int MAX_VERTICAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING = 1;
+
     private static final int INVENTORY_SIZE = 27;
     /**
      * The minion's own carried inventory.
@@ -172,7 +176,16 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
     protected void registerGoals() {
         super.registerGoals();
 
-        this.goalSelector.addGoal(1, new GatedGoal(new MeleeAttackGoal(this, 1.0D, true), () -> !this.isSedentary()));
+        this.goalSelector.addGoal(1, new GatedGoal(
+                new MeleeAttackGoal(this, 1.0D, true),
+                () -> !this.isSedentary() && this.isHoldingWeapon().equals(WeaponType.MELEE)));
+        this.goalSelector.addGoal(1, new GatedGoal(
+                new RangedBowAttackGoal<>(this, 1.0D, 20, 15.0F),
+                () -> !this.isSedentary() && this.isHoldingWeapon().equals(WeaponType.RANGED)));
+        this.goalSelector.addGoal(1, new GatedGoal(
+                new MinionSpearUseGoal<>(this, 1.0F, 1.0F, 10.0F, 2.0F),
+                () -> !this.isSedentary() && this.isHoldingWeapon().equals(WeaponType.SPEAR)));
+
         this.goalSelector.addGoal(2, new FarmCropsGoal(this, 1.0D, 6));
         this.goalSelector.addGoal(3, new GatedGoal(new PlantSeedsGoal(this, 1.0D, 6), this::canAutoPlant));
         this.goalSelector.addGoal(4, new GatedGoal(new TillFarmlandGoal(this, 1.0D, 6), this::canAutoTill));
@@ -185,6 +198,48 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         this.targetSelector.addGoal(1, new GatedGoal(new SummonerHurtByTargetGoal(this), () -> !this.isSedentary()));
         this.targetSelector.addGoal(2, new GatedGoal(new SummonerHurtTargetGoal(this), () -> !this.isSedentary()));
         this.targetSelector.addGoal(3, new GatedGoal(new HuntPreyGoal(this, 16.0F), () -> !this.isSedentary()));
+    }
+
+    /**
+     * @return {@code true} if the minion is currently holding a bow in its main hand
+     */
+    public WeaponType isHoldingWeapon() {
+        if(this.getMainHandItem().is(Items.BOW)) {
+            return WeaponType.RANGED;
+        }
+
+        if(this.getMainHandItem().is(ItemTags.SPEARS)){
+            return WeaponType.SPEAR;
+        }
+        return WeaponType.MELEE;
+    }
+
+    /**
+     * Fires an arrow at {@code target}, scaled by the given distance factor
+     * (mirrors vanilla {@code AbstractSkeleton#performRangedAttack}).
+     */
+    @Override
+    public void performRangedAttack(@NotNull LivingEntity target, float power) {
+        ItemStack bow = this.getMainHandItem();
+        if (!bow.is(Items.BOW)) {
+            return;
+        }
+
+        ItemStack bowItem = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, (item) -> item instanceof BowItem));
+        ItemStack projectile = this.getProjectile(bowItem);
+
+        AbstractArrow arrow = this.applyArrowEffect(projectile, power, bowItem);
+
+        double dx = target.getX() - this.getX();
+        double dy = target.getY(0.3333333333333333) - arrow.getY();
+        double dz = target.getZ() - this.getZ();
+        double horizontalDist = Math.sqrt(dx * dx + dz * dz);
+        arrow.shoot(dx, dy + horizontalDist * 0.20000000298023224, dz,
+                1.6F, (float) (14 - this.level().getDifficulty().getId() * 4));
+
+        this.playSound(SoundEvents.SKELETON_SHOOT, 1.0F,
+                1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
+        this.level().addFreshEntity(arrow);
     }
 
 
@@ -319,25 +374,18 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
             }
         }
     }
-
     /**
      * @return {@code true} if the minion has an owner, is not sedentary, is
      * not {@link #getNemesis() corrupted}, is not {@link #getWandering()
-     * wandering}, and is at least {@link #TELEPORT_WHEN_DISTANCE_IS_SQ}
-     * (squared blocks) away from them
+     * wandering}
      */
     public boolean shouldTryTeleportToOwner() {
         LivingEntity owner = this.getOwner();
         return owner != null && !this.isSedentary() && !this.getNemesis() && !this.getWandering()
                 && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
     }
-
     /**
-     * Tries up to 10 random offsets around {@code targetPos} (within
-     * {@link #MIN_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING} to
-     * {@link #MAX_HORIZONTAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING} blocks
-     * horizontally and {@link #MAX_VERTICAL_DISTANCE_FROM_TARGET_AFTER_TELEPORTING}
-     * blocks vertically) and teleports to the first valid one found.
+     * Tries up to 10 random offsets around {@code targetPos} and teleports to the first valid one found.
      *
      * @param targetPos the position to teleport around (typically the owner's position)
      * @return {@code true} if a valid position was found and the teleport happened
@@ -622,7 +670,24 @@ public class AbstractMinion extends PathfinderMob implements OwnableEntity, Cont
         return super.doHurtTarget(level, target);
     }
 
-    protected void applyHurtEffect(@NotNull Entity target) {}
+    protected void applyHurtEffect(@NotNull Entity target) {
+        if(getMinionEffect() != null) {
+            Objects.requireNonNull(target.asLivingEntity())
+                    .addEffect(new MobEffectInstance(getMinionEffect(), 200, 0, true, true, true));
+        }
+    }
+
+    public abstract @Nullable Holder<@NotNull MobEffect> getMinionEffect();
+
+    protected AbstractArrow applyArrowEffect(ItemStack projectile, float power, @Nullable ItemStack firingWeapon){
+        AbstractArrow arrow = ProjectileUtil.getMobArrow(this, projectile, power, firingWeapon);
+        if (arrow instanceof Arrow arrow2 && getMinionEffect() != null) {
+            arrow2.addEffect(new MobEffectInstance(getMinionEffect(), 600));
+        }
+
+        return arrow;
+    }
+
     protected void applyTickEffect(){}
 
     /**

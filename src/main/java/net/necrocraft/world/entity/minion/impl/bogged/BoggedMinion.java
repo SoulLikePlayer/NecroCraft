@@ -1,11 +1,12 @@
 package net.necrocraft.world.entity.minion.impl.bogged;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -15,8 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.necrocraft.world.entity.minion.impl.SkeletonMinion;
 import net.necrocraft.world.item.ModItems;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 public class BoggedMinion extends SkeletonMinion {
 
@@ -30,6 +30,11 @@ public class BoggedMinion extends SkeletonMinion {
      */
     public BoggedMinion(EntityType<? extends @NotNull PathfinderMob> type, Level level) {
         super(type, level);
+    }
+
+    @Override
+    public @Nullable Holder<@NotNull MobEffect> getMinionEffect() {
+        return MobEffects.POISON;
     }
 
     /** @return the ambient sound played while the minion is idle */
@@ -63,22 +68,5 @@ public class BoggedMinion extends SkeletonMinion {
      */
     protected void playStepSound(@NotNull BlockPos pos, @NotNull BlockState blockState) {
         this.playSound(this.getStepSound(), 0.15F, 1.0F);
-    }
-
-    /**
-     * Minion's logic at what happen when he hurt
-     *
-     * @param level the level the minion is created in
-     * @param target the entity the minion hurt
-     * @return if everithing works
-     */
-    @Override
-    public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
-        return super.doHurtTarget(level, target);
-    }
-
-    protected void applyHurtEffect(@NotNull Entity target) {
-        Objects.requireNonNull(target.asLivingEntity())
-                .addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0, true, true, true));
     }
 }
