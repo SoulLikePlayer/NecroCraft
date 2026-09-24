@@ -68,14 +68,10 @@ import java.util.*;
  * ability to teleport back to its owner when left too far behind.
  * <p>
  * Concrete subclasses (e.g. {@link ZombieMinion}, {@link SkeletonMinion})
- * only need to supply mob-specific sounds & specific behavior; all shared behavior (goals,
- * inventory, ownership, persistence) lives here.
+ * only need to supply mob-specific sounds & specific behavior; all shared
+ * behavior (goals, inventory, ownership, persistence) lives here.
  * <p>
- * Class layout, top to bottom: constants/fields, construction, AI goals,
- * synced data, persistence, ownership, teleportation, container interaction
- * (chest UI tracking), the bonus-trigger system, combat/lifecycle, the
- * {@link Container} implementation backing the minion's inventory, and
- * finally player interaction.
+ *
  */
 public abstract class AbstractMinion extends PathfinderMob implements OwnableEntity, Container, ContainerUser, RangedAttackMob {
 
@@ -87,17 +83,37 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
     protected static final EntityDataAccessor<@NotNull Optional<EntityReference<@NotNull LivingEntity>>> DATA_SUMMONER_UUID_ID =
             SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
+    /**
+     * Synced flag: whether this minion has been corrupted by a {@link net.necrocraft.world.item.equipment.NemesisShard}.
+     * Kept in {@link SynchedEntityData} (rather than a plain field) so the client
+     * picks up the change immediately, e.g. to swap render textures in real time.
+     */
+    protected static final EntityDataAccessor<@NotNull Boolean> DATA_NEMESIS_ID =
+            SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.BOOLEAN);
+
     private static final int INVENTORY_SIZE = 27;
+
+    /** Chance for a non-corrupted minion to drop a single {@link ModItems#NEMESIS_SHARD} on death. */
+    private static final float NEMESIS_SHARD_DROP_CHANCE = 0.15F;
+
+    /** Maximum number of {@link ModItems#NEMESIS_SHARD} a corrupted ({@link #getNemesis()}) minion can drop on death. */
+    private static final int MAX_NEMESIS_SHARD_DROPS = 5;
+
     /**
      * The minion's own carried inventory.
      */
     private final NonNullList<@NotNull ItemStack> inventoryItems = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
+
+    /** Server tick at which this minion last dealt or received damage. */
     public int lastCombatTick = 0;
+
     /**
      * Identifiers of the bonus items currently equipped on this minion, driving its optional behaviors.
      */
     private List<Identifier> bonuses = new ArrayList<>();
+
     private boolean isSedentary;
+
     /**
      * Whether this minion has been ordered to wander freely: like
      * {@link #isSedentary()}, it will neither follow nor teleport back to
@@ -106,23 +122,11 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
      * (setting one clears the other).
      */
     private boolean isWandering;
+
     /**
      * Position of the container currently visually opened by this minion, if any (see {@link StoreItemsInContainerGoal}).
      */
     private @Nullable BlockPos openedChestPos;
-
-    /**
-     * Synced flag: whether this minion has been corrupted by a {@link net.necrocraft.world.item.equipment.NemesisShard}.
-     * Kept in {@link SynchedEntityData} (rather than a plain field) so the client
-     * picks up the change immediately, e.g. to swap render textures in real time.
-     */
-    protected static final EntityDataAccessor<Boolean> DATA_NEMESIS_ID =
-            SynchedEntityData.defineId(AbstractMinion.class, EntityDataSerializers.BOOLEAN);
-    /** Chance for a non-corrupted minion to drop a single {@link ModItems#NEMESIS_SHARD} on death. */
-    private static final float NEMESIS_SHARD_DROP_CHANCE = 0.15F;
-    /** Maximum number of {@link ModItems#NEMESIS_SHARD} a corrupted ({@link #getNemesis()}) minion can drop on death. */
-    private static final int MAX_NEMESIS_SHARD_DROPS = 5;
-
 
     /**
      * @param type  the entity type this minion is instantiated from
@@ -201,14 +205,16 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
     }
 
     /**
-     * @return {@code true} if the minion is currently holding a bow in its main hand
+     * @return the type of weapon currently held in the minion's main hand
+     * ({@link WeaponType#RANGED} for a bow, {@link WeaponType#SPEAR} for a
+     * spear, {@link WeaponType#MELEE} otherwise)
      */
     public WeaponType isHoldingWeapon() {
-        if(this.getMainHandItem().is(Items.BOW)) {
+        if (this.getMainHandItem().is(Items.BOW)) {
             return WeaponType.RANGED;
         }
 
-        if(this.getMainHandItem().is(ItemTags.SPEARS)){
+        if (this.getMainHandItem().is(ItemTags.SPEARS)) {
             return WeaponType.SPEAR;
         }
         return WeaponType.MELEE;
@@ -242,7 +248,6 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         this.level().addFreshEntity(arrow);
     }
 
-
     /**
      * Defines all the data that is synced at the creation of the mob.
      *
@@ -254,7 +259,6 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         entityData.define(DATA_SUMMONER_UUID_ID, Optional.empty());
         entityData.define(DATA_NEMESIS_ID, false);
     }
-
 
     /**
      * Writes this minion's owner reference, bonus list and inventory contents
@@ -272,38 +276,6 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         output.putBoolean("isSedentary", this.getSedentary());
         output.putBoolean("isWandering", this.getWandering());
         ContainerHelper.saveAllItems(output, this.inventoryItems);
-    }
-
-    public boolean getSedentary() {
-        return this.isSedentary;
-    }
-
-    /**
-     * @param newSedentary the new sedentary state; setting it to {@code true}
-     *                      clears {@link #isWandering} since the two states
-     *                      are mutually exclusive
-     */
-    public void setSedentary(boolean newSedentary){
-        this.isSedentary = newSedentary;
-        if (newSedentary) {
-            this.isWandering = false;
-        }
-    }
-
-    public boolean getWandering() {
-        return this.isWandering;
-    }
-
-    /**
-     * @param newWandering the new wandering state; setting it to {@code true}
-     *                      clears {@link #isSedentary} since the two states
-     *                      are mutually exclusive
-     */
-    public void setWandering(boolean newWandering){
-        this.isWandering = newWandering;
-        if (newWandering) {
-            this.isSedentary = false;
-        }
     }
 
     /**
@@ -327,6 +299,60 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         ContainerHelper.loadAllItems(input, this.inventoryItems);
     }
 
+    /**
+     * @return the raw sedentary flag set on this minion, ignoring any
+     * sedentary bonus (see {@link #isSedentary()} for the effective value)
+     */
+    public boolean getSedentary() {
+        return this.isSedentary;
+    }
+
+    /**
+     * @param newSedentary the new sedentary state; setting it to {@code true}
+     *                      clears {@link #isWandering} since the two states
+     *                      are mutually exclusive
+     */
+    public void setSedentary(boolean newSedentary) {
+        this.isSedentary = newSedentary;
+        if (newSedentary) {
+            this.isWandering = false;
+        }
+    }
+
+    /**
+     * @return {@code true} if this minion has been ordered to wander freely
+     */
+    public boolean getWandering() {
+        return this.isWandering;
+    }
+
+    /**
+     * @param newWandering the new wandering state; setting it to {@code true}
+     *                      clears {@link #isSedentary} since the two states
+     *                      are mutually exclusive
+     */
+    public void setWandering(boolean newWandering) {
+        this.isWandering = newWandering;
+        if (newWandering) {
+            this.isSedentary = false;
+        }
+    }
+
+    /**
+     * @return {@code true} if any equipped bonus marks this minion as
+     * sedentary (disabling combat/following goals in favor of
+     * stationary farming behavior)
+     */
+    public boolean isSedentary() {
+        for (Identifier bonusId : this.bonuses) {
+            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
+            if (bonus.isPresent() && bonus.get().isSedentary()) {
+                return true;
+            }
+        }
+
+        return getSedentary();
+    }
 
     /**
      * @return the synced reference to this minion's owner, or {@code null} if it has none
@@ -358,7 +384,6 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         }
     }
 
-
     /**
      * Attempts to teleport this minion to a random walkable position near
      * its owner. Does nothing if the minion has no owner. Fires
@@ -374,16 +399,18 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
             }
         }
     }
+
     /**
      * @return {@code true} if the minion has an owner, is not sedentary, is
      * not {@link #getNemesis() corrupted}, is not {@link #getWandering()
-     * wandering}
+     * wandering}, and is far enough (12+ blocks) from its owner to warrant teleporting
      */
     public boolean shouldTryTeleportToOwner() {
         LivingEntity owner = this.getOwner();
         return owner != null && !this.isSedentary() && !this.getNemesis() && !this.getWandering()
                 && this.distanceToSqr(this.getOwner()) >= (double) 144.0F;
     }
+
     /**
      * Tries up to 10 random offsets around {@code targetPos} and teleports to the first valid one found.
      *
@@ -463,7 +490,6 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         return false;
     }
 
-
     /**
      * @param openedChestPos the position of the container this minion is
      *                       currently visually opening, or {@code null} to clear it
@@ -526,17 +552,20 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
     }
 
     /**
-     * Aggregates the huntable entity types contributed by all of this
-     * minion's equipped bonuses.
+     * Unequips a single bonus item from this minion.
      *
-     * @return the combined set of entity types this minion may hunt
+     * @param bonusId the identifier of the bonus item to remove
      */
-    public @NotNull Set<EntityType<?>> getHuntableTargets() {
-        Set<EntityType<?>> targets = new HashSet<>();
-        for (Identifier bonusId : this.bonuses) {
-            BonusUtil.resolve(bonusId).ifPresent(bonus -> targets.addAll(bonus.getHuntableTargets()));
-        }
-        return targets;
+    public void removeBonus(@NotNull Identifier bonusId) {
+        this.bonuses.remove(bonusId);
+    }
+
+    /**
+     * @param bonusId the bonus item identifier to look for
+     * @return {@code true} if this minion currently has {@code bonusId} equipped
+     */
+    public boolean hasBonus(@NotNull Identifier bonusId) {
+        return this.bonuses.contains(bonusId);
     }
 
     /**
@@ -553,24 +582,18 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         return false;
     }
 
-    public boolean hasBonus(@NotNull Identifier bonusId) {
-        return this.bonuses.contains(bonusId);
-    }
-
     /**
-     * @return {@code true} if any equipped bonus marks this minion as
-     * sedentary (disabling combat/following goals in favor of
-     * stationary farming behavior)
+     * Aggregates the huntable entity types contributed by all of this
+     * minion's equipped bonuses.
+     *
+     * @return the combined set of entity types this minion may hunt
      */
-    public boolean isSedentary() {
+    public @NotNull Set<EntityType<?>> getHuntableTargets() {
+        Set<EntityType<?>> targets = new HashSet<>();
         for (Identifier bonusId : this.bonuses) {
-            Optional<AbstractBonusItem> bonus = BonusUtil.resolve(bonusId);
-            if (bonus.isPresent() && bonus.get().isSedentary()) {
-                return true;
-            }
+            BonusUtil.resolve(bonusId).ifPresent(bonus -> targets.addAll(bonus.getHuntableTargets()));
         }
-
-        return getSedentary();
+        return targets;
     }
 
     /**
@@ -648,11 +671,38 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         }
     }
 
+    /**
+     * @return the bonus items this concrete minion type treats as "synced"
+     * for the purposes of {@link #fireSyncedTrigger(BonusTrigger)};
+     * defaults to {@link #SYNCED_BONUS}, overridable per subclass
+     */
     public ArrayList<DeferredItem<@NotNull AbstractBonusItem>> getSyncedBonusItem() {
         return SYNCED_BONUS;
     }
 
+    /**
+     * @return {@code true} if this minion has been corrupted by a {@link net.necrocraft.world.item.equipment.NemesisShard}
+     */
+    public boolean getNemesis() {
+        return this.entityData.get(DATA_NEMESIS_ID);
+    }
 
+    /**
+     * @param newNemesis the new corruption state
+     */
+    public void setNemesis(boolean newNemesis) {
+        this.entityData.set(DATA_NEMESIS_ID, newNemesis);
+    }
+
+    /**
+     * Records the combat tick and fires {@link BonusTrigger#ON_HIT} whenever
+     * this minion takes damage.
+     *
+     * @param level  the server level the damage occurred in
+     * @param source the source of the damage
+     * @param damage the amount of damage dealt
+     * @return {@code true} if the damage was actually applied (delegates to vanilla behavior)
+     */
     @Override
     public boolean hurtServer(@NotNull ServerLevel level, @NotNull DamageSource source, float damage) {
         this.lastCombatTick = this.tickCount;
@@ -661,6 +711,15 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         return super.hurtServer(level, source, damage);
     }
 
+    /**
+     * Records the combat tick, applies this minion's on-hit effect (see
+     * {@link #getMinionEffect()}) to the target, and fires
+     * {@link BonusTrigger#ON_DAMAGE} whenever this minion deals damage.
+     *
+     * @param level  the server level the attack occurred in
+     * @param target the entity being attacked
+     * @return {@code true} if the attack landed (delegates to vanilla behavior)
+     */
     @Override
     public boolean doHurtTarget(@NotNull ServerLevel level, @NotNull Entity target) {
         this.lastCombatTick = this.tickCount;
@@ -670,16 +729,35 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         return super.doHurtTarget(level, target);
     }
 
+    /**
+     * Applies this minion's {@link #getMinionEffect()} (if any) to a melee target on hit.
+     *
+     * @param target the entity that was just melee-attacked
+     */
     protected void applyHurtEffect(@NotNull Entity target) {
-        if(getMinionEffect() != null) {
+        if (getMinionEffect() != null) {
             Objects.requireNonNull(target.asLivingEntity())
                     .addEffect(new MobEffectInstance(getMinionEffect(), 200, 0, true, true, true));
         }
     }
 
+    /**
+     * @return the status effect this minion's melee hits and arrows should
+     * inflict on their target, or {@code null} for none; defined per concrete minion type
+     */
     public abstract @Nullable Holder<@NotNull MobEffect> getMinionEffect();
 
-    protected AbstractArrow applyArrowEffect(ItemStack projectile, float power, @Nullable ItemStack firingWeapon){
+    /**
+     * Builds an arrow for {@link #performRangedAttack(LivingEntity, float)},
+     * applying this minion's {@link #getMinionEffect()} to it when it is a
+     * regular {@link Arrow}.
+     *
+     * @param projectile   the arrow item stack to shoot
+     * @param power        the shot power
+     * @param firingWeapon the bow used to fire the arrow
+     * @return the arrow entity to shoot, with the minion's effect applied if applicable
+     */
+    protected AbstractArrow applyArrowEffect(ItemStack projectile, float power, @Nullable ItemStack firingWeapon) {
         AbstractArrow arrow = ProjectileUtil.getMobArrow(this, projectile, power, firingWeapon);
         if (arrow instanceof Arrow arrow2 && getMinionEffect() != null) {
             arrow2.addEffect(new MobEffectInstance(getMinionEffect(), 600));
@@ -688,7 +766,12 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         return arrow;
     }
 
-    protected void applyTickEffect(){}
+    /**
+     * Hook called once per server tick (see {@link #tick()}) for subclasses
+     * to apply their own passive per-tick effects. No-op by default.
+     */
+    protected void applyTickEffect() {
+    }
 
     /**
      * Fires {@link BonusTrigger#ON_KILL} whenever this minion lands the
@@ -696,6 +779,8 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
      *
      * @param level  the server level the kill occurred in
      * @param entity the entity that was killed
+     * @param source the source of the killing blow
+     * @return {@code true} if the kill was processed (delegates to vanilla behavior)
      */
     @Override
     public boolean killedEntity(@NotNull ServerLevel level, @NotNull LivingEntity entity, @NotNull DamageSource source) {
@@ -705,6 +790,10 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         return super.killedEntity(level, entity, source);
     }
 
+    /**
+     * Server-side per-tick update: fires {@link BonusTrigger#ON_TICK} on
+     * equipped bonuses and runs {@link #applyTickEffect()}.
+     */
     @Override
     public void tick() {
         super.tick();
@@ -737,7 +826,7 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
             dropItems();
             dropNemesisShards();
 
-            if(this.getNemesis() && damageSource.getEntity() instanceof ServerPlayer player && isSummonedBy(player)){
+            if (this.getNemesis() && damageSource.getEntity() instanceof ServerPlayer player && isSummonedBy(player)) {
                 AdvancementUtil.grant(player, "put_it_down");
             }
         }
@@ -762,8 +851,10 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
         }
     }
 
-
-    public void dropItems(){
+    /**
+     * Drops this minion's entire carried inventory on the ground.
+     */
+    public void dropItems() {
         Containers.dropContents(this.level(), this, this);
     }
 
@@ -1028,24 +1119,10 @@ public abstract class AbstractMinion extends PathfinderMob implements OwnableEnt
     }
 
     /**
-     * The minion can resist to the fire with some bonus
-     *
-     * @return true if the minion have some bonus
+     * @return {@code true} if this minion is equipped with a bonus granting fire immunity
      */
     @Override
     public boolean fireImmune() {
         return bonuses.contains(ModItems.NETHERIFIED_BONE_BONUS_ITEM.getId());
-    }
-
-    public boolean getNemesis(){
-        return this.entityData.get(DATA_NEMESIS_ID);
-    }
-
-    public void setNemesis(boolean newNemesis){
-        this.entityData.set(DATA_NEMESIS_ID, newNemesis);
-    }
-
-    public void removeBonus(@NotNull Identifier bonusId) {
-        this.bonuses.remove(bonusId);
     }
 }
