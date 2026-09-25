@@ -68,6 +68,7 @@ public class ModItemGroups {
                     ModItems.CYCLE_OF_NEMESIS_BONUS_ITEM,
 
                     ModItems.HUNTER_BONUS_ITEM,
+                    ModItems.SLAYER_BONUS_ITEM,
                     ModItems.FARMER_BONUS_ITEM,
                     ModItems.AUTO_PLANTER_BONUS_ITEM,
                     ModItems.AUTO_TILLER_BONUS_ITEM,

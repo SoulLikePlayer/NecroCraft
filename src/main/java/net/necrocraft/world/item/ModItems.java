@@ -167,6 +167,9 @@ public class ModItems{
     public static final DeferredItem<@NotNull AbstractBonusItem> HUNTER_BONUS_ITEM =
             registerBonus("hunter_bonus_item", HunterBonusItem::new);
 
+    public static final DeferredItem<@NotNull AbstractBonusItem> SLAYER_BONUS_ITEM =
+            registerBonus("slayer_bonus_item", SlayerBonusItem::new);
+
     public static final DeferredItem<@NotNull AbstractBonusItem> FARMER_BONUS_ITEM =
             registerBonus("farmer_bonus_item", FarmerBonusItem::new);
 

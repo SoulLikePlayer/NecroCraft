@@ -12,13 +12,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class HunterBonusItem extends AbstractBonusItem {
+public class SlayerBonusItem extends AbstractBonusItem {
 
     private static final Set<EntityType<?>> HUNTABLE = BuiltInRegistries.ENTITY_TYPE.stream()
-            .filter(type -> type.getCategory() == MobCategory.CREATURE)
+            .filter(type -> type.getCategory() == MobCategory.MONSTER)
             .collect(Collectors.toUnmodifiableSet());
 
-    public HunterBonusItem(Properties properties) {
+    public SlayerBonusItem(Properties properties) {
         super(properties);
     }
 
